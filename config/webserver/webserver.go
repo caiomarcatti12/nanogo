@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"sync"
 
 	"github.com/codelesshub/nanogo/config/log"
 	"github.com/gorilla/mux"
@@ -11,19 +12,40 @@ import (
 
 type WebServer struct {
 	router *mux.Router
+	port   string
 }
 
-func NewWebServer() *WebServer {
-	ws := &WebServer{
-		router: mux.NewRouter(),
-	}
-	ws.AddRouter("/healthcheck", WebServerRouter())
+var (
+	once sync.Once
+	ws   *WebServer
+)
+
+func getWebServerInstance() *WebServer {
+	once.Do(func() {
+		router := mux.NewRouter()
+		port := getPortWebServer()
+
+		ws = &WebServer{
+			router: router,
+			port:   port,
+		}
+
+		ws.router.Use(CorrelationIDMiddleware)
+	})
+
 	return ws
 }
 
-func (ws *WebServer) AddRouter(path string, router *mux.Router) {
-	router.Use(CorrelationIDMiddleware)
-	ws.router.PathPrefix(path).Handler(router)
+func NewWebServer() *WebServer {
+	ws := getWebServerInstance()
+
+	WebserverDefaultRouter()
+
+	return ws
+}
+
+func AddRouter(method string, path string, f func(http.ResponseWriter, *http.Request)) {
+	getWebServerInstance().router.HandleFunc(path, f).Methods(method)
 }
 
 func (ws *WebServer) Start() {

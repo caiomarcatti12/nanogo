@@ -10,13 +10,6 @@ func main() {
 	env.LoadEnv()
 
 	server := webserver.NewWebServer()
-
-	//caso desejar utilizar outras rotas
-	//runRouter := config.WebServerRouter()
-	//server.AddRouter("/run", runRouter)
-	//
-	//otherRouter := outras_rotas.OutrasRotasRouter()
-	//server.AddRouter("/", otherRouter)
-
+	//webserver.AddRouter("GET", "/test", controller.HealthcheckHandler)
 	server.Start()
 }
