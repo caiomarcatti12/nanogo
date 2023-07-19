@@ -14,19 +14,20 @@ type WebServer struct {
 }
 
 func NewWebServer() *WebServer {
-	return &WebServer{
+	ws := &WebServer{
 		router: mux.NewRouter(),
 	}
+	ws.AddRouter("/healthcheck", WebServerRouter())
+	return ws
 }
 
 func (ws *WebServer) AddRouter(path string, router *mux.Router) {
+	router.Use(CorrelationIDMiddleware)
 	ws.router.PathPrefix(path).Handler(router)
 }
 
 func (ws *WebServer) Start() {
 	port := getPortWebServer()
-
-	ws.AddRouter("/", WebServerRouter())
 
 	fmt.Printf("Servidor iniciado em localhost:%s\n", port)
 

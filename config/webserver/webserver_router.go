@@ -8,9 +8,8 @@ import (
 
 func WebServerRouter() *mux.Router {
 	router := mux.NewRouter()
-	router.Use(CorrelationIDMiddleware)
 
-	router.HandleFunc("/healthcheck", controller.HealthcheckHandler).Methods("GET")
+	router.HandleFunc("/", controller.HealthcheckHandler).Methods("GET")
 
 	return router
 }
