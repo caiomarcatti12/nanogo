@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
@@ -19,7 +21,6 @@ func LoadEnv() {
 
 	logrus.Info("Carregamento do arquivo .env realizado")
 }
-
 func LoadRemoteEnv() {
 	cloudPropertiesHost := GetEnv("CLOUD_PROPERTIES_HOST")
 	appName := GetEnv("APP_NAME")
@@ -57,6 +58,8 @@ func LoadRemoteEnv() {
 			return
 		}
 	}
+
+	autoRefresh()
 }
 
 func GetEnv(variable string, default_ ...string) string {
@@ -70,4 +73,20 @@ func GetEnv(variable string, default_ ...string) string {
 	}
 
 	return value
+}
+
+func autoRefresh() {
+	refreshTime := GetEnv("ENV_REFRESH_TIME", "1")
+	refreshInterval, err := strconv.Atoi(refreshTime)
+
+	if err != nil {
+		logrus.Fatal("ENV_REFRESH_TIME deve ser um número inteiro")
+	}
+
+	ticker := time.NewTicker(time.Duration(refreshInterval) * time.Minute)
+	go func() {
+		for range ticker.C {
+			LoadRemoteEnv()
+		}
+	}()
 }
