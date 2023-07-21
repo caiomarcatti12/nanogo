@@ -1,7 +1,11 @@
 package env
 
 import (
+	"encoding/json"
+	"fmt"
+	"net/http"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
@@ -16,6 +20,45 @@ func LoadEnv() {
 	logrus.Info("Carregamento do arquivo .env realizado")
 }
 
+func LoadRemoteEnv() {
+	cloudPropertiesHost := GetEnv("CLOUD_PROPERTIES_HOST")
+	appName := GetEnv("APP_NAME")
+	env := GetEnv("ENV")
+
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/%s", cloudPropertiesHost, appName, env), nil)
+	if err != nil {
+		logrus.Fatalf("%s", err)
+	}
+
+	token := GetEnv("CLOUD_PROPERTIES_TOKEN", "")
+	if token != "" {
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		logrus.Fatalf("%s", err)
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		logrus.Fatalf("não foi possível obter a configuração: %s", resp.Status)
+	}
+
+	var config map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&config); err != nil {
+		logrus.Fatalf("%s", err)
+	}
+
+	for k, v := range config {
+		err := os.Setenv(strings.ToUpper(k), fmt.Sprintf("%v", v))
+		if err != nil {
+			return
+		}
+	}
+}
+
 func GetEnv(variable string, default_ ...string) string {
 	value := os.Getenv(variable)
 
@@ -23,7 +66,7 @@ func GetEnv(variable string, default_ ...string) string {
 		if len(default_) > 0 {
 			return default_[0]
 		}
-		logrus.Fatalf("A variavel %s não foi definida no arquivo .env", variable)
+		logrus.Fatalf("A variavel de ambiente %s não foi definida", variable)
 	}
 
 	return value
