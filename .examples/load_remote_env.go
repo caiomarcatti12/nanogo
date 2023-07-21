@@ -10,6 +10,7 @@ func main() {
 	// CLOUD_PROPERTIES_HOST=http://host.docker.internal:8080;
 	// APP_NAME=teste;
 	// ENV=prod
+	// CLOUD_PROPERTIES_TOKEN
 	env.LoadRemoteEnv()
 
 	log.Debug(env.GetEnv("SENHA"))
