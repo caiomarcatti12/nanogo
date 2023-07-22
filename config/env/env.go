@@ -22,6 +22,8 @@ func LoadEnv() {
 	logrus.Info("Carregamento do arquivo .env realizado")
 }
 func LoadRemoteEnv() {
+	logrus.Debug("Carregando variaveis de ambiente remotamente.")
+
 	cloudPropertiesHost := GetEnv("CLOUD_PROPERTIES_HOST")
 	appName := GetEnv("APP_NAME")
 	env := GetEnv("ENV")
