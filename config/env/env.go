@@ -13,6 +13,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type LoadRemoteEnvParams struct {
+	Host    string
+	Token   string
+	AppName string
+	Env     string
+}
+
+var ticker *time.Ticker
+
 func LoadEnv() {
 	err := godotenv.Load()
 	if err != nil {
@@ -21,21 +30,10 @@ func LoadEnv() {
 
 	logrus.Info("Carregamento do arquivo .env realizado")
 }
-func LoadRemoteEnv(app ...string) {
+func LoadRemoteEnv(params LoadRemoteEnvParams) {
 	logrus.Debug("Carregando variaveis de ambiente remotamente.")
 
-	cloudPropertiesHost := GetEnv("CLOUD_PROPERTIES_HOST")
-	env := GetEnv("ENV", "dev")
-
-	appName := ""
-
-	if len(app) > 0 {
-		appName = app[0]
-	} else {
-		appName = GetEnv("APP_NAME")
-	}
-
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/%s", cloudPropertiesHost, appName, env), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/%s", params.Host, params.AppName, params.Env), nil)
 	if err != nil {
 		logrus.Fatalf("%s", err)
 	}
@@ -68,7 +66,7 @@ func LoadRemoteEnv(app ...string) {
 		}
 	}
 
-	autoRefresh(appName)
+	autoRefresh(params)
 }
 
 func GetEnv(variable string, default_ ...string) string {
@@ -84,7 +82,7 @@ func GetEnv(variable string, default_ ...string) string {
 	return value
 }
 
-func autoRefresh(appName string) {
+func autoRefresh(params LoadRemoteEnvParams) {
 	refreshTime := GetEnv("ENV_REFRESH_TIME", "1")
 	refreshInterval, err := strconv.Atoi(refreshTime)
 
@@ -92,10 +90,10 @@ func autoRefresh(appName string) {
 		logrus.Fatal("ENV_REFRESH_TIME deve ser um número inteiro")
 	}
 
-	ticker := time.NewTicker(time.Duration(refreshInterval) * time.Minute)
+	ticker = time.NewTicker(time.Duration(refreshInterval) * time.Minute)
 	go func() {
 		for range ticker.C {
-			LoadRemoteEnv(appName)
+			LoadRemoteEnv(params)
 		}
 	}()
 }
