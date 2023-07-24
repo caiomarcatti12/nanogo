@@ -21,12 +21,19 @@ func LoadEnv() {
 
 	logrus.Info("Carregamento do arquivo .env realizado")
 }
-func LoadRemoteEnv() {
+func LoadRemoteEnv(app ...string) {
 	logrus.Debug("Carregando variaveis de ambiente remotamente.")
 
 	cloudPropertiesHost := GetEnv("CLOUD_PROPERTIES_HOST")
-	appName := GetEnv("APP_NAME")
-	env := GetEnv("ENV")
+	env := GetEnv("ENV", "dev")
+
+	appName := ""
+
+	if len(app) > 0 {
+		appName = app[0]
+	} else {
+		appName = GetEnv("APP_NAME")
+	}
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/%s", cloudPropertiesHost, appName, env), nil)
 	if err != nil {
@@ -61,7 +68,7 @@ func LoadRemoteEnv() {
 		}
 	}
 
-	autoRefresh()
+	autoRefresh(appName)
 }
 
 func GetEnv(variable string, default_ ...string) string {
@@ -77,7 +84,7 @@ func GetEnv(variable string, default_ ...string) string {
 	return value
 }
 
-func autoRefresh() {
+func autoRefresh(appName string) {
 	refreshTime := GetEnv("ENV_REFRESH_TIME", "1")
 	refreshInterval, err := strconv.Atoi(refreshTime)
 
@@ -88,7 +95,7 @@ func autoRefresh() {
 	ticker := time.NewTicker(time.Duration(refreshInterval) * time.Minute)
 	go func() {
 		for range ticker.C {
-			LoadRemoteEnv()
+			LoadRemoteEnv(appName)
 		}
 	}()
 }
