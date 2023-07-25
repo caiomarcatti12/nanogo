@@ -14,10 +14,11 @@ import (
 )
 
 type LoadRemoteEnvParams struct {
-	Host    string
-	Token   string
-	AppName string
-	Env     string
+	Host     string
+	Token    string
+	AppName  string
+	Env      string
+	Attempts int
 }
 
 func LoadEnv() {
@@ -28,6 +29,7 @@ func LoadEnv() {
 
 	logrus.Info("Carregamento do arquivo .env realizado")
 }
+
 func LoadRemoteEnv(params LoadRemoteEnvParams) {
 	logrus.Debug("Carregando variaveis de ambiente remotamente.")
 
@@ -42,6 +44,7 @@ func LoadRemoteEnv(params LoadRemoteEnvParams) {
 	}
 
 	resp, err := http.DefaultClient.Do(req)
+
 	if err != nil {
 		logrus.Fatalf("%s", err)
 	}
@@ -49,8 +52,17 @@ func LoadRemoteEnv(params LoadRemoteEnvParams) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		logrus.Fatalf("não foi possível obter a configuração: %s", resp.Status)
+		if params.Attempts < 5 {
+			logrus.Fatalf("Não foi possível obter a configuração: %s, relizando uma nova tentativa", resp.Status)
+			params.Attempts++
+			autoRefresh(params)
+			return
+		}
+
+		logrus.Fatalf("Não foi possível obter a configuração: %s", resp.Status)
 	}
+
+	params.Attempts = 0
 
 	var config map[string]interface{}
 	if err := json.NewDecoder(resp.Body).Decode(&config); err != nil {
@@ -87,6 +99,8 @@ func autoRefresh(params LoadRemoteEnvParams) {
 	if err != nil {
 		logrus.Fatal("ENV_REFRESH_TIME deve ser um número inteiro")
 	}
+
+	params.IgnoreError = false
 
 	go func() {
 		time.Sleep(time.Duration(refreshInterval) * time.Minute)
