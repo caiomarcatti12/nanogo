@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -21,6 +22,7 @@ type LoadRemoteEnvParams struct {
 }
 
 var ticker *time.Ticker
+var tickerMutex sync.Mutex
 
 func LoadEnv() {
 	err := godotenv.Load()
@@ -89,6 +91,9 @@ func autoRefresh(params LoadRemoteEnvParams) {
 	if err != nil {
 		logrus.Fatal("ENV_REFRESH_TIME deve ser um número inteiro")
 	}
+
+	tickerMutex.Lock()
+	defer tickerMutex.Unlock()
 
 	ticker = time.NewTicker(time.Duration(refreshInterval) * time.Minute)
 	go func() {
