@@ -100,8 +100,6 @@ func autoRefresh(params LoadRemoteEnvParams) {
 		logrus.Fatal("ENV_REFRESH_TIME deve ser um número inteiro")
 	}
 
-	params.IgnoreError = false
-
 	go func() {
 		time.Sleep(time.Duration(refreshInterval) * time.Minute)
 		LoadRemoteEnv(params)
