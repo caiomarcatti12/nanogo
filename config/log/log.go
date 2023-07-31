@@ -65,6 +65,22 @@ func Info(args ...interface{}) {
 	logger.Info(args)
 }
 
+func Error(args ...interface{}) {
+	if !logInitialized {
+		LoadLog()
+	}
+
+	logger.Error(args)
+}
+
+func Warning(args ...interface{}) {
+	if !logInitialized {
+		LoadLog()
+	}
+
+	logger.Warning(args)
+}
+
 func Debugf(format string, args ...interface{}) {
 	if !logInitialized {
 		LoadLog()
@@ -87,4 +103,20 @@ func Fatalf(format string, args ...interface{}) {
 	}
 
 	logger.Fatalf(format, args)
+}
+
+func Errorf(format string, args ...interface{}) {
+	if !logInitialized {
+		LoadLog()
+	}
+
+	logger.Errorf(format, args)
+}
+
+func Warningf(format string, args ...interface{}) {
+	if !logInitialized {
+		LoadLog()
+	}
+
+	logger.Warningf(format, args)
 }
