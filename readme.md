@@ -1,6 +1,6 @@
-go mod init codelesshub/api-crontab
+go mod init caiomarcatti12/api-crontab
 
-get github.com/codelesshub/nanogo 
+get github.com/caiomarcatti12/nanogo 
 
 .env
 .nano.go

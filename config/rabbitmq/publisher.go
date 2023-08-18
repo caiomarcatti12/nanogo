@@ -3,7 +3,7 @@ package rabbitmq
 import (
 	"encoding/json"
 
-	logger "github.com/codelesshub/nanogo/config/log"
+	logger "github.com/caiomarcatti12/nanogo/config/log"
 	"github.com/streadway/amqp"
 )
 

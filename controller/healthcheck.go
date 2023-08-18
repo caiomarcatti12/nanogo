@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/codelesshub/nanogo/config/log"
+	"github.com/caiomarcatti12/nanogo/config/log"
 	"net/http"
 )
 

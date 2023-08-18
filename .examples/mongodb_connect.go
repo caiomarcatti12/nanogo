@@ -1,8 +1,8 @@
 package main
 
 import (
-	mongodb "github.com/codelesshub/nanogo/config/database"
-	"github.com/codelesshub/nanogo/config/env"
+	mongodb "github.com/caiomarcatti12/nanogo/config/database"
+	"github.com/caiomarcatti12/nanogo/config/env"
 )
 
 func main() {

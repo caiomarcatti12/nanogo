@@ -6,7 +6,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/codelesshub/nanogo/config/log"
+	"github.com/caiomarcatti12/nanogo/config/log"
 	"github.com/gorilla/mux"
 )
 

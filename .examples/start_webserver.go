@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/codelesshub/nanogo/config/env"
-	"github.com/codelesshub/nanogo/config/webserver"
+	"github.com/caiomarcatti12/nanogo/config/env"
+	"github.com/caiomarcatti12/nanogo/config/webserver"
 )
 
 func main() {

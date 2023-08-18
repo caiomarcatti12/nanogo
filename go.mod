@@ -1,4 +1,4 @@
-module github.com/codelesshub/nanogo
+module github.com/caiomarcatti12/nanogo
 
 go 1.19
 

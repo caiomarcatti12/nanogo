@@ -3,7 +3,7 @@ package log
 import (
 	"os"
 
-	"github.com/codelesshub/nanogo/config/env"
+	"github.com/caiomarcatti12/nanogo/config/env"
 	"github.com/sirupsen/logrus"
 )
 

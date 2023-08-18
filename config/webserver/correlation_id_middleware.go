@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/codelesshub/nanogo/config/log"
+	"github.com/caiomarcatti12/nanogo/config/log"
 )
 
 func CorrelationIDMiddleware(next http.Handler) http.Handler {

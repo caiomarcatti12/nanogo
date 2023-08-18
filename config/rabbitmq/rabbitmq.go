@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/codelesshub/nanogo/config/env"
-	logger "github.com/codelesshub/nanogo/config/log"
+	"github.com/caiomarcatti12/nanogo/config/env"
+	logger "github.com/caiomarcatti12/nanogo/config/log"
 
 	"github.com/streadway/amqp"
 )
