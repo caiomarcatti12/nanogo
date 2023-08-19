@@ -1,6 +1,7 @@
 package webserver
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -31,6 +32,7 @@ func getWebServerInstance() *WebServer {
 		}
 
 		ws.router.Use(CorrelationIDMiddleware)
+		ws.router.Use(PayloadMiddleware)
 	})
 
 	return ws
@@ -44,8 +46,36 @@ func NewWebServer() *WebServer {
 	return ws
 }
 
-func AddRouter(method string, path string, f func(http.ResponseWriter, *http.Request)) {
-	getWebServerInstance().router.HandleFunc(path, f).Methods(method)
+//func AddRouter(method string, path string, f func(http.ResponseWriter, *http.Request)) {
+//
+//	getWebServerInstance().router.HandleFunc(path, f).Methods(method)
+//}
+
+func AddRouter(method string, path string, f func(ctx *HandlerContext) *APIResponse) {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
+		contextPayload := r.Context().Value("payload")
+
+		// Se você esperar um tipo específico para o payload, faça o type assertion aqui
+		payload, _ := contextPayload.(map[string]interface{})
+
+		response := f(&HandlerContext{
+			Payload:  payload,
+			Headers:  r.Header,
+			Request:  r,
+			Response: w,
+		})
+
+		// Set headers
+		for key, value := range response.Headers {
+			w.Header().Set(key, value)
+		}
+		// Send the response
+		w.WriteHeader(response.StatusCode)
+		if response.Data != nil {
+			json.NewEncoder(w).Encode(response.Data)
+		}
+	}
+	getWebServerInstance().router.HandleFunc(path, handlerFunc).Methods(method)
 }
 
 func (ws *WebServer) Start() {
