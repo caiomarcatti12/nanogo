@@ -47,21 +47,22 @@ func NewWebServer() *WebServer {
 	return ws
 }
 
-func AddRouter(method string, path string, f func(ctx *HandlerContext) (*APIResponse, error)) {
+// No pacote webserver
+
+func AddRouter(method string, path string, f func(ctx *HandlerContext) (interface{}, error)) {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 		contextPayload := r.Context().Value("payload")
 
-		// Se você esperar um tipo específico para o payload, faça o type assertion aqui
+		// Se você espera um tipo específico para o payload, faça o type assertion aqui
 		payload, _ := contextPayload.(map[string]interface{})
 
-		response, err := f(&HandlerContext{
+		data, err := f(&HandlerContext{
 			Payload:  payload,
 			Headers:  r.Header,
 			Request:  r,
 			Response: w,
 		})
-		
-		// Handle error if present
+
 		if err != nil {
 			if customErr, ok := err.(*errors.CustomError); ok {
 				http.Error(w, customErr.Message, customErr.Code)
@@ -72,16 +73,24 @@ func AddRouter(method string, path string, f func(ctx *HandlerContext) (*APIResp
 			}
 		}
 
-		// Set headers
-		for key, value := range response.Headers {
-			w.Header().Set(key, value)
-		}
-		// Send the response
-		w.WriteHeader(response.StatusCode)
-		if response.Data != nil {
-			json.NewEncoder(w).Encode(response.Data)
+		// Verifique se a resposta é uma APIResponse
+		if apiResponse, ok := data.(*APIResponse); ok {
+			// Se for uma APIResponse, envie diretamente
+			for key, value := range apiResponse.Headers {
+				w.Header().Set(key, value)
+			}
+			w.WriteHeader(apiResponse.StatusCode)
+			if apiResponse.Data != nil {
+				json.NewEncoder(w).Encode(apiResponse.Data)
+			}
+		} else {
+			// Caso contrário, envolva os dados em uma resposta padrão
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(data)
 		}
 	}
+
 	getWebServerInstance().router.HandleFunc(path, handlerFunc).Methods(method)
 }
 
