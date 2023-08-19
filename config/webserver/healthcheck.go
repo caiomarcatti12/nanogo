@@ -6,7 +6,7 @@ import (
 	"github.com/caiomarcatti12/nanogo/v2/config/log"
 )
 
-func HealthcheckHandler(ctx *HandlerContext) (*APIResponse, error) {
+func HealthcheckHandler(ctx *HandlerContext) (interface{}, error) {
 	logger := log.GetLoggerFromContext(ctx.Request.Context())
 	logger.Debug("Healthcheck request received")
 
