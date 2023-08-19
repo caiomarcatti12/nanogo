@@ -1,4 +1,4 @@
-module github.com/caiomarcatti12/nanogo
+module github.com/caiomarcatti12/nanogo/v2
 
 go 1.19
 
