@@ -4,11 +4,11 @@ import (
 	"github.com/google/uuid"
 )
 
-type Repository interface {
-	Insert(document interface{}) (interface{}, error)
-	Update(document interface{}) (interface{}, error)
-	Delete(document interface{}) (bool, error)
-	Save(document interface{}) (interface{}, error)
-	FindById(id *uuid.UUID) (interface{}, error)
-	FindAll() ([]interface{}, error)
+type Repository [T any]interface {
+	Insert(document T) (T, error)
+	Update(document T) (T, error)
+	Delete(document T) (bool, error)
+	Save(document T) (T, error)
+	FindById(id *uuid.UUID) (T, error)
+	FindAll() ([]T, error)
 }
