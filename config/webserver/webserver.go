@@ -3,11 +3,12 @@ package webserver
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/caiomarcatti12/nanogo/v2/config/errors"
 	"net/http"
 	"os"
 	"sync"
 
-	"github.com/caiomarcatti12/nanogo/config/log"
+	"github.com/caiomarcatti12/nanogo/v2/config/log"
 	"github.com/gorilla/mux"
 )
 
@@ -46,24 +47,30 @@ func NewWebServer() *WebServer {
 	return ws
 }
 
-//func AddRouter(method string, path string, f func(http.ResponseWriter, *http.Request)) {
-//
-//	getWebServerInstance().router.HandleFunc(path, f).Methods(method)
-//}
-
-func AddRouter(method string, path string, f func(ctx *HandlerContext) *APIResponse) {
+func AddRouter(method string, path string, f func(ctx *HandlerContext) (*APIResponse, error)) {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 		contextPayload := r.Context().Value("payload")
 
 		// Se você esperar um tipo específico para o payload, faça o type assertion aqui
 		payload, _ := contextPayload.(map[string]interface{})
 
-		response := f(&HandlerContext{
+		response, err := f(&HandlerContext{
 			Payload:  payload,
 			Headers:  r.Header,
 			Request:  r,
 			Response: w,
 		})
+		
+		// Handle error if present
+		if err != nil {
+			if customErr, ok := err.(*errors.CustomError); ok {
+				http.Error(w, customErr.Message, customErr.Code)
+				return
+			} else {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
 
 		// Set headers
 		for key, value := range response.Headers {

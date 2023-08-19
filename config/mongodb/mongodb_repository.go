@@ -5,7 +5,9 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/caiomarcatti12/nanogo/config/log"
+	"github.com/caiomarcatti12/nanogo/v2/config/repository"
+
+	"github.com/caiomarcatti12/nanogo/v2/config/log"
 	"github.com/google/uuid"
 	"github.com/mitchellh/mapstructure"
 	"go.mongodb.org/mongo-driver/bson"
@@ -16,10 +18,10 @@ import (
 
 type MongoRepository struct {
 	collection *mongo.Collection
-	model      Model
+	model      repository.Model
 }
 
-func NewMongoRepository(collectionName string, model Model) *MongoRepository {
+func NewMongoRepository(collectionName string, model repository.Model) *MongoRepository {
 	db, err := ConnectMongoDB()
 
 	if err != nil {
@@ -31,7 +33,7 @@ func NewMongoRepository(collectionName string, model Model) *MongoRepository {
 	return &MongoRepository{collection: collection, model: model}
 }
 
-func (r *MongoRepository) Insert(document Model) (Model, error) {
+func (r *MongoRepository) Insert(document repository.Model) (repository.Model, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -46,7 +48,7 @@ func (r *MongoRepository) Insert(document Model) (Model, error) {
 	return document, err
 }
 
-func (r *MongoRepository) Update(document Model) (Model, error) {
+func (r *MongoRepository) Update(document repository.Model) (repository.Model, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -60,7 +62,7 @@ func (r *MongoRepository) Update(document Model) (Model, error) {
 	return document, nil
 }
 
-func (r *MongoRepository) Delete(document Model) (bool, error) {
+func (r *MongoRepository) Delete(document repository.Model) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -73,7 +75,7 @@ func (r *MongoRepository) Delete(document Model) (bool, error) {
 	return true, nil
 }
 
-func (r *MongoRepository) Save(document Model) (Model, error) {
+func (r *MongoRepository) Save(document repository.Model) (repository.Model, error) {
 	if document.GetID() == nil {
 		return r.Insert(document)
 	} else {
@@ -81,7 +83,7 @@ func (r *MongoRepository) Save(document Model) (Model, error) {
 	}
 }
 
-func (r *MongoRepository) FindById(id *uuid.UUID) (Model, error) {
+func (r *MongoRepository) FindById(id *uuid.UUID) (repository.Model, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -102,7 +104,7 @@ func (r *MongoRepository) FindById(id *uuid.UUID) (Model, error) {
 	}
 
 	// We need a fresh instance for each document.
-	outputModel := reflect.New(reflect.TypeOf(r.model).Elem()).Interface().(Model)
+	outputModel := reflect.New(reflect.TypeOf(r.model).Elem()).Interface().(repository.Model)
 	err = mapstructure.Decode(result, &outputModel)
 	if err != nil {
 		return nil, err
@@ -111,7 +113,7 @@ func (r *MongoRepository) FindById(id *uuid.UUID) (Model, error) {
 	return outputModel, nil
 }
 
-func (r *MongoRepository) FindAll() ([]Model, error) {
+func (r *MongoRepository) FindAll() ([]repository.Model, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -126,7 +128,7 @@ func (r *MongoRepository) FindAll() ([]Model, error) {
 		log.Fatal(err)
 	}
 
-	var outputModels []Model
+	var outputModels []repository.Model
 
 	for _, result := range results {
 
@@ -138,7 +140,7 @@ func (r *MongoRepository) FindAll() ([]Model, error) {
 			result["id"] = convertedUUID
 		}
 
-		model := reflect.New(reflect.TypeOf(r.model).Elem()).Interface().(Model)
+		model := reflect.New(reflect.TypeOf(r.model).Elem()).Interface().(repository.Model)
 		err = mapstructure.Decode(result, &model)
 		if err != nil {
 			return nil, err
@@ -150,7 +152,7 @@ func (r *MongoRepository) FindAll() ([]Model, error) {
 	return outputModels, nil
 }
 
-func (r *MongoRepository) RawQuery(query bson.M) ([]Model, error) {
+func (r *MongoRepository) RawQuery(query bson.M) ([]repository.Model, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -165,7 +167,7 @@ func (r *MongoRepository) RawQuery(query bson.M) ([]Model, error) {
 		return nil, err
 	}
 
-	var outputModels []Model
+	var outputModels []repository.Model
 
 	for _, result := range results {
 		if idField, ok := result["_id"].(primitive.Binary); ok {
@@ -176,7 +178,7 @@ func (r *MongoRepository) RawQuery(query bson.M) ([]Model, error) {
 			result["id"] = convertedUUID
 		}
 
-		model := reflect.New(reflect.TypeOf(r.model).Elem()).Interface().(Model)
+		model := reflect.New(reflect.TypeOf(r.model).Elem()).Interface().(repository.Model)
 		err = mapstructure.Decode(result, &model)
 		if err != nil {
 			return nil, err
@@ -188,7 +190,7 @@ func (r *MongoRepository) RawQuery(query bson.M) ([]Model, error) {
 	return outputModels, nil
 }
 
-func decode(document Model) (map[string]interface{}, error) {
+func decode(document repository.Model) (map[string]interface{}, error) {
 	var mapInterface map[string]interface{}
 	err := mapstructure.Decode(document, &mapInterface)
 	if err != nil {
@@ -197,6 +199,6 @@ func decode(document Model) (map[string]interface{}, error) {
 	return mapInterface, nil
 }
 
-func encode(inputMap map[string]interface{}, outputModel Model) error {
+func encode(inputMap map[string]interface{}, outputModel repository.Model) error {
 	return mapstructure.Decode(inputMap, outputModel)
 }

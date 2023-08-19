@@ -1,8 +1,8 @@
 package redis
 
 import (
-	"github.com/caiomarcatti12/nanogo/config/env"
-	logger "github.com/caiomarcatti12/nanogo/config/log"
+	"github.com/caiomarcatti12/nanogo/v2/config/env"
+	logger "github.com/caiomarcatti12/nanogo/v2/config/log"
 
 	"sync"
 

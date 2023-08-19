@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/caiomarcatti12/nanogo/config/env"
-	"github.com/caiomarcatti12/nanogo/config/mongodb"
+	"github.com/caiomarcatti12/nanogo/v2/config/env"
+	"github.com/caiomarcatti12/nanogo/v2/config/mongodb"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 )

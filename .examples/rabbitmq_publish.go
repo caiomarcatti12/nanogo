@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/caiomarcatti12/nanogo/config/env"
-	"github.com/caiomarcatti12/nanogo/config/rabbitmq"
+	"github.com/caiomarcatti12/nanogo/v2/config/env"
+	"github.com/caiomarcatti12/nanogo/v2/config/rabbitmq"
 )
 
 func main() {

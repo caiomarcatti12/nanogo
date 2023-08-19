@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/caiomarcatti12/nanogo/config"
-	"github.com/caiomarcatti12/nanogo/config/env"
-	redis "github.com/caiomarcatti12/nanogo/config/redis"
+	"github.com/caiomarcatti12/nanogo/v2/config"
+	"github.com/caiomarcatti12/nanogo/v2/config/env"
+	redis "github.com/caiomarcatti12/nanogo/v2/config/redis"
 )
 
 func main() {

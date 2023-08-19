@@ -8,8 +8,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/caiomarcatti12/nanogo/config/env"
-	"github.com/caiomarcatti12/nanogo/config/log"
+	"github.com/caiomarcatti12/nanogo/v2/config/env"
+	"github.com/caiomarcatti12/nanogo/v2/config/log"
 )
 
 var (

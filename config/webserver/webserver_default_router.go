@@ -1,7 +1,7 @@
 package webserver
 
 import (
-	"github.com/caiomarcatti12/nanogo/controller"
+	"github.com/caiomarcatti12/nanogo/v2/controller"
 )
 
 func WebserverDefaultRouter() {

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/caiomarcatti12/nanogo/config/env"
-	"github.com/caiomarcatti12/nanogo/config/webserver"
+	"github.com/caiomarcatti12/nanogo/v2/config/env"
+	"github.com/caiomarcatti12/nanogo/v2/config/webserver"
 )
 
 func main() {

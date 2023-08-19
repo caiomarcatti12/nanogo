@@ -3,7 +3,7 @@ package tasks
 import (
 	"fmt"
 
-	redis "github.com/caiomarcatti12/nanogo/config/redis"
+	redis "github.com/caiomarcatti12/nanogo/v2/config/redis"
 	"github.com/gocraft/work"
 )
 
