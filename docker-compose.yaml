@@ -1,0 +1,12 @@
+version: '3.9'
+
+services:
+    nanogo:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: caiomarcatti12/nanogo:dev
+        container_name: nanogo
+        tty: true
+        volumes:
+            - ./:/app
