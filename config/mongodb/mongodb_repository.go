@@ -112,7 +112,7 @@ func (r *MongoRepository[T]) FindById(id *uuid.UUID) (T, error) {
 	return outputModel, nil
 }
 
-func (r *MongoRepository[T]) FindAll() ([]interface{}, error) {
+func (r *MongoRepository[T]) FindAll() ([]T, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -127,7 +127,7 @@ func (r *MongoRepository[T]) FindAll() ([]interface{}, error) {
 		log.Fatal(err)
 	}
 
-	var outputModels []interface{}
+	var outputModels []T
 
 	for _, result := range results {
 
