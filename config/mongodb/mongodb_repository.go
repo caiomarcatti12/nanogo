@@ -33,7 +33,7 @@ func NewMongoRepository(collectionName string, model repository.Model) *MongoRep
 	return &MongoRepository{collection: collection, model: model}
 }
 
-func (r *MongoRepository) Insert(document repository.Model) (repository.Model, error) {
+func (r *MongoRepository) Insert(document repository.Model) (interface{}, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -48,7 +48,7 @@ func (r *MongoRepository) Insert(document repository.Model) (repository.Model, e
 	return document, err
 }
 
-func (r *MongoRepository) Update(document repository.Model) (repository.Model, error) {
+func (r *MongoRepository) Update(document repository.Model) (interface{}, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -75,7 +75,7 @@ func (r *MongoRepository) Delete(document repository.Model) (bool, error) {
 	return true, nil
 }
 
-func (r *MongoRepository) Save(document repository.Model) (repository.Model, error) {
+func (r *MongoRepository) Save(document repository.Model) (interface{}, error) {
 	if document.GetID() == nil {
 		return r.Insert(document)
 	} else {
@@ -83,7 +83,7 @@ func (r *MongoRepository) Save(document repository.Model) (repository.Model, err
 	}
 }
 
-func (r *MongoRepository) FindById(id *uuid.UUID) (repository.Model, error) {
+func (r *MongoRepository) FindById(id *uuid.UUID) (interface{}, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -113,7 +113,7 @@ func (r *MongoRepository) FindById(id *uuid.UUID) (repository.Model, error) {
 	return outputModel, nil
 }
 
-func (r *MongoRepository) FindAll() ([]repository.Model, error) {
+func (r *MongoRepository) FindAll() ([]interface{}, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -128,7 +128,7 @@ func (r *MongoRepository) FindAll() ([]repository.Model, error) {
 		log.Fatal(err)
 	}
 
-	var outputModels []repository.Model
+	var outputModels []interface{}
 
 	for _, result := range results {
 
@@ -140,7 +140,7 @@ func (r *MongoRepository) FindAll() ([]repository.Model, error) {
 			result["id"] = convertedUUID
 		}
 
-		model := reflect.New(reflect.TypeOf(r.model).Elem()).Interface().(repository.Model)
+		model := reflect.New(reflect.TypeOf(r.model).Elem()).Interface().(interface{})
 		err = mapstructure.Decode(result, &model)
 		if err != nil {
 			return nil, err

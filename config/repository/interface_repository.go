@@ -5,10 +5,10 @@ import (
 )
 
 type Repository interface {
-	Insert(document Model) (Model, error)
-	Update(document Model) (Model, error)
-	Delete(document Model) (bool, error)
-	Save(document Model) (Model, error)
-	FindById(id *uuid.UUID) (Model, error)
-	FindAll() ([]Model, error)
+	Insert(document interface{}) (interface{}, error)
+	Update(document interface{}) (interface{}, error)
+	Delete(document interface{}) (bool, error)
+	Save(document interface{}) (interface{}, error)
+	FindById(id *uuid.UUID) (interface{}, error)
+	FindAll() ([]interface{}, error)
 }
