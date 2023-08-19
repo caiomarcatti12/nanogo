@@ -2,9 +2,10 @@ package mongodb
 
 import (
 	"context"
-	"github.com/caiomarcatti12/nanogo/v2/config/repository"
 	"reflect"
 	"time"
+
+	"github.com/caiomarcatti12/nanogo/v2/config/repository"
 
 	"github.com/caiomarcatti12/nanogo/v2/config/log"
 	"github.com/google/uuid"
@@ -31,7 +32,7 @@ func NewMongoRepository[T repository.Model](collectionName string, model T) *Mon
 	return &MongoRepository[T]{collection: collection, model: model}
 }
 
-func (r *MongoRepository[T]) Insert(document T) (interface{}, error) {
+func (r *MongoRepository[T]) Insert(document T) (T, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -40,13 +41,13 @@ func (r *MongoRepository[T]) Insert(document T) (interface{}, error) {
 	_, err := r.collection.InsertOne(ctx, document)
 
 	if err != nil {
-		return nil, err
+		return reflect.Zero(reflect.TypeOf(document)).Interface().(T), err
 	}
 
 	return document, err
 }
 
-func (r *MongoRepository[T]) Update(document T) (interface{}, error) {
+func (r *MongoRepository[T]) Update(document T) (T, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -54,7 +55,7 @@ func (r *MongoRepository[T]) Update(document T) (interface{}, error) {
 	updateDoc := bson.M{"$set": document}
 	_, err := r.collection.UpdateOne(ctx, filter, updateDoc)
 	if err != nil {
-		return nil, err
+		return reflect.Zero(reflect.TypeOf(document)).Interface().(T), err
 	}
 
 	return document, nil
@@ -73,7 +74,7 @@ func (r *MongoRepository[T]) Delete(document T) (bool, error) {
 	return true, nil
 }
 
-func (r *MongoRepository[T]) Save(document T) (interface{}, error) {
+func (r *MongoRepository[T]) Save(document T) (T, error) {
 	if document.GetID() == nil {
 		return r.Insert(document)
 	} else {
@@ -81,7 +82,7 @@ func (r *MongoRepository[T]) Save(document T) (interface{}, error) {
 	}
 }
 
-func (r *MongoRepository[T]) FindById(id *uuid.UUID) (interface{}, error) {
+func (r *MongoRepository[T]) FindById(id *uuid.UUID) (T, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -89,14 +90,14 @@ func (r *MongoRepository[T]) FindById(id *uuid.UUID) (interface{}, error) {
 	var result map[string]interface{}
 	err := r.collection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
-		return nil, err
+		return reflect.Zero(reflect.TypeOf(result)).Interface().(T), err
 	}
 
 	// Convert _id field back to uuid.UUID
 	if idField, ok := result["_id"].(primitive.Binary); ok {
 		convertedUUID, err := uuid.FromBytes(idField.Data)
 		if err != nil {
-			return nil, err
+			return reflect.Zero(reflect.TypeOf(result)).Interface().(T), err
 		}
 		result["id"] = convertedUUID
 	}
@@ -105,7 +106,7 @@ func (r *MongoRepository[T]) FindById(id *uuid.UUID) (interface{}, error) {
 	outputModel := reflect.New(reflect.TypeOf(r.model).Elem()).Interface().(T)
 	err = mapstructure.Decode(result, &outputModel)
 	if err != nil {
-		return nil, err
+		return reflect.Zero(reflect.TypeOf(result)).Interface().(T), err
 	}
 
 	return outputModel, nil
@@ -138,7 +139,7 @@ func (r *MongoRepository[T]) FindAll() ([]interface{}, error) {
 			result["id"] = convertedUUID
 		}
 
-		model := reflect.New(reflect.TypeOf(r.model).Elem()).Interface().(interface{})
+		model := reflect.New(reflect.TypeOf(r.model).Elem()).Interface().(T)
 		err = mapstructure.Decode(result, &model)
 		if err != nil {
 			return nil, err
