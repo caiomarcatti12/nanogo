@@ -123,6 +123,11 @@ func (r *MongoRepository[T]) FindAll() ([]T, error) {
 		return nil, err
 	}
 
+	// Verificar se a lista de resultados está vazia
+	if len(results) == 0 {
+		return []T{}, nil
+	}
+
 	var models []T
 	for _, result := range results {
 		document, err := r.decodeAndMap(result)
