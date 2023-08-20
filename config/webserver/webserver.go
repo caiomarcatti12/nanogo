@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/caiomarcatti12/nanogo/v2/config/errors"
+	"github.com/mitchellh/mapstructure"
 	"net/http"
 	"os"
 	"sync"
@@ -47,17 +48,24 @@ func NewWebServer() *WebServer {
 	return ws
 }
 
-// No pacote webserver
-
-func AddRouter(method string, path string, f func(ctx *HandlerContext) (interface{}, error)) {
+func AddRouter[T any](method string, path string, f func(ctx *HandlerContext) (interface{}, error), decoderType ...T) {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 		contextPayload := r.Context().Value("payload")
 
-		// Se você espera um tipo específico para o payload, faça o type assertion aqui
-		payload, _ := contextPayload.(map[string]interface{})
+		// type assertion aqui
+		if len(decoderType) > 0 && decoderType[0] != nil {
+			err := mapstructure.Decode(contextPayload, decoderType[0])
+
+			if err != nil {
+				http.Error(w, "Invalid payload format", http.StatusBadRequest)
+				return
+			}
+
+			contextPayload = decoderType[0]
+		}
 
 		data, err := f(&HandlerContext{
-			Payload:  payload,
+			Payload:  contextPayload,
 			Headers:  r.Header,
 			Request:  r,
 			Response: w,
@@ -79,6 +87,7 @@ func AddRouter(method string, path string, f func(ctx *HandlerContext) (interfac
 			for key, value := range apiResponse.Headers {
 				w.Header().Set(key, value)
 			}
+
 			w.WriteHeader(apiResponse.StatusCode)
 			if apiResponse.Data != nil {
 				json.NewEncoder(w).Encode(apiResponse.Data)
@@ -110,4 +119,14 @@ func getPortWebServer() string {
 	}
 
 	return port
+}
+
+func sendJSONError(w http.ResponseWriter, errorMessage string, statusCode int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+
+	// Encode and send the error message
+	json.NewEncoder(w).Encode(map[string]string{
+		"error": errorMessage,
+	})
 }
