@@ -101,7 +101,7 @@ func (r *MongoRepository[T]) Save(document T) (T, error) {
 	}
 }
 
-func (r *MongoRepository[T]) FindById(id *uuid.UUID) (T, error) {
+func (r *MongoRepository[T]) FindById(id uuid.UUID) (T, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
