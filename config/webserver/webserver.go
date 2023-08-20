@@ -53,7 +53,7 @@ func AddRouter[T any](method string, path string, f func(ctx *HandlerContext[T])
 		contextPayload := r.Context().Value("payload")
 
 		// type assertion aqui
-		if len(decoderType) > 0 && decoderType[0] != nil {
+		if len(decoderType) > 0 && !isNil(decoderType[0]) {
 			err := mapstructure.Decode(contextPayload, decoderType[0])
 
 			if err != nil {
@@ -61,7 +61,12 @@ func AddRouter[T any](method string, path string, f func(ctx *HandlerContext[T])
 				return
 			}
 
-			contextPayload = decoderType[0]
+			if typedPayload, ok := contextPayload.(T); ok {
+				contextPayload = typedPayload
+			} else {
+				http.Error(w, "Invalid payload format", http.StatusBadRequest)
+				return
+			}
 		}
 
 		data, err := f(&HandlerContext[T]{
@@ -129,4 +134,8 @@ func sendJSONError(w http.ResponseWriter, errorMessage string, statusCode int) {
 	json.NewEncoder(w).Encode(map[string]string{
 		"error": errorMessage,
 	})
+}
+
+func isNil(i interface{}) bool {
+	return i == nil
 }
