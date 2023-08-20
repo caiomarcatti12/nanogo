@@ -48,7 +48,7 @@ func NewWebServer() *WebServer {
 	return ws
 }
 
-func AddRouter[T any](method string, path string, f func(ctx *HandlerContext) (interface{}, error), decoderType ...T) {
+func AddRouter[T any](method string, path string, f func(ctx *HandlerContext[T]) (interface{}, error), decoderType ...T) {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 		contextPayload := r.Context().Value("payload")
 
@@ -64,7 +64,7 @@ func AddRouter[T any](method string, path string, f func(ctx *HandlerContext) (i
 			contextPayload = decoderType[0]
 		}
 
-		data, err := f(&HandlerContext{
+		data, err := f(&HandlerContext[T]{
 			Payload:  contextPayload,
 			Headers:  r.Header,
 			Request:  r,
