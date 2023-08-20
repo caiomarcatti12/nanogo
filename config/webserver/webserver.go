@@ -73,10 +73,10 @@ func AddRouter[T any](method string, path string, f func(ctx *HandlerContext) (i
 
 		if err != nil {
 			if customErr, ok := err.(*errors.CustomError); ok {
-				http.Error(w, customErr.Message, customErr.Code)
+				sendJSONError(w, customErr.Message, customErr.Code)
 				return
 			} else {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				sendJSONError(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
 		}
