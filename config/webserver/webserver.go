@@ -61,7 +61,12 @@ func AddRouter[T any](method string, path string, f func(ctx *HandlerContext[T])
 				return
 			}
 		} else {
-			typedPayload = contextPayload
+			if tp, ok := contextPayload.(T); ok {
+				typedPayload = tp
+			} else {
+				http.Error(w, "Mismatched payload type", http.StatusBadRequest)
+				return
+			}
 		}
 
 		data, err := f(&HandlerContext[T]{
