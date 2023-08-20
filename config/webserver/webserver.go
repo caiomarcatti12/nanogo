@@ -61,9 +61,8 @@ func AddRouter[T any](method string, path string, f func(ctx *HandlerContext[T])
 				return
 			}
 
-			if typedPayload, ok := contextPayload.(T); ok {
-				contextPayload = typedPayload
-			} else {
+			var ok bool
+			if contextPayload, ok = contextPayload.(T); !ok {
 				http.Error(w, "Invalid payload format", http.StatusBadRequest)
 				return
 			}
