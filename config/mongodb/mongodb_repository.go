@@ -79,6 +79,20 @@ func (r *MongoRepository[T]) Delete(document T) (bool, error) {
 	return true, nil
 }
 
+func (r *MongoRepository[T]) DeleteById(uuid uuid.UUID) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	filter := bson.D{{"_id", uuid}}
+	_, err := r.collection.DeleteOne(ctx, filter)
+	if err != nil {
+		log.Errorf("Erro ao deletar documento: %v", err)
+		return false, err
+	}
+
+	return true, nil
+}
+
 func (r *MongoRepository[T]) Save(document T) (T, error) {
 	if document.GetID() == nil {
 		return r.Insert(document)
