@@ -3,34 +3,42 @@ package webserver
 import (
 	"context"
 	"encoding/json"
-	"net/http"
+	"github.com/gorilla/mux"
 	"io"
+	"net/http"
 )
 
 func PayloadMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		// Se for uma solicitação GET, capture os parâmetros de consulta.
+		var payload map[string]interface{}
+
+		// Se o método for GET, capture os parâmetros de consulta.
 		if r.Method == http.MethodGet {
-			params := r.URL.Query()
-			newCtx := context.WithValue(ctx, "params", params)
-			next.ServeHTTP(w, r.WithContext(newCtx))
-			return
+			for key, values := range r.URL.Query() {
+				if len(values) > 0 {
+					// Se houver múltiplos valores para a mesma chave, armazene apenas o primeiro valor
+					payload[key] = values[0]
+				}
+			}
 		}
 
-		// Se o corpo da requisição estiver vazio, simplesmente chame o próximo manipulador.
-		if r.Body == http.NoBody {
-			next.ServeHTTP(w, r)
-			return
+		// Para todos os métodos, capture parâmetros da rota.
+		vars := mux.Vars(r)
+		for key, value := range vars {
+			if payload == nil {
+				payload = make(map[string]interface{})
+			}
+			payload[key] = value
 		}
 
-		var payload map[string]interface{} 
-
-		// Se houver um erro ao decodificar e o erro não for devido a um corpo vazio, retorne um erro.
-		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil && err != io.EOF {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
+		// Se o corpo da requisição estiver vazio, não tente decodificá-lo. Caso contrário, decodifique-o.
+		if r.Body != http.NoBody {
+			if err := json.NewDecoder(r.Body).Decode(&payload); err != nil && err != io.EOF {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
 		}
 
 		if payload != nil {
