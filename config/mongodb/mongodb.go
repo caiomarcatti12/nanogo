@@ -37,13 +37,14 @@ func ConnectMongoDB() (*mongo.Database, error) {
 		}
 
 		clientInstance, err = mongo.Connect(context.Background(), clientOptions)
+
+		log.Info("Connected to MongoDB!")
+
 	})
 
 	if err != nil {
 		return nil, err
 	}
-
-	log.Info("Connected to MongoDB!")
 
 	dbname := env.GetEnv("MONGO_DBNAME")
 

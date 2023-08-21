@@ -20,7 +20,7 @@ type MongoRepository[T repository.Model] struct {
 	model      T
 }
 
-func NewMongoRepository[T repository.Model](collectionName string, model T) *MongoRepository[T] {
+func NewMongoRepository[T repository.Model](collectionName string, model T) MongoRepository[T] {
 	db, err := ConnectMongoDB()
 
 	if err != nil {
@@ -28,7 +28,7 @@ func NewMongoRepository[T repository.Model](collectionName string, model T) *Mon
 	}
 
 	collection := db.Collection(collectionName)
-	return &MongoRepository[T]{collection: collection, model: model}
+	return MongoRepository[T]{collection: collection, model: model}
 }
 
 func (r *MongoRepository[T]) Insert(document T) (T, error) {
@@ -93,14 +93,6 @@ func (r *MongoRepository[T]) DeleteById(uuid uuid.UUID) (bool, error) {
 	return true, nil
 }
 
-func (r *MongoRepository[T]) Save(document T) (T, error) {
-	if document.GetID() == nil {
-		return r.Insert(document)
-	} else {
-		return r.Update(document)
-	}
-}
-
 func (r *MongoRepository[T]) FindById(id uuid.UUID) (T, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -154,7 +146,7 @@ func (r *MongoRepository[T]) FindAll() ([]T, error) {
 	return models, nil
 }
 
-func (r *MongoRepository[T]) RawQuery(query bson.M) ([]T, error) {
+func (r *MongoRepository[T]) RawQuery(query bson.M) ([]*T, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -169,13 +161,13 @@ func (r *MongoRepository[T]) RawQuery(query bson.M) ([]T, error) {
 		return nil, err
 	}
 
-	var models []T
+	var models []*T
 	for _, result := range results {
 		document, err := r.decodeAndMap(result)
 		if err != nil {
 			return nil, err
 		}
-		models = append(models, document)
+		models = append(models, &document)
 	}
 
 	return models, nil
