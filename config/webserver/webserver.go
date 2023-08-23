@@ -60,7 +60,7 @@ func AddRouter[T any](method string, path string, f func(ctx *HandlerContext[T])
 				http.Error(w, "Invalid payload format", http.StatusBadRequest)
 				return
 			}
-		} else {
+		} else if contextPayload != nil {
 			if tp, ok := contextPayload.(T); ok {
 				typedPayload = tp
 			} else {
@@ -94,7 +94,20 @@ func AddRouter[T any](method string, path string, f func(ctx *HandlerContext[T])
 			}
 
 			w.WriteHeader(apiResponse.StatusCode)
-			if apiResponse.Data != nil {
+
+			// Verifique o cabeçalho de Content-Type
+			contentType := w.Header().Get("Content-Type")
+			if contentType != "" && contentType != "application/json" && apiResponse.Data != nil {
+				switch v := apiResponse.Data.(type) {
+				case []byte:
+					w.Write(v)
+				case string:
+					w.Write([]byte(v))
+				default:
+					http.Error(w, "Unsupported data type", http.StatusInternalServerError)
+					return
+				}
+			} else if apiResponse.Data != nil {
 				json.NewEncoder(w).Encode(apiResponse.Data)
 			}
 		} else {

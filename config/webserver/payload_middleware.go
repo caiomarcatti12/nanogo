@@ -3,6 +3,7 @@ package webserver
 import (
 	"context"
 	"encoding/json"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"io"
 	"net/http"
@@ -30,7 +31,13 @@ func PayloadMiddleware(next http.Handler) http.Handler {
 			if payload == nil {
 				payload = make(map[string]interface{})
 			}
-			payload[key] = value
+
+			// Tente converter o valor para UUID
+			if id, err := uuid.Parse(value); err == nil {
+				payload[key] = id
+			} else {
+				payload[key] = value
+			}
 		}
 
 		// Se o corpo da requisição estiver vazio, não tente decodificá-lo. Caso contrário, decodifique-o.

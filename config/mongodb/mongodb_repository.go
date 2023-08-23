@@ -9,9 +9,7 @@ import (
 	"github.com/caiomarcatti12/nanogo/v2/config/log"
 	"github.com/caiomarcatti12/nanogo/v2/config/repository"
 	"github.com/google/uuid"
-	"github.com/mitchellh/mapstructure"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -84,13 +82,13 @@ func (r *MongoRepository[T]) DeleteById(uuid uuid.UUID) (bool, error) {
 	defer cancel()
 
 	filter := bson.D{{"_id", uuid}}
-	_, err := r.collection.DeleteOne(ctx, filter)
+	result, err := r.collection.DeleteOne(ctx, filter)
 	if err != nil {
 		log.Errorf("Erro ao deletar documento: %v", err)
 		return false, err
 	}
 
-	return true, nil
+	return result.DeletedCount > 0, nil
 }
 
 func (r *MongoRepository[T]) FindById(id uuid.UUID) (T, error) {
@@ -98,19 +96,19 @@ func (r *MongoRepository[T]) FindById(id uuid.UUID) (T, error) {
 	defer cancel()
 
 	filter := bson.D{{"_id", id}}
-	var result map[string]interface{}
+	var result T
 	err := r.collection.FindOne(ctx, filter).Decode(&result)
+
 	if err != nil {
+		if err.Error() == "mongo: no documents in result" {
+			return reflect.Zero(reflect.TypeOf(r.model)).Interface().(T), nil
+		}
+
 		log.Errorf("Erro ao encontrar documento pelo ID: %v", err)
 		return reflect.Zero(reflect.TypeOf(r.model)).Interface().(T), err
 	}
 
-	document, err := r.decodeAndMap(result)
-	if err != nil {
-		return reflect.Zero(reflect.TypeOf(r.model)).Interface().(T), err
-	}
-
-	return document, nil
+	return result, nil
 }
 
 func (r *MongoRepository[T]) FindAll() ([]T, error) {
@@ -123,7 +121,7 @@ func (r *MongoRepository[T]) FindAll() ([]T, error) {
 	}
 	defer cursor.Close(ctx)
 
-	var results []map[string]interface{}
+	var results []T
 	if err = cursor.All(ctx, &results); err != nil {
 		log.Errorf("Erro ao buscar todos os documentos: %v", err)
 		return nil, err
@@ -134,19 +132,10 @@ func (r *MongoRepository[T]) FindAll() ([]T, error) {
 		return []T{}, nil
 	}
 
-	var models []T
-	for _, result := range results {
-		document, err := r.decodeAndMap(result)
-		if err != nil {
-			return nil, err
-		}
-		models = append(models, document)
-	}
-
-	return models, nil
+	return results, nil
 }
 
-func (r *MongoRepository[T]) RawQuery(query bson.M) ([]*T, error) {
+func (r *MongoRepository[T]) RawQuery(query bson.M) ([]T, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -156,36 +145,10 @@ func (r *MongoRepository[T]) RawQuery(query bson.M) ([]*T, error) {
 	}
 	defer cursor.Close(ctx)
 
-	var results []map[string]interface{}
+	var results []T
 	if err = cursor.All(ctx, &results); err != nil {
 		return nil, err
 	}
 
-	var models []*T
-	for _, result := range results {
-		document, err := r.decodeAndMap(result)
-		if err != nil {
-			return nil, err
-		}
-		models = append(models, &document)
-	}
-
-	return models, nil
-}
-
-func (r *MongoRepository[T]) decodeAndMap(result map[string]interface{}) (T, error) {
-	if idField, ok := result["_id"].(primitive.Binary); ok {
-		convertedUUID, err := uuid.FromBytes(idField.Data)
-		if err != nil {
-			return reflect.Zero(reflect.TypeOf(r.model)).Interface().(T), err
-		}
-		result["_id"] = convertedUUID
-	}
-
-	var document T
-	if err := mapstructure.Decode(result, &document); err != nil {
-		return reflect.Zero(reflect.TypeOf(r.model)).Interface().(T), err
-	}
-
-	return document, nil
+	return results, nil
 }
