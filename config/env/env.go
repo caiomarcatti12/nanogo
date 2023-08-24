@@ -43,6 +43,8 @@ func LoadRemoteEnv(params LoadRemoteEnvParams) {
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 	}
 
+	req.Header.Set("Content-Type", "application/json")
+
 	resp, err := http.DefaultClient.Do(req)
 
 	if err != nil {
