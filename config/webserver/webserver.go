@@ -71,6 +71,7 @@ func AddRouter[T any](method string, path string, f func(ctx *HandlerContext[T])
 
 		data, err := f(&HandlerContext[T]{
 			Payload:  typedPayload,
+			RawQuery: r.URL.RawQuery,
 			Headers:  r.Header,
 			Request:  r,
 			Response: w,
