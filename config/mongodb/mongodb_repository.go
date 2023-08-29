@@ -3,6 +3,7 @@ package mongodb
 import (
 	"context"
 	"errors"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"reflect"
 	"time"
 
@@ -135,11 +136,23 @@ func (r *MongoRepository[T]) FindAll() ([]T, error) {
 	return results, nil
 }
 
-func (r *MongoRepository[T]) RawQuery(query bson.M) ([]T, error) {
+func (r *MongoRepository[T]) RawQuery(query bson.M, sort bson.M, limit int64, skip int64) ([]T, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	cursor, err := r.collection.Find(ctx, query)
+	// Configurando as opções de pesquisa
+	findOptions := options.Find()
+	if sort != nil {
+		findOptions.SetSort(sort)
+	}
+	if limit > 0 {
+		findOptions.SetLimit(limit)
+	}
+	if skip > 0 {
+		findOptions.SetSkip(skip)
+	}
+
+	cursor, err := r.collection.Find(ctx, query, findOptions)
 	if err != nil {
 		return nil, err
 	}
