@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/mux"
 	"io"
 	"net/http"
+	"strconv"
 )
 
 func PayloadMiddleware(next http.Handler) http.Handler {
@@ -19,8 +20,20 @@ func PayloadMiddleware(next http.Handler) http.Handler {
 		if r.Method == http.MethodGet {
 			for key, values := range r.URL.Query() {
 				if len(values) > 0 {
+					val := values[0]
+
 					// Se houver múltiplos valores para a mesma chave, armazene apenas o primeiro valor
-					payload[key] = values[0]
+					// Tente converter o valor para um inteiro
+					if intValue, err := strconv.Atoi(val); err == nil {
+						payload[key] = intValue
+					} else {
+						// Tente converter o valor para um float
+						if floatValue, err := strconv.ParseFloat(val, 64); err == nil {
+							payload[key] = floatValue
+						} else {
+							payload[key] = val
+						}
+					}
 				}
 			}
 		}
