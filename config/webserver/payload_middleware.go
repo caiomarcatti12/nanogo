@@ -13,7 +13,7 @@ func PayloadMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		var payload map[string]interface{}
+		payload := make(map[string]interface{})
 
 		// Se o método for GET, capture os parâmetros de consulta.
 		if r.Method == http.MethodGet {
@@ -28,10 +28,6 @@ func PayloadMiddleware(next http.Handler) http.Handler {
 		// Para todos os métodos, capture parâmetros da rota.
 		vars := mux.Vars(r)
 		for key, value := range vars {
-			if payload == nil {
-				payload = make(map[string]interface{})
-			}
-
 			// Tente converter o valor para UUID
 			if id, err := uuid.Parse(value); err == nil {
 				payload[key] = id
