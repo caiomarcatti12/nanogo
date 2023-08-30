@@ -24,7 +24,9 @@ func PayloadMiddleware(next http.Handler) http.Handler {
 
 					// Se houver múltiplos valores para a mesma chave, armazene apenas o primeiro valor
 					// Tente converter o valor para um inteiro
-					if intValue, err := strconv.Atoi(val); err == nil {
+					if id, err := uuid.Parse(val); err == nil {
+						payload[key] = id
+					} else if intValue, err := strconv.Atoi(val); err == nil {
 						payload[key] = intValue
 					} else {
 						// Tente converter o valor para um float
