@@ -136,7 +136,7 @@ func (r *MongoRepository[T]) FindAll() ([]T, error) {
 	return results, nil
 }
 
-func (r *MongoRepository[T]) RawQuery(query bson.M, sort bson.M, limit int64, skip int64) ([]T, error) {
+func (r *MongoRepository[T]) RawQuery(query bson.M, sort bson.M, limit int64, skip int64) ([]T, int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -154,14 +154,33 @@ func (r *MongoRepository[T]) RawQuery(query bson.M, sort bson.M, limit int64, sk
 
 	cursor, err := r.collection.Find(ctx, query, findOptions)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	defer cursor.Close(ctx)
 
 	var results []T
 	if err = cursor.All(ctx, &results); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return results, nil
+	count, err := r.collection.CountDocuments(ctx, query)
+	if err != nil {
+		log.Errorf("Erro ao contar os documentos: %v", err)
+		return nil, 0, err
+	}
+
+	return results, count, nil
+}
+
+func (r *MongoRepository[T]) RawQueryCount(query bson.M) (int64, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	count, err := r.collection.CountDocuments(ctx, query)
+	if err != nil {
+		log.Errorf("Erro ao contar os documentos: %v", err)
+		return 0, err
+	}
+
+	return count, nil
 }
