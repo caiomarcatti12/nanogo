@@ -44,7 +44,7 @@ O framework **Nanogo** oferece um conjunto robusto de funcionalidades projetadas
 - **[API Webserver](./.docs/api_webserver.md)**
    - Construa APIs poderosas e escaláveis com nossa funcionalidade de servidor web integrado.
 
-- **[Conexão com Redis](./.docs/redis_connection.md)**
+- **[Conexão com Redis](./.docs/redis_cache.md)**
    - Facilite a integração e a manipulação de bancos de dados Redis em seus projetos.
 
 - **[Integração com MongoDB](./.docs/mongodb_integration.md)**
