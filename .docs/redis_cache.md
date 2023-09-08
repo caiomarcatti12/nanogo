@@ -4,7 +4,7 @@ A biblioteca Redis facilita a interação com um servidor Redis, permitindo arma
 
 #### Configuração
 
-Para configurar o servidor Redis, você deve definir as seguintes variáveis de ambiente:
+Para configurar o cliente do Redis, você deve definir as seguintes variáveis de ambiente:
 
 ```sh
 REDIS_ADDR=host.docker.internal
