@@ -78,7 +78,7 @@ Cada funcionalidade foi meticulosamente desenvolvida para fornecer a melhor expe
 
 Estamos sempre de portas abertas para novas contribuições! Se você deseja auxiliar no crescimento e aprimoramento do projeto — seja através da correção de bugs, propostas de melhorias ou incorporação de novas funcionalidades — sua ajuda será sempre bem-vinda.
 
-Acesse nosso [Guia de Contribuição](./.docs/contributing.md) para entender melhor como você pode fazer parte desse processo e garantir que sua contribuição seja integrada da maneira mais eficaz possível.
+Acesse nosso [Guia de Contribuição](contributing.md) para entender melhor como você pode fazer parte desse processo e garantir que sua contribuição seja integrada da maneira mais eficaz possível.
 
 ### **Código de Conduta**
 
@@ -88,6 +88,6 @@ Faça um favor a si e à comunidade: dedique um momento para ler e internalizar 
 
 ### **Licença**
 
-O projeto Nanogo está disponível sob a licença Apache 2.0, uma licença permissiva e de código aberto que permite a liberdade de usar o software para qualquer finalidade, respeitando as limitações estabelecidas na [LICENÇA](./.docs/license).
+O projeto Nanogo está disponível sob a licença Apache 2.0, uma licença permissiva e de código aberto que permite a liberdade de usar o software para qualquer finalidade, respeitando as limitações estabelecidas na [LICENÇA](license).
 
 Dessa forma, você pode contribuir, modificar e distribuir o projeto, estando protegido juridicamente e respeitando os direitos e esforços dos outros contribuintes.
