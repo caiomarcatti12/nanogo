@@ -153,16 +153,6 @@ func decodeToStruct[T any](value string, target *T) error {
 	}
 
 	return nil
-	//return target
-	//
-	//// A chamada exata para mapperstruct.Decode depende da sua API.
-	//// Isso é apenas um exemplo baseado na suposição.
-	//err = mapper.Transform(result, target)
-	//
-	//if err != nil {
-	//	return errors.New("failed to decode string to struct: " + err.Error())
-	//}
-	//return nil
 }
 
 // stringifyValue tenta converter um valor do tipo interface{} para uma string usando JSON
