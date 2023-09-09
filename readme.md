@@ -37,6 +37,19 @@ Para uma descrição detalhada de cada dependência e como elas são usadas no f
 
 📄 [Consulte o Guia de Dependências](./.docs/dependencies.md)
 
+### **Arquitetura 🔥**
+
+- **[Arquitetura Limpa (Clean Architecture)](./.docs/clean_architecture.md)**
+    - Mantenha seu código organizado e fácil de manter aderindo aos princípios da Arquitetura Limpa.
+
+- **[Arquitetura Hexagonal](./.docs/hexagonal_architecture.md)**
+    - Facilite a manutenção e o teste de seus aplicativos através da implementação da Arquitetura Hexagonal.
+      Claro, podemos adicionar um novo tópico à sua documentação README.md principal que destaca a "Arquitetura de Repository". Aqui está uma sugestão:
+
+- **[Arquitetura de Repository](./.docs/repository_architecture.md)**
+    - Descubra como a estrutura de repository no nanogo facilita a abstração do acesso ao banco de dados, promovendo um código mais limpo, flexível e testável. Explore como o princípio SOLID de inversão de dependência é central para esta arquitetura, permitindo um design de software robusto e de fácil manutenção.
+
+
 ### **Funcionalidades 🔥**
 
 O framework **Nanogo** oferece um conjunto robusto de funcionalidades projetadas para facilitar e acelerar o desenvolvimento de software. Abaixo, você encontrará uma lista de funcionalidades-chave juntamente com links para suas respectivas documentações:
@@ -58,12 +71,6 @@ O framework **Nanogo** oferece um conjunto robusto de funcionalidades projetadas
 
 - **[Carregamento dinamico de Arquivos .env](./.docs/remote_env_loading.md)**
     - Gerencie configurações de aplicativos dinamicamente através do suporte para carregamento por api
-
-- **[Arquitetura Limpa (Clean Architecture)](./.docs/clean_architecture.md)**
-   - Mantenha seu código organizado e fácil de manter aderindo aos princípios da Arquitetura Limpa.
-
-- **[Arquitetura Hexagonal](./.docs/hexagonal_architecture.md)**
-   - Facilite a manutenção e o teste de seus aplicativos através da implementação da Arquitetura Hexagonal.
 
 Cada funcionalidade foi meticulosamente desenvolvida para fornecer a melhor experiência possível aos desenvolvedores, poupando tempo e esforço ao criar softwares incríveis com **Nanogo**.
 
