@@ -50,6 +50,14 @@ Para uma descrição detalhada de cada dependência e como elas são usadas no f
     - Descubra como a estrutura de repository no nanogo facilita a abstração do acesso ao banco de dados, promovendo um código mais limpo, flexível e testável. Explore como o princípio SOLID de inversão de dependência é central para esta arquitetura, permitindo um design de software robusto e de fácil manutenção.
 
 
+### **Instalando a Biblioteca Nanogo**
+
+**Adicione a Biblioteca como Dependência**: Abra o terminal no diretório do seu projeto e execute o comando a seguir para adicionar a biblioteca Nanogo como uma dependência:
+
+```
+go get github.com/caiomarcatti12/nanogo/v2
+```
+
 ### **Funcionalidades 🔥**
 
 O framework **Nanogo** oferece um conjunto robusto de funcionalidades projetadas para facilitar e acelerar o desenvolvimento de software. Abaixo, você encontrará uma lista de funcionalidades-chave juntamente com links para suas respectivas documentações:
