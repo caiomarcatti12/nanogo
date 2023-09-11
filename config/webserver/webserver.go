@@ -16,8 +16,10 @@
 package webserver
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/caiomarcatti12/nanogo/v2/config/env"
 	"github.com/caiomarcatti12/nanogo/v2/config/errors"
 	"github.com/mitchellh/mapstructure"
 	"net/http"
@@ -29,8 +31,11 @@ import (
 )
 
 type WebServer struct {
-	router *mux.Router
-	port   string
+	router    *mux.Router
+	port      string
+	TLSConfig *tls.Config
+	crt       string
+	key       string
 }
 
 var (
@@ -42,10 +47,24 @@ func getWebServerInstance() *WebServer {
 	once.Do(func() {
 		router := mux.NewRouter()
 		port := getPortWebServer()
+		crt := env.GetEnv("SERVER_CERTIFICATE", "")
+		key := env.GetEnv("SERVER_KEY", "")
 
-		ws = &WebServer{
-			router: router,
-			port:   port,
+		if crt != "" && key != "" {
+			ws = &WebServer{
+				router: router,
+				port:   port,
+				crt:    crt,
+				key:    key,
+				TLSConfig: &tls.Config{
+					ClientAuth: tls.RequestClientCert,
+				},
+			}
+		} else {
+			ws = &WebServer{
+				router: router,
+				port:   port,
+			}
 		}
 
 		ws.router.Use(CorrelationIDMiddleware)
@@ -138,11 +157,24 @@ func AddRouter[T any](method string, path string, f func(ctx *HandlerContext[T])
 }
 
 func (ws *WebServer) Start() {
-	port := getPortWebServer()
+	fmt.Printf("Servidor iniciado em localhost:%s\n", ws.port)
 
-	fmt.Printf("Servidor iniciado em localhost:%s\n", port)
-
-	log.Fatal(http.ListenAndServe(":"+port, ws.router))
+	if ws.crt != "" && ws.key != "" {
+		server := &http.Server{
+			Addr:    ":" + ws.port,
+			Handler: ws.router,
+			TLSConfig: &tls.Config{
+				ClientAuth: tls.RequestClientCert,
+			},
+		}
+		log.Fatal(server.ListenAndServeTLS(ws.crt, ws.key))
+	} else {
+		server := &http.Server{
+			Addr:    ":" + ws.port,
+			Handler: ws.router,
+		}
+		log.Fatal(server.ListenAndServe())
+	}
 }
 
 func getPortWebServer() string {
