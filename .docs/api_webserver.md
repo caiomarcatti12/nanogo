@@ -34,6 +34,9 @@ func main() {
 	server.Start()
 }
 ```
+#### Inicialização do Servidor Web HTTPS (TLS)
+
+Para configurar o HTTPS no servidor web HTTPS, siga a documentação - **[Configuração HTTPS (TLS)](./api_webserver_tls.md)**
 
 #### Definindo Rotas
 
