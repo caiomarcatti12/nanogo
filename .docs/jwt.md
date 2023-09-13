@@ -42,6 +42,19 @@ func (manager *JWTManager) ValidateToken(tokenString string) (jwt.Claims, error)
     - `(jwt.Claims, error)`: As claims do token JWT ou um erro se a validação falhar.
 - **Descrição**: Este método valida o token JWT fornecido verificando sua assinatura e tempo de expiração, e retorna suas claims se a validação for bem-sucedida.
 
+#### DecodeToken
+
+```go
+func (manager *JWTManager) DecodeToken(tokenString string) (map[string]interface{}, error)
+```
+
+- **Parâmetros**:
+  - `tokenString` (string): A string do token JWT que deve ser decodificada.
+- **Retorno**:
+  - `(map[string]interface{}, error)`: Um mapa contendo as claims do token JWT ou um erro se a decodificação falhar.
+- **Descrição**: Este método decodifica o token JWT fornecido e retorna suas claims sem validar a assinatura ou o tempo de expiração do token.
+
+
 ### Exemplos de Uso
 
 #### Criando um Novo JWTManager
@@ -68,6 +81,17 @@ if err != nil {
 	fmt.Println("Token inválido:", err)
 } else {
 	fmt.Println("Token válido. Claims:", claims)
+}
+```
+
+#### Decodificando um Token
+
+```go
+data, err := jwtManager.DecodeToken(tokenString)
+if err != nil {
+	fmt.Println("Erro ao decodificar o token:", err)
+} else {
+	fmt.Println("Dados do token:", data)
 }
 ```
 
