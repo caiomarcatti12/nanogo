@@ -79,6 +79,9 @@ O framework **Nanogo** oferece um conjunto robusto de funcionalidades projetadas
 
 - **[Carregamento dinamico de Arquivos .env](./.docs/remote_env_loading.md)**
     - Gerencie configurações de aplicativos dinamicamente através do suporte para carregamento por api
+- 
+- **[JWT Manager](./.docs/jwt.md)**
+    - Crie e valide tokens JWT de maneira fácil e segura com o nosso JWT Manager.
 
 Cada funcionalidade foi meticulosamente desenvolvida para fornecer a melhor experiência possível aos desenvolvedores, poupando tempo e esforço ao criar softwares incríveis com **Nanogo**.
 

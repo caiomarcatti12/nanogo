@@ -24,3 +24,6 @@ O **Nanogo** foi construído sobre a solidez e eficiência de várias biblioteca
 
 - **[AMQP Streadway](https://github.com/streadway/amqp) (v1.1.0)**
     - Uma implementação do protocolo AMQP para Go, facilitando a comunicação com servidores RabbitMQ.
+
+- **[DGrijalva JWT-Go](https://github.com/dgrijalva/jwt-go) (v3.2.0)**
+  - Uma biblioteca poderosa para criar e validar JSON Web Tokens (JWT) no Go. Ela permite a fácil geração de tokens JWT seguros, facilitando a autenticação e a autorização em seus serviços. A integração do JWT-Go no Nanogo oferece uma forma segura e eficiente de transmitir informações entre partes, garantindo a integridade e a segurança das informações trocadas.
