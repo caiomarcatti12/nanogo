@@ -37,3 +37,22 @@ func (manager *JWTManager) ValidateToken(tokenString string) (jwt.Claims, error)
 
 	return claims, nil
 }
+
+func (manager *JWTManager) DecodeToken(tokenString string) (map[string]interface{}, error) {
+	claims := jwt.MapClaims{}
+
+	_, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return manager.signingKey, nil
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("erro ao decodificar o token: %w", err)
+	}
+
+	decodedData := make(map[string]interface{})
+	for k, v := range claims {
+		decodedData[k] = v
+	}
+
+	return decodedData, nil
+}
