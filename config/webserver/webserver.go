@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"github.com/caiomarcatti12/nanogo/v2/config/env"
 	"github.com/caiomarcatti12/nanogo/v2/config/errors"
-	"github.com/mitchellh/mapstructure"
+	"github.com/caiomarcatti12/nanogo/v2/config/mapper"
 	"net/http"
 	"os"
 	"sync"
@@ -89,7 +89,7 @@ func AddRouter[T any](method string, path string, f func(ctx *HandlerContext[T])
 		// type assertion aqui
 		var typedPayload T
 		if len(decoderType) > 0 && !isNil(decoderType[0]) {
-			err := mapstructure.Decode(contextPayload, &typedPayload)
+			err := mapper.Transform(contextPayload, &typedPayload)
 			if err != nil {
 				http.Error(w, "Invalid payload format", http.StatusBadRequest)
 				return

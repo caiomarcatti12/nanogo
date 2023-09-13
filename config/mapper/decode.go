@@ -16,9 +16,37 @@
 package mapper
 
 import (
+	"github.com/google/uuid"
 	"github.com/mitchellh/mapstructure"
+	"reflect"
 )
 
 func Transform(input interface{}, output any) error {
-	return mapstructure.Decode(input, &output)
+	decoderConfig := &mapstructure.DecoderConfig{
+		DecodeHook: mapstructure.ComposeDecodeHookFunc(
+			func(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+				if f.Kind() == reflect.String && t == reflect.TypeOf(&uuid.UUID{}) {
+					uuidVal, err := uuid.Parse(data.(string))
+					if err != nil {
+						return nil, err
+					}
+					return &uuidVal, nil
+				}
+				return data, nil
+			},
+		),
+		Result: &output,
+	}
+
+	decoder, err := mapstructure.NewDecoder(decoderConfig)
+
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(input)
+	if err != nil {
+		return err
+	}
+	return nil
 }
