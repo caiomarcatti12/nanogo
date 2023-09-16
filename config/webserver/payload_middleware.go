@@ -116,7 +116,7 @@ func isMultiPartPost(r *http.Request) bool {
 
 func checkMaxUploadSize(r *http.Request) error {
 	// Obtém o tamanho máximo de upload da variável de ambiente
-	maxUploadSizeStr := env.GetEnv("WEBSERVER_MAX_UPLOAD_SIZE", "10")
+	maxUploadSizeStr := env.GetEnv("SERVER_MAX_UPLOAD_SIZE", "5")
 	maxUploadSize, err := strconv.ParseInt(maxUploadSizeStr, 10, 64)
 	if err != nil || maxUploadSize <= 0 {
 		maxUploadSize = 5 << 20 // Valor padrão de 5 MB
