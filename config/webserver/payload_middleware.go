@@ -18,11 +18,14 @@ package webserver
 import (
 	"context"
 	"encoding/json"
+	"github.com/caiomarcatti12/nanogo/v2/config/env"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 func PayloadMiddleware(next http.Handler) http.Handler {
@@ -66,8 +69,32 @@ func PayloadMiddleware(next http.Handler) http.Handler {
 			}
 		}
 
-		// Se o corpo da requisição estiver vazio, não tente decodificá-lo. Caso contrário, decodifique-o.
-		if r.Body != http.NoBody {
+		if isMultiPartPost(r) == true {
+			err := checkMaxUploadSize(r)
+
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+
+			for key, values := range r.MultipartForm.Value {
+				if len(values) > 0 {
+					payload[key] = values[0]
+				}
+			}
+
+			for key := range r.MultipartForm.File {
+				fileUpload, err := parseUpload(r, key)
+
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusBadRequest)
+					return
+				}
+
+				payload[key] = fileUpload
+			}
+
+		} else if r.Body != http.NoBody {
 			if err := json.NewDecoder(r.Body).Decode(&payload); err != nil && err != io.EOF {
 				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
@@ -81,4 +108,44 @@ func PayloadMiddleware(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 		}
 	})
+}
+
+func isMultiPartPost(r *http.Request) bool {
+	return r.Method == "POST" && strings.HasPrefix(r.Header.Get("Content-Type"), "multipart/form-data")
+}
+
+func checkMaxUploadSize(r *http.Request) error {
+	// Obtém o tamanho máximo de upload da variável de ambiente
+	maxUploadSizeStr := env.GetEnv("WEBSERVER_MAX_UPLOAD_SIZE", "10")
+	maxUploadSize, err := strconv.ParseInt(maxUploadSizeStr, 10, 64)
+	if err != nil || maxUploadSize <= 0 {
+		maxUploadSize = 5 << 20 // Valor padrão de 5 MB
+	}
+
+	// Define o tamanho máximo de upload
+	err = r.ParseMultipartForm(maxUploadSize)
+	if err != nil {
+		return UploadSizeExceededException(maxUploadSize)
+	}
+	return nil
+}
+
+func parseUpload(r *http.Request, name string) (*FileUpload, error) {
+	file, handler, err := r.FormFile(name)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	fileBytes, err := ioutil.ReadAll(file)
+	if err != nil {
+
+		return nil, err
+	}
+
+	return &FileUpload{
+		Filename: handler.Filename,
+		Size:     handler.Size,
+		Content:  fileBytes,
+	}, nil
 }
