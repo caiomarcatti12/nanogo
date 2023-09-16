@@ -69,7 +69,7 @@ func PayloadMiddleware(next http.Handler) http.Handler {
 			}
 		}
 
-		if isMultiPartPost(r) == true {
+		if isMultiPart(r) == true {
 			err := checkMaxUploadSize(r)
 
 			if err != nil {
@@ -110,8 +110,8 @@ func PayloadMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func isMultiPartPost(r *http.Request) bool {
-	return r.Method == "POST" && strings.HasPrefix(r.Header.Get("Content-Type"), "multipart/form-data")
+func isMultiPart(r *http.Request) bool {
+	return strings.HasPrefix(r.Header.Get("Content-Type"), "multipart/form-data")
 }
 
 func checkMaxUploadSize(r *http.Request) error {
