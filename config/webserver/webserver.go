@@ -91,14 +91,14 @@ func AddRouter[T any](method string, path string, f func(ctx *HandlerContext[T])
 		if len(decoderType) > 0 && !isNil(decoderType[0]) {
 			err := mapper.Transform(contextPayload, &typedPayload)
 			if err != nil {
-				http.Error(w, "Invalid payload format", http.StatusBadRequest)
+				sendJSONError(w, "Invalid payload format: "+err.Error(), http.StatusBadRequest)
 				return
 			}
 		} else if contextPayload != nil {
 			if tp, ok := contextPayload.(T); ok {
 				typedPayload = tp
 			} else {
-				http.Error(w, "Mismatched payload type", http.StatusBadRequest)
+				sendJSONError(w, "Mismatched payload type", http.StatusBadRequest)
 				return
 			}
 		}
@@ -139,7 +139,7 @@ func AddRouter[T any](method string, path string, f func(ctx *HandlerContext[T])
 				case string:
 					w.Write([]byte(v))
 				default:
-					http.Error(w, "Unsupported data type", http.StatusInternalServerError)
+					sendJSONError(w, "Unsupported data type", http.StatusInternalServerError)
 					return
 				}
 			} else if apiResponse.Data != nil {
