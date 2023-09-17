@@ -19,12 +19,14 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/caiomarcatti12/nanogo/v2/config/env"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func PayloadMiddleware(next http.Handler) http.Handler {
@@ -60,7 +62,7 @@ func PayloadMiddleware(next http.Handler) http.Handler {
 func parseGetPayload(r *http.Request, payload map[string]interface{}) {
 	for key, values := range r.URL.Query() {
 		if len(values) > 0 {
-			payload[key] = values[0]
+			payload[key] = parseValue(values[0])
 		}
 	}
 }
@@ -68,7 +70,7 @@ func parseGetPayload(r *http.Request, payload map[string]interface{}) {
 func parseRoutePayload(r *http.Request, payload map[string]interface{}) {
 	vars := mux.Vars(r)
 	for key, value := range vars {
-		payload[key] = value
+		payload[key] = parseValue(value)
 	}
 }
 
@@ -80,7 +82,7 @@ func parseMultiPartPayload(r *http.Request, w http.ResponseWriter, payload map[s
 
 	for key, values := range r.MultipartForm.Value {
 		if len(values) > 0 {
-			payload[key] = values[0]
+			payload[key] = parseValue(values[0])
 		}
 	}
 
@@ -103,6 +105,21 @@ func parseJSONPayload(r *http.Request, w http.ResponseWriter, payload map[string
 		}
 	}
 	return nil
+}
+
+func parseValue(value string) interface{} {
+	if id, err := uuid.Parse(value); err == nil {
+		return id
+	} else if intValue, err := strconv.Atoi(value); err == nil {
+		return intValue
+	} else if floatValue, err := strconv.ParseFloat(value, 64); err == nil {
+		return floatValue
+	} else if boolValue, err := strconv.ParseBool(value); err == nil {
+		return boolValue
+	} else if timeValue, err := time.Parse(time.RFC3339, value); err == nil {
+		return timeValue
+	}
+	return value
 }
 
 func isMultiPart(r *http.Request) bool {
