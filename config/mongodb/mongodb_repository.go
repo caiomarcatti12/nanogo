@@ -18,6 +18,7 @@ package mongodb
 import (
 	"context"
 	"errors"
+	"github.com/caiomarcatti12/nanogo/v2/config/rsql"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"reflect"
 	"time"
@@ -162,6 +163,48 @@ func (r *MongoRepository[T]) RawQuery(query bson.M, sort bson.M, limit int64, sk
 	}
 	if limit > 0 {
 		findOptions.SetLimit(limit)
+	}
+	if skip > 0 {
+		findOptions.SetSkip(skip)
+	}
+
+	cursor, err := r.collection.Find(ctx, query, findOptions)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer cursor.Close(ctx)
+
+	var results []T
+	if err = cursor.All(ctx, &results); err != nil {
+		return nil, 0, err
+	}
+
+	count, err := r.collection.CountDocuments(ctx, query)
+	if err != nil {
+		log.Errorf("Erro ao contar os documentos: %v", err)
+		return nil, 0, err
+	}
+
+	return results, count, nil
+}
+
+func (r *MongoRepository[T]) RawQueryRsqlFiltered(qf rsql.QueryFilter) ([]T, int64, error) {
+	query, sort, size, skip, err := RsqlConvertToBson(qf)
+
+	if err != nil {
+		return nil, 0, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// Configurando as opções de pesquisa
+	findOptions := options.Find()
+	if sort != nil {
+		findOptions.SetSort(sort)
+	}
+	if size > 0 {
+		findOptions.SetLimit(size)
 	}
 	if skip > 0 {
 		findOptions.SetSkip(skip)

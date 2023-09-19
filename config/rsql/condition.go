@@ -15,22 +15,8 @@
  */
 package rsql
 
-import (
-	"fmt"
-	"strings"
-)
-
-func Parse(rsql string) ([]Condition, error) {
-	var conditions []Condition
-
-	// Dividir a consulta RSQL em condições usando o delimitador ';'
-	for _, part := range strings.Split(rsql, ";") {
-		tokens := strings.Split(part, "==")
-		if len(tokens) != 2 {
-			return nil, fmt.Errorf("formato RSQL inválido")
-		}
-		conditions = append(conditions, Condition{Field: tokens[0], Operator: "==", Value: tokens[1]})
-	}
-
-	return conditions, nil
+type Condition struct {
+	Field    string
+	Operator string
+	Value    string
 }
