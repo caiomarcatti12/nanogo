@@ -188,11 +188,11 @@ func (r *MongoRepository[T]) RawQuery(query bson.M, sort bson.M, limit int64, sk
 	return results, count, nil
 }
 
-func (r *MongoRepository[T]) RawQueryRsqlFiltered(qf rsql.QueryFilter) ([]T, int64, error) {
+func (r *MongoRepository[T]) RawQueryRsqlFiltered(qf rsql.QueryFilter) (*rsql.ResultPaginated[T], error) {
 	query, sort, size, skip, err := RsqlConvertToBson(qf)
 
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -212,22 +212,25 @@ func (r *MongoRepository[T]) RawQueryRsqlFiltered(qf rsql.QueryFilter) ([]T, int
 
 	cursor, err := r.collection.Find(ctx, query, findOptions)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 	defer cursor.Close(ctx)
 
 	var results []T
 	if err = cursor.All(ctx, &results); err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 
 	count, err := r.collection.CountDocuments(ctx, query)
 	if err != nil {
 		log.Errorf("Erro ao contar os documentos: %v", err)
-		return nil, 0, err
+		return nil, err
 	}
 
-	return results, count, nil
+	return &rsql.ResultPaginated[T]{
+		Rows:  results,
+		Total: count,
+	}, nil
 }
 
 func (r *MongoRepository[T]) RawQueryCount(query bson.M) (int64, error) {
