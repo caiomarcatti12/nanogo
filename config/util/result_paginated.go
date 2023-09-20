@@ -1,4 +1,4 @@
-package rsql
+package util
 
 type ResultPaginated[T any] struct {
 	Rows  *T    `json:"rows"`

@@ -16,7 +16,6 @@
 package repository
 
 import (
-	"github.com/caiomarcatti12/nanogo/v2/config/rsql"
 	"github.com/google/uuid"
 )
 
@@ -27,5 +26,4 @@ type Repository[T Model] interface {
 	FindById(id uuid.UUID) (*T, error)
 	DeleteById(id uuid.UUID) (bool, error)
 	FindAll() ([]*T, error)
-	RawQueryRsqlFiltered(filter rsql.QueryFilter) (rsql.ResultPaginated[[]*T], error)
 }

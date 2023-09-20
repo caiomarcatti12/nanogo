@@ -152,6 +152,16 @@ func (r *MongoRepository[T]) FindAll() ([]T, error) {
 	return results, nil
 }
 
+func (r *MongoRepository[T]) RawQueryParseRsql(filter rsql.QueryFilter) ([]T, int64, error) {
+	query, sort, limit, skip, err := RsqlConvertToBson(filter)
+
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return r.RawQuery(query, sort, limit, skip)
+}
+
 func (r *MongoRepository[T]) RawQuery(query bson.M, sort bson.M, limit int64, skip int64) ([]T, int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -186,51 +196,6 @@ func (r *MongoRepository[T]) RawQuery(query bson.M, sort bson.M, limit int64, sk
 	}
 
 	return results, count, nil
-}
-
-func (r *MongoRepository[T]) RawQueryRsqlFiltered(qf rsql.QueryFilter) (rsql.ResultPaginated[[]T], error) {
-	query, sort, size, skip, err := RsqlConvertToBson(qf)
-
-	if err != nil {
-		return rsql.ResultPaginated[[]T]{}, err
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	// Configurando as opções de pesquisa
-	findOptions := options.Find()
-	if sort != nil {
-		findOptions.SetSort(sort)
-	}
-	if size > 0 {
-		findOptions.SetLimit(size)
-	}
-	if skip > 0 {
-		findOptions.SetSkip(skip)
-	}
-
-	cursor, err := r.collection.Find(ctx, query, findOptions)
-	if err != nil {
-		return rsql.ResultPaginated[[]T]{}, err
-	}
-	defer cursor.Close(ctx)
-
-	var results []T
-	if err = cursor.All(ctx, &results); err != nil {
-		return rsql.ResultPaginated[[]T]{}, err
-	}
-
-	count, err := r.collection.CountDocuments(ctx, query)
-	if err != nil {
-		log.Errorf("Erro ao contar os documentos: %v", err)
-		return rsql.ResultPaginated[[]T]{}, err
-	}
-
-	return rsql.ResultPaginated[[]T]{
-		Rows:  &results,
-		Total: count,
-	}, nil
 }
 
 func (r *MongoRepository[T]) RawQueryCount(query bson.M) (int64, error) {
