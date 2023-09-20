@@ -27,5 +27,5 @@ type Repository[T Model] interface {
 	FindById(id uuid.UUID) (*T, error)
 	DeleteById(id uuid.UUID) (bool, error)
 	FindAll() ([]*T, error)
-	RawQueryParseRsql(filter rsql.QueryFilter) ([]T, int64, error)
+	RawQueryParseRsql(filter rsql.QueryFilter) ([]*T, int64, error)
 }
