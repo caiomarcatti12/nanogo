@@ -228,7 +228,7 @@ func (r *MongoRepository[T]) RawQueryRsqlFiltered(qf rsql.QueryFilter) (rsql.Res
 	}
 
 	return rsql.ResultPaginated[[]T]{
-		Rows:  results,
+		Rows:  &results,
 		Total: count,
 	}, nil
 }
