@@ -7,8 +7,8 @@ Nesta seção, vamos descrever como você pode configurar e trabalhar com Rabbit
 A biblioteca se conecta ao RabbitMQ usando as informações fornecidas através das variáveis de ambiente. Certifique-se de configurar corretamente as seguintes variáveis:
 
 ```env
-RABBITMQ_HOST=host.rabbitmq
-RABBITMQ_USER=user
+RABBITMQ_HOST=host.docker.internal
+RABBITMQ_USER=root
 RABBITMQ_PASSWORD=password
 RABBITMQ_PORT=5672
 RABBITMQ_VHOST=/
@@ -18,32 +18,46 @@ RABBITMQ_VHOST=/
 
 A biblioteca Nanogo oferece uma camada adicional de abstração que facilita a integração com o RabbitMQ, encapsulando as operações complexas de maneira simples e direta. Isso permite que os desenvolvedores criem rapidamente aplicativos que podem publicar e consumir mensagens do RabbitMQ sem ter que lidar com os detalhes internos do RabbitMQ.
 
-No exemplo abaixo, demonstramos como é simples iniciar um consumidor utilizando a biblioteca Nanogo. Aqui, encapsulamos a configuração da `Exchange` e da `Queue` em suas respectivas funções e criamos um consumidor que implementa a interface `Consumer`:
+No exemplo abaixo, demonstramos como é simples iniciar um consumidor utilizando a biblioteca Nanogo. Aqui, encapsulamos a configuração da `Exchange` e da `Queue` em suas respectivas funções e criamos um consumidor que implementa a interface de `Consumer`:
 
+- Interface: 
+```go
+type Consumer[T any] interface {
+Consume(body T, headers map[string]interface{})
+}
+```
+
+- Implementação:
+- 
 ```go
 package main
 
 import (
-	"log"
+"fmt"
+"log"
 
-	"github.com/caiomarcatti12/nanogo/v2/config"
-	"github.com/caiomarcatti12/nanogo/v2/config/env"
-	"github.com/caiomarcatti12/nanogo/v2/config/rabbitmq"
+"github.com/caiomarcatti12/nanogo/v2/config/rabbitmq"
+"github.com/caiomarcatti12/nanogo/v2/queue"    
 )
+
+type Hello struct {
+	Name string    `json:"name"`
+}
 
 type MyConsumer struct{}
 
-func (mc *MyConsumer) Consume(body map[string]interface{}, headers map[string]interface{}) {
+func (c *MyConsumer) Consume(body Hello, headers map[string]interface{}) {
 	log.Printf("Headers: %v", headers)
-	log.Printf("Body: %s", body)
+	fmt.Printf("Body: %s", body)
 }
+
 
 func main() {
 	// Carrega o arquivo .env
 	env.LoadEnv()
 
 	// Cria um consumidor da fila MyConsumer
-	rabbitmq.Consume(exchange(), queue(), &MyConsumer{})
+	rabbitmq.Consume[Hello](exchange(), queue(), &MyConsumer{})
 
 	config.WaitSignalStop()
 }
@@ -117,7 +131,6 @@ A estrutura `Queue` permite definir as propriedades de uma fila (queue). Os camp
 - `Exclusive`: Define se a fila é exclusiva para a conexão atual.
 - `NoWait`: Define se a declaração da fila será não-bloqueante.
 - `Parameters`: Permite definir parâmetros adicionais para a fila, usando uma tabela AMQP.
-  Claro, peço desculpas pela confusão. Vamos manter as descrições junto com os exemplos de código para cada tópico.
 
 ### **Inicializando uma Conexão**
 
@@ -174,7 +187,7 @@ Uma vez que as exchanges e queues estejam devidamente configuradas, você poder�
 Aqui está um exemplo de como publicar uma mensagem:
 
 ```go
-body := map[string]interface{}{"hello": "world"}
+body := map[string]interface{}{"hello": "world"} // Ou seu objeto struct
 rabbitmq.Publish(exchange.Name, queue.Key, body)
 ```
 
@@ -185,14 +198,27 @@ Para consumir mensagens, você precisa criar um consumidor que implemente a inte
 Aqui está um exemplo de como você pode criar um consumidor e iniciar a consumir mensagens:
 
 ```go
-type MyConsumer struct{}
+package main
 
-func (c *MyConsumer) Consume(body map[string]interface{}, headers map[string]interface{}) {
-    log.Printf("Received message with body: %v and headers: %v", body, headers)
+import (
+	"fmt"
+	"log"
+)
+
+type Hello struct {
+	Name string    `json:"name"`
 }
 
-// ...
+type MyConsumer struct{}
 
+func (c *MyConsumer) Consume(body Hello, headers map[string]interface{}) {
+	log.Printf("Headers: %v", headers)
+	fmt.Printf("Body: %s", body)
+
+	// ...
+}
+
+//Adicione esse código no inicializador de seu aplicativo
 rabbitmq.Consume(exchange, queue, &MyConsumer{})
 ```
 

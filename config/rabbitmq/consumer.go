@@ -18,13 +18,15 @@ package rabbitmq
 import (
 	"encoding/json"
 	"log"
+	"reflect"
 )
 
-type Consumer interface {
-	Consume(body map[string]interface{}, headers map[string]interface{})
+type Consumer[T any] interface {
+	Consume(body T, headers map[string]interface{})
 }
 
-func Consume(exchange Exchange, queue Queue, consumer Consumer) {
+// , consumer func Consumer[T]
+func Consume[T any](exchange Exchange, queue Queue, consumer Consumer[T]) {
 	connection := NewInstanceRabbitmq()
 
 	DeclareExchange(exchange)
@@ -47,11 +49,13 @@ func Consume(exchange Exchange, queue Queue, consumer Consumer) {
 
 	go func() {
 		for d := range msgs {
-			bodyMap := make(map[string]interface{})
+			typ := reflect.TypeOf((*T)(nil)).Elem()
+			val := reflect.New(typ).Elem()
+			bodyMap := val.Interface().(T)
 
-			err := json.Unmarshal(d.Body, &bodyMap)
+			err = json.Unmarshal(d.Body, &bodyMap)
 			if err != nil {
-				log.Fatalf("Error decoding JSON: %s", err)
+				log.Fatalf("Error decoding body JSON: %s", err)
 				continue
 			}
 

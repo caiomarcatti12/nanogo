@@ -22,7 +22,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-func Publish(exchangeName string, routingKey string, body map[string]interface{}) {
+func Publish[T any](exchangeName string, routingKey string, body T) {
 	connection := NewInstanceRabbitmq()
 
 	bodyBytes, err := json.Marshal(body)
