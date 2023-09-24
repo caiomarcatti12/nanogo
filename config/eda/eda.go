@@ -1,5 +1,5 @@
 package eda
 
-type EDA interface {
+type EventDispatcherInterface interface {
 	SendEvent(event Event)
 }
