@@ -2,12 +2,19 @@ package jwt
 
 import (
 	"fmt"
+	"github.com/caiomarcatti12/nanogo/v2/config/env"
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )
 
-func NewJWTManager(signingKey string) *JWTManager {
-	return &JWTManager{signingKey: []byte(signingKey)}
+func NewJWTManager(signingKey ...string) *JWTManager {
+	var key []byte
+	if len(signingKey) > 0 && signingKey[0] != "" {
+		key = []byte(signingKey[0])
+	} else {
+		key = []byte(env.GetEnv("JTW_SECRET"))
+	}
+	return &JWTManager{signingKey: []byte(key)}
 }
 
 func (manager *JWTManager) GenerateToken(expirationTime time.Duration, data map[string]interface{}) (string, error) {
