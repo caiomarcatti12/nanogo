@@ -26,82 +26,31 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func PayloadMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-
 		payload := make(map[string]interface{})
 
-		// Se o método for GET, capture os parâmetros de consulta.
 		if r.Method == http.MethodGet {
-			for key, values := range r.URL.Query() {
-				if len(values) > 0 {
-					val := values[0]
-
-					// Se houver múltiplos valores para a mesma chave, armazene apenas o primeiro valor
-					// Tente converter o valor para um inteiro
-					if id, err := uuid.Parse(val); err == nil {
-						payload[key] = id
-					} else if intValue, err := strconv.Atoi(val); err == nil {
-						payload[key] = intValue
-					} else {
-						// Tente converter o valor para um float
-						if floatValue, err := strconv.ParseFloat(val, 64); err == nil {
-							payload[key] = floatValue
-						} else {
-							payload[key] = val
-						}
-					}
-				}
-			}
+			parseGetPayload(r, payload)
 		}
 
-		// Para todos os métodos, capture parâmetros da rota.
-		vars := mux.Vars(r)
-		for key, value := range vars {
-			// Tente converter o valor para UUID
-			if id, err := uuid.Parse(value); err == nil {
-				payload[key] = id
-			} else {
-				payload[key] = value
-			}
-		}
+		parseRoutePayload(r, payload)
 
-		if isMultiPart(r) == true {
-			err := checkMaxUploadSize(r)
-
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
+		if isMultiPart(r) {
+			if err := parseMultiPartPayload(r, w, payload); err != nil {
 				return
 			}
-
-			for key, values := range r.MultipartForm.Value {
-				if len(values) > 0 {
-					payload[key] = values[0]
-				}
-			}
-
-			for key := range r.MultipartForm.File {
-				fileUpload, err := parseUpload(r, key)
-
-				if err != nil {
-					http.Error(w, err.Error(), http.StatusBadRequest)
-					return
-				}
-
-				payload[key] = fileUpload
-			}
-
-		} else if r.Body != http.NoBody {
-			if err := json.NewDecoder(r.Body).Decode(&payload); err != nil && err != io.EOF {
-				http.Error(w, err.Error(), http.StatusBadRequest)
+		} else {
+			if err := parseJSONPayload(r, w, payload); err != nil {
 				return
 			}
 		}
 
-		if payload != nil {
+		if len(payload) > 0 {
 			newCtx := context.WithValue(ctx, "payload", payload)
 			next.ServeHTTP(w, r.WithContext(newCtx))
 		} else {
@@ -110,22 +59,83 @@ func PayloadMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+func parseGetPayload(r *http.Request, payload map[string]interface{}) {
+	for key, values := range r.URL.Query() {
+		if len(values) > 0 {
+			payload[key] = parseValue(values[0])
+		}
+	}
+}
+
+func parseRoutePayload(r *http.Request, payload map[string]interface{}) {
+	vars := mux.Vars(r)
+	for key, value := range vars {
+		payload[key] = parseValue(value)
+	}
+}
+
+func parseMultiPartPayload(r *http.Request, w http.ResponseWriter, payload map[string]interface{}) error {
+	if err := checkMaxUploadSize(r); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return err
+	}
+
+	for key, values := range r.MultipartForm.Value {
+		if len(values) > 0 {
+			payload[key] = parseValue(values[0])
+		}
+	}
+
+	for key := range r.MultipartForm.File {
+		fileUpload, err := parseUpload(r, key)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return err
+		}
+		payload[key] = fileUpload
+	}
+	return nil
+}
+
+func parseJSONPayload(r *http.Request, w http.ResponseWriter, payload map[string]interface{}) error {
+	if r.Body != http.NoBody {
+		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil && err != io.EOF {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return err
+		}
+	}
+	return nil
+}
+
+func parseValue(value string) interface{} {
+	if id, err := uuid.Parse(value); err == nil {
+		return id
+	} else if intValue, err := strconv.Atoi(value); err == nil {
+		return intValue
+	} else if floatValue, err := strconv.ParseFloat(value, 64); err == nil {
+		return floatValue
+	} else if boolValue, err := strconv.ParseBool(value); err == nil {
+		return boolValue
+	} else if timeValue, err := time.Parse(time.RFC3339, value); err == nil {
+		return timeValue
+	}
+	return value
+}
+
 func isMultiPart(r *http.Request) bool {
 	return strings.HasPrefix(r.Header.Get("Content-Type"), "multipart/form-data")
 }
 
 func checkMaxUploadSize(r *http.Request) error {
-	// Obtém o tamanho máximo de upload da variável de ambiente
 	maxUploadSizeStr := env.GetEnv("SERVER_MAX_UPLOAD_SIZE", "5")
 	maxUploadSize, err := strconv.ParseInt(maxUploadSizeStr, 10, 64)
 	if err != nil || maxUploadSize <= 0 {
-		maxUploadSize = 5 << 20 // Valor padrão de 5 MB
+		maxUploadSize = 5 << 20
 	}
 
-	// Define o tamanho máximo de upload
 	err = r.ParseMultipartForm(maxUploadSize)
 	if err != nil {
-		return UploadSizeExceededException(maxUploadSize)
+		return err
 	}
 	return nil
 }
@@ -139,7 +149,6 @@ func parseUpload(r *http.Request, name string) (*FileUpload, error) {
 
 	fileBytes, err := ioutil.ReadAll(file)
 	if err != nil {
-
 		return nil, err
 	}
 

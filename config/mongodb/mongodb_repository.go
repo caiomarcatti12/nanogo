@@ -18,6 +18,7 @@ package mongodb
 import (
 	"context"
 	"errors"
+	"github.com/caiomarcatti12/nanogo/v2/config/rsql"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"reflect"
 	"time"
@@ -149,6 +150,16 @@ func (r *MongoRepository[T]) FindAll() ([]T, error) {
 	}
 
 	return results, nil
+}
+
+func (r *MongoRepository[T]) RawQueryParseRsql(filter rsql.QueryFilter) ([]T, int64, error) {
+	query, sort, limit, skip, err := RsqlConvertToBson(filter)
+
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return r.RawQuery(query, sort, limit, skip)
 }
 
 func (r *MongoRepository[T]) RawQuery(query bson.M, sort bson.M, limit int64, skip int64) ([]T, int64, error) {

@@ -19,9 +19,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/mitchellh/mapstructure"
 	"reflect"
+	"strconv"
+	"time"
 )
 
-func Transform(input interface{}, output any) error {
+func Transform(input interface{}, output interface{}) error {
 	decoderConfig := &mapstructure.DecoderConfig{
 		DecodeHook: mapstructure.ComposeDecodeHookFunc(
 			func(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
@@ -32,6 +34,39 @@ func Transform(input interface{}, output any) error {
 					}
 					return &uuidVal, nil
 				}
+
+				if f.Kind() == reflect.String && t == reflect.TypeOf(time.Time{}) {
+					timeVal, err := time.Parse(time.RFC3339, data.(string))
+					if err != nil {
+						return nil, err
+					}
+					return timeVal, nil
+				}
+
+				if f.Kind() == reflect.String && t.Kind() == reflect.Int {
+					intVal, err := strconv.Atoi(data.(string))
+					if err != nil {
+						return nil, err
+					}
+					return intVal, nil
+				}
+
+				if f.Kind() == reflect.String && t.Kind() == reflect.Float64 {
+					floatVal, err := strconv.ParseFloat(data.(string), 64)
+					if err != nil {
+						return nil, err
+					}
+					return floatVal, nil
+				}
+
+				if f.Kind() == reflect.String && t.Kind() == reflect.Bool {
+					boolVal, err := strconv.ParseBool(data.(string))
+					if err != nil {
+						return nil, err
+					}
+					return boolVal, nil
+				}
+
 				return data, nil
 			},
 		),

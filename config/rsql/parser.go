@@ -13,36 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package rabbitmq
+package rsql
 
 import (
-	"encoding/json"
-
-	logger "github.com/caiomarcatti12/nanogo/v2/config/log"
-	"github.com/streadway/amqp"
+	"fmt"
+	"strings"
 )
 
-func Publish[T any](exchangeName string, routingKey string, body T) {
-	connection := NewInstanceRabbitmq()
+func Parse(rsql string) ([]Condition, error) {
+	var conditions []Condition
 
-	bodyBytes, err := json.Marshal(body)
-
-	if err != nil {
-		logger.Fatalf("Houve uma falha ao converter a struct para json: %s", err)
+	// Dividir a consulta RSQL em condições usando o delimitador ';'
+	for _, part := range strings.Split(rsql, ";") {
+		tokens := strings.Split(part, "==")
+		if len(tokens) != 2 {
+			return nil, fmt.Errorf("formato RSQL inválido")
+		}
+		conditions = append(conditions, Condition{Field: tokens[0], Operator: "==", Value: tokens[1]})
 	}
 
-	errPublish := connection.Channel.Publish(
-		exchangeName,
-		routingKey,
-		false,
-		false,
-		amqp.Publishing{
-			ContentType: "application/json",
-			Body:        bodyBytes,
-		},
-	)
-
-	if errPublish != nil {
-		logger.Fatalf("Failed to publish a message: %s", errPublish)
-	}
+	return conditions, nil
 }

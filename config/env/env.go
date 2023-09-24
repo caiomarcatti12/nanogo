@@ -45,7 +45,9 @@ func LoadEnv() {
 	logrus.Info("Carregamento do arquivo .env realizado")
 }
 
-func LoadRemoteEnv(params LoadRemoteEnvParams) {
+func LoadRemoteEnv(loadRemoteEnvParams ...LoadRemoteEnvParams) {
+	params := getLoadRemoteEnvParams(loadRemoteEnvParams...)
+
 	logrus.Debug("Carregando variaveis de ambiente remotamente.")
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/%s", params.Host, params.AppName, params.Env), nil)
@@ -107,6 +109,31 @@ func GetEnv(variable string, default_ ...string) string {
 	}
 
 	return value
+}
+
+func getLoadRemoteEnvParams(params ...LoadRemoteEnvParams) LoadRemoteEnvParams {
+	var p LoadRemoteEnvParams
+	if len(params) > 0 {
+		p = params[0]
+	}
+
+	if p.Host == "" {
+		p.Host = GetEnv("CLOUD_PROPERTIES_HOST", "")
+	}
+	if p.Token == "" {
+		p.Token = GetEnv("CLOUD_PROPERTIES_TOKEN", "")
+	}
+	if p.AppName == "" {
+		p.AppName = GetEnv("APP_NAME", "")
+	}
+	if p.Env == "" {
+		p.Env = GetEnv("ENV", "")
+	}
+	if p.Attempts == 0 {
+		p.Attempts = 1
+	}
+
+	return p
 }
 
 func autoRefresh(params LoadRemoteEnvParams) {

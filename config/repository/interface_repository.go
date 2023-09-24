@@ -16,14 +16,16 @@
 package repository
 
 import (
+	"github.com/caiomarcatti12/nanogo/v2/config/rsql"
 	"github.com/google/uuid"
 )
 
-type Repository[T any] interface {
+type Repository[T Model] interface {
 	Insert(document *T) (*T, error)
 	Update(document *T) (*T, error)
 	Delete(document *T) (bool, error)
 	FindById(id uuid.UUID) (*T, error)
 	DeleteById(id uuid.UUID) (bool, error)
 	FindAll() ([]*T, error)
+	RawQueryParseRsql(filter rsql.QueryFilter) ([]*T, int64, error)
 }

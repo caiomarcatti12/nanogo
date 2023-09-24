@@ -13,17 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package webserver
+package rsql
 
-import (
-	"github.com/caiomarcatti12/nanogo/v2/config/errors"
-	"net/http"
-	"strconv"
-)
-
-func UploadSizeExceededException(sizeLimit int64) *errors.CustomError {
-	return &errors.CustomError{
-		Code:    http.StatusBadRequest,
-		Message: "Upload size exceeded, limit: " + strconv.FormatInt(sizeLimit, 10),
-	}
+type QueryFilter struct {
+	Filter     *string `mapstructure:"filter"`
+	Size       *int64  `mapstructure:"size"`
+	Skip       *int64  `mapstructure:"skip"`
+	SortParams *string `mapstructure:"sortParams"`
 }
