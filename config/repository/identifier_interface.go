@@ -17,7 +17,7 @@ package repository
 
 import "github.com/google/uuid"
 
-type Model interface {
-	GetID() *uuid.UUID
-	SetID(id *uuid.UUID)
+type Identifier interface {
+	GetID() uuid.UUID
+	SetID(id uuid.UUID)
 }
