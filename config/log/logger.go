@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package webserver
+package log
 
 import (
-	"github.com/caiomarcatti12/nanogo/v2/config/log"
-	"net/http"
+	"context"
+
+	log "github.com/sirupsen/logrus"
 )
 
-func HealthcheckHandler(ctx *HandlerContext[any]) (interface{}, error) {
-	log.Debug("Healthcheck request received")
-
-	return &APIResponse{
-		Data:       "Service is up and running", // ou simplesmente nil se você não quiser enviar uma mensagem
-		StatusCode: http.StatusOK,
-		Headers:    map[string]string{"Content-Type": "text/plain"},
-	}, nil
+func GetLoggerFromContext(ctx context.Context) *log.Entry {
+	logger := ctx.Value("logger")
+	if logger == nil {
+		InitializeLogger()
+	}
+	return logger.(*log.Entry)
 }

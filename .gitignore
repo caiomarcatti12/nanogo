@@ -33,7 +33,6 @@ main.go
 __debug_bin
 *.sh
 # Ignorar tudo
-*
 
 # Não ignorar pastas e arquivos específicos
 !/.docs/

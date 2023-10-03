@@ -38,6 +38,10 @@ func GetCorrelationID() string {
 }
 
 func InitializeLogger() {
+	if logInitialized {
+		return
+	}
+
 	logrus.SetOutput(os.Stdout)
 	logrus.SetLevel(logrus.TraceLevel)
 
@@ -47,10 +51,16 @@ func InitializeLogger() {
 		logrus.SetFormatter(&logrus.TextFormatter{})
 	}
 
+	logInitialized = true
+
 	UpdateCorrelationID() // Call this to set the initial logger
 }
 
 func UpdateCorrelationID() {
+	if logger == nil {
+		InitializeLogger()
+	}
+
 	correlationID := GetCorrelationID()
 
 	logger = logrus.WithFields(logrus.Fields{
@@ -61,52 +71,55 @@ func UpdateCorrelationID() {
 	})
 }
 
+func extractFields(args ...interface{}) (string, logrus.Fields) {
+	if len(args) == 0 {
+		return "", nil
+	}
+
+	// Obtendo o primeiro nível
+	innerArgs, ok := args[0].([]interface{})
+	if !ok || len(innerArgs) == 0 {
+		return "", nil
+	}
+
+	// Extraindo a mensagem do primeiro nível
+	msg, _ := innerArgs[0].(string)
+
+	// Extraindo os campos, se existirem
+	fields := logrus.Fields{}
+	if len(innerArgs) > 1 {
+		fields, _ = innerArgs[1].(logrus.Fields)
+	}
+
+	return msg, fields
+}
+
 func Fatal(args ...interface{}) {
 	UpdateCorrelationID()
-	logger.Fatal(args)
+	msg, fields := extractFields(args)
+	logger.WithFields(fields).Fatal(msg)
 }
 
 func Debug(args ...interface{}) {
 	UpdateCorrelationID()
-	logger.Debug(args)
+	msg, fields := extractFields(args)
+	logger.WithFields(fields).Debug(msg)
 }
 
 func Info(args ...interface{}) {
 	UpdateCorrelationID()
-	logger.Info(args)
+	msg, fields := extractFields(args)
+	logger.WithFields(fields).Info(msg)
 }
 
 func Error(args ...interface{}) {
 	UpdateCorrelationID()
-	logger.Error(args)
+	msg, fields := extractFields(args)
+	logger.WithFields(fields).Error(msg)
 }
 
 func Warning(args ...interface{}) {
 	UpdateCorrelationID()
-	logger.Warning(args)
-}
-
-func Debugf(format string, args ...interface{}) {
-	UpdateCorrelationID()
-	logger.Debugf(format, args)
-}
-
-func Infof(format string, args ...interface{}) {
-	UpdateCorrelationID()
-	logger.Infof(format, args)
-}
-
-func Fatalf(format string, args ...interface{}) {
-	UpdateCorrelationID()
-	logger.Fatalf(format, args)
-}
-
-func Errorf(format string, args ...interface{}) {
-	UpdateCorrelationID()
-	logger.Errorf(format, args)
-}
-
-func Warningf(format string, args ...interface{}) {
-	UpdateCorrelationID()
-	logger.Warningf(format, args)
+	msg, fields := extractFields(args)
+	logger.WithFields(fields).Warning(msg)
 }
