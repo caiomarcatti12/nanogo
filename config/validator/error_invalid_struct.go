@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package errors
+package validator
 
-type CustomError struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Details interface{} `json:"details,omitempty"`
-}
+import (
+	"github.com/caiomarcatti12/nanogo/v2/config/errors"
+	"net/http"
+)
 
-func (e *CustomError) Error() string {
-	return e.Message
+func InvalidStructException(details string) *errors.CustomError {
+	return &errors.CustomError{
+		Code:    http.StatusBadRequest,
+		Message: "The data provided is invalid.",
+		Details: details,
+	}
 }
