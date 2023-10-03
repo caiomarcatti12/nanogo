@@ -29,6 +29,8 @@ var (
 	fcm            = context_manager.NewSafeContextManager()
 )
 
+type Fields map[string]interface{}
+
 // GetCorrelationID retrieves the correlationID from gls.
 func GetCorrelationID() string {
 	if correlationID, ok := fcm.GetValue("x-correlation-id"); ok {
@@ -88,7 +90,9 @@ func extractFields(args ...interface{}) (string, logrus.Fields) {
 	// Extraindo os campos, se existirem
 	fields := logrus.Fields{}
 	if len(innerArgs) > 1 {
-		fields, _ = innerArgs[1].(logrus.Fields)
+		if customFields, ok := innerArgs[1].(Fields); ok {
+			fields = logrus.Fields(customFields)
+		}
 	}
 
 	return msg, fields
