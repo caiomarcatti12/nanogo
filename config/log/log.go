@@ -16,6 +16,7 @@
 package log
 
 import (
+	"encoding/json"
 	"github.com/caiomarcatti12/nanogo/v2/config/context_manager"
 	"os"
 
@@ -90,8 +91,14 @@ func extractFields(args ...interface{}) (string, logrus.Fields) {
 	// Extraindo os campos, se existirem
 	fields := logrus.Fields{}
 	if len(innerArgs) > 1 {
-		if customFields, ok := innerArgs[1].(Fields); ok {
-			fields = logrus.Fields(customFields)
+		switch v := innerArgs[1].(type) {
+		case Fields:
+			fields = logrus.Fields(v)
+		default: // Tratar como struct ou qualquer outro tipo
+			data, err := json.Marshal(v)
+			if err == nil {
+				_ = json.Unmarshal(data, &fields)
+			}
 		}
 	}
 
