@@ -16,12 +16,10 @@
 package webserver
 
 import (
-	"context"
+	"github.com/caiomarcatti12/nanogo/v2/config/context_manager"
 	"net/http"
 
 	"github.com/google/uuid"
-
-	"github.com/caiomarcatti12/nanogo/v2/config/log"
 )
 
 func CorrelationIDMiddleware(next http.Handler) http.Handler {
@@ -32,12 +30,12 @@ func CorrelationIDMiddleware(next http.Handler) http.Handler {
 			r.Header.Set("X-Correlation-ID", correlationID)
 		}
 
-		// Criando uma nova instância de logrus com o field definido
-		logger := log.LoadLog(correlationID)
+		fcm := context_manager.NewSafeContextManager()
 
-		// Adicionando o logger ao contexto da requisição
-		ctx := context.WithValue(r.Context(), "logger", logger)
+		contextValues := fcm.CreateValue("x-correlation-id", correlationID)
 
-		next.ServeHTTP(w, r.WithContext(ctx))
+		fcm.SetValues(contextValues, func() {
+			next.ServeHTTP(w, r)
+		})
 	})
 }

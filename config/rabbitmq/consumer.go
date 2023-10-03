@@ -17,6 +17,8 @@ package rabbitmq
 
 import (
 	"encoding/json"
+	"github.com/caiomarcatti12/nanogo/v2/config/context_manager"
+	"github.com/google/uuid"
 	"log"
 	"reflect"
 )
@@ -72,7 +74,20 @@ func Consume[T any](exchange Exchange, queue Queue, consumer Consumer[T]) {
 				continue
 			}
 
-			consumer.Consume(bodyMap, headersMap)
+			// Pegue o x-correlation-id do header
+			correlationID, exists := headersMap["x-correlation-id"]
+			if !exists {
+				correlationID = uuid.New().String()
+			}
+
+			// Configure o x-correlation-id no contexto
+			fcm := context_manager.NewSafeContextManager()
+			contextValues := fcm.CreateValue("x-correlation-id", correlationID)
+
+			// Defina os valores no contexto e execute o consumer
+			fcm.SetValues(contextValues, func() {
+				consumer.Consume(bodyMap, headersMap)
+			})
 		}
 	}()
 }
