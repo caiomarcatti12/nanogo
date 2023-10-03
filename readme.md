@@ -83,6 +83,9 @@ O framework **Nanogo** oferece um conjunto robusto de funcionalidades projetadas
 - **[JWT Manager](./.docs/jwt.md)**
     - Crie e valide tokens JWT de maneira fácil e segura com o nosso JWT Manager.
 
+- **[Logger Integrado](./.docs/logger.md)**
+    - Monitore e rastreie as operações e eventos de seu aplicativo com eficiência e precisão usando nosso logger integrado. Com suporte a múltiplos níveis de log e Correlation ID.
+
 Cada funcionalidade foi meticulosamente desenvolvida para fornecer a melhor experiência possível aos desenvolvedores, poupando tempo e esforço ao criar softwares incríveis com **Nanogo**.
 
 ### **Como Contribuir**
@@ -102,3 +105,4 @@ Faça um favor a si e à comunidade: dedique um momento para ler e internalizar 
 O projeto Nanogo está disponível sob a licença Apache 2.0, uma licença permissiva e de código aberto que permite a liberdade de usar o software para qualquer finalidade, respeitando as limitações estabelecidas na [LICENÇA](license).
 
 Dessa forma, você pode contribuir, modificar e distribuir o projeto, estando protegido juridicamente e respeitando os direitos e esforços dos outros contribuintes.
+
