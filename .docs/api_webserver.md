@@ -9,10 +9,18 @@ Para configurar o servidor Web, você deve definir as seguintes variáveis de am
 ```sh
 SERVER_PORT=8080
 SERVER_MAX_UPLOAD_SIZE=5MB
+PRINT_INPUT=true
+PRINT_URL_INPUT=true
+PRINT_HEADER_INPUT=true
+PRINT_BODY_INPUT=true
 ```
 
 - `SERVER_PORT`: A porta que será disponibilizada a aplicação.
 - `SERVER_MAX_UPLOAD_SIZE`: Define o tamanho máximo permitido para upload por requisição. O valor padrão é 5MB.
+- `PRINT_INPUT`: Se ativada (setada para true), essa variável pode ser usada como uma opção para registrar todos os detalhes da requisição de entrada, incluindo URL, cabeçalhos e corpo da requisição. Se for a intenção, quando essa variável estiver setada para true, as demais (PRINT_URL_INPUT, PRINT_HEADER_INPUT, PRINT_BODY_INPUT) poderiam ser ignoradas, pois você estaria optando por registrar tudo.
+- `PRINT_URL_INPUT`: Quando ativada, essa variável indica que a URL da requisição de entrada deve ser registrada.
+- `PRINT_HEADER_INPUT`: Se ativada, essa variável indica que os cabeçalhos da requisição HTTP de entrada devem ser registrados
+- `PRINT_BODY_INPUT`:  Quando setada para true, essa variável sinaliza que o corpo da requisição de entrada (payload) deve ser registrado
 
 
 #### Inicialização do Servidor Web
@@ -172,6 +180,7 @@ func CreateHandler(ctx *webserver.HandlerContext[dto.ApplicationCreateDTO]) (int
 }
 ```
 
+---
 
 ### Exemplo de Controlador com  Download de um Arquivo
 
@@ -202,3 +211,30 @@ func DownloadHandler(ctx *webserver.HandlerContext[dto.ApplicationCreateDTO]) (i
 ```
 
 Neste exemplo, o `DownloadHandler` está configurado para retornar um conjunto de bytes que representam o conteúdo do arquivo. Os cabeçalhos da resposta HTTP são configurados para indicar o tipo de conteúdo como "application/octet-stream", e um cabeçalho "Content-Disposition" está sendo usado para especificar que a resposta deve ser tratada como um arquivo para download, dando-lhe um nome de arquivo específico ("meuarquivo.txt").
+
+
+Claro! Vou criar uma seção que aborda a validação de structs de entrada sem expor diretamente a biblioteca mencionada:
+
+---
+
+### Validação da Struct de Entrada
+
+A fim de assegurar a integridade e a consistência dos dados que fluem através do sistema, nosso framework oferece um mecanismo robusto de validação para os dados de entrada. Esta validação é realizada antes de os dados chegarem à rota específica, garantindo que o controlador receba apenas dados válidos e bem formados.
+
+#### Uso Básico
+
+A validação é aplicada diretamente nas structs de entrada usando anotações. Por exemplo, considere a seguinte struct que representa um usuário:
+
+```go
+type User struct {
+	FirstName string `validate:"required"`
+	Email     string
+	Age       int
+}
+```
+
+Neste exemplo, a anotação `validate:"required"` assegura que o campo `FirstName` não esteja vazio quando uma instância da struct `User` é validada.
+
+#### Abstração da Validação
+
+Embora as anotações forneçam um meio direto de especificar regras de validação, é importante notar que a lógica e a implementação subjacentes da validação são abstraídas pelo framework. Isso significa que os desenvolvedores não precisam se preocupar em invocar explicitamente uma função de validação ou em gerenciar erros de validação. Em vez disso, se um erro de validação ocorrer, ele será tratado de maneira adequada pela camada superior do framework, e uma resposta apropriada será enviada ao cliente.
