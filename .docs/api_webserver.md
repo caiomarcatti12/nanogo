@@ -9,10 +9,15 @@ Para configurar o servidor Web, você deve definir as seguintes variáveis de am
 ```sh
 SERVER_PORT=8080
 SERVER_MAX_UPLOAD_SIZE=5MB
+
 PRINT_INPUT=true
 PRINT_URL_INPUT=true
 PRINT_HEADER_INPUT=true
 PRINT_BODY_INPUT=true
+
+ENABLE_SWAGGER=false
+SWAGGER_DOCS_ROUTE=/swagger
+SWAGGER_DOCS_PATH=.docs/swagger/
 ```
 
 - `SERVER_PORT`: A porta que será disponibilizada a aplicação.
@@ -21,6 +26,9 @@ PRINT_BODY_INPUT=true
 - `PRINT_URL_INPUT`: Quando ativada, essa variável indica que a URL da requisição de entrada deve ser registrada.
 - `PRINT_HEADER_INPUT`: Se ativada, essa variável indica que os cabeçalhos da requisição HTTP de entrada devem ser registrados
 - `PRINT_BODY_INPUT`:  Quando setada para true, essa variável sinaliza que o corpo da requisição de entrada (payload) deve ser registrado
+- `ENABLE_SWAGGER`: Indica se a documentação Swagger deve ser habilitada. O valor padrão é false.
+- `SWAGGER_DOCS_ROUTE`: Define a rota para acessar a documentação Swagger. O valor padrão é /swagger.
+- `SWAGGER_DOCS_PATH`: Especifica o caminho para os arquivos da documentação Swagger. O valor padrão é .docs/swagger/.
 
 
 #### Inicialização do Servidor Web
@@ -238,3 +246,54 @@ Neste exemplo, a anotação `validate:"required"` assegura que o campo `FirstNam
 #### Abstração da Validação
 
 Embora as anotações forneçam um meio direto de especificar regras de validação, é importante notar que a lógica e a implementação subjacentes da validação são abstraídas pelo framework. Isso significa que os desenvolvedores não precisam se preocupar em invocar explicitamente uma função de validação ou em gerenciar erros de validação. Em vez disso, se um erro de validação ocorrer, ele será tratado de maneira adequada pela camada superior do framework, e uma resposta apropriada será enviada ao cliente.
+
+### Documentação Atualizada:
+
+---
+
+### WebServer
+
+A biblioteca oferece uma maneira simplificada e estruturada para configurar e iniciar um servidor web, definir rotas e controladores para manipular requisições HTTP.
+
+#### Configuração
+
+Para configurar o servidor Web, você deve definir as seguintes variáveis de ambiente:
+
+```sh
+SERVER_PORT=8080
+SERVER_MAX_UPLOAD_SIZE=5MB
+PRINT_INPUT=true
+PRINT_URL_INPUT=true
+PRINT_HEADER_INPUT=true
+PRINT_BODY_INPUT=true
+ENABLE_SWAGGER=false
+SWAGGER_DOCS_ROUTE=/swagger
+SWAGGER_DOCS_PATH=.docs/swagger/
+```
+
+- `SERVER_PORT`: A porta que será disponibilizada a aplicação.
+- `SERVER_MAX_UPLOAD_SIZE`: Define o tamanho máximo permitido para upload por requisição. O valor padrão é 5MB.
+- `PRINT_INPUT`: Se ativada (setada para true), essa variável pode ser usada como uma opção para registrar todos os detalhes da requisição de entrada, incluindo URL, cabeçalhos e corpo da requisição.
+- `PRINT_URL_INPUT`: Quando ativada, essa variável indica que a URL da requisição de entrada deve ser registrada.
+- `PRINT_HEADER_INPUT`: Se ativada, essa variável indica que os cabeçalhos da requisição HTTP de entrada devem ser registrados.
+- `PRINT_BODY_INPUT`: Quando setada para true, essa variável sinaliza que o corpo da requisição de entrada (payload) deve ser registrado.
+- `ENABLE_SWAGGER`: Indica se a documentação Swagger deve ser habilitada. O valor padrão é false.
+- `SWAGGER_DOCS_ROUTE`: Define a rota para acessar a documentação Swagger. O valor padrão é `/swagger`.
+- `SWAGGER_DOCS_PATH`: Especifica o caminho para os arquivos da documentação Swagger. O valor padrão é `.docs/swagger/`.
+
+### Swagger
+
+O Swagger é uma ferramenta poderosa para documentação de APIs. Com a integração do Swagger nesta biblioteca, os usuários podem visualizar e interagir com a API de forma intuitiva, proporcionando uma forma clara de entender a funcionalidade da API.
+
+Para habilitar a documentação Swagger, defina a variável de ambiente `ENABLE_SWAGGER` como `true`. Isso ativa uma rota adicional definida pela variável `SWAGGER_DOCS_ROUTE` (com valor padrão `/swagger`) para acessar a documentação. Os arquivos do Swagger são servidos a partir do caminho especificado pela variável `SWAGGER_DOCS_PATH`.
+
+
+#### Gerando Documentação Swagger
+
+Para gerar a documentação Swagger, usamos a biblioteca [swag](https://github.com/swaggo/swag). Para gerar ou atualizar a documentação, execute o seguinte comando:
+
+```sh
+swag init -o .docs/swagger
+```
+
+Isso gera os arquivos necessários no caminho especificado por `SWAGGER_DOCS_PATH`. Certifique-se de executar este comando sempre que fizer alterações na API para manter a documentação atualizada.

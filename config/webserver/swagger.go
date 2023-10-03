@@ -17,13 +17,21 @@ package webserver
 
 import (
 	"github.com/caiomarcatti12/nanogo/v2/config/env"
+	"io/ioutil"
+	"net/http"
 )
 
-func WebserverDefaultRouter() {
-	AddRouter("GET", "/healthcheck", HealthcheckHandler)
+func SwaggerHandler(ctx *HandlerContext[any]) (interface{}, error) {
+	docsPath := env.GetEnv("SWAGGER_DOCS_PATH", ".docs/swagger/swaggeer.yaml")
 
-	if env.GetEnvBool("ENABLE_SWAGGER", "false") {
-		docsRoute := env.GetEnv("SWAGGER_DOCS_ROUTE", "/swagger")
-		AddRouter("GET", docsRoute, SwaggerHandler)
+	content, err := ioutil.ReadFile(docsPath)
+	if err != nil {
+		return nil, err
 	}
+
+	return &APIResponse{
+		Data:       content,
+		StatusCode: http.StatusOK,
+		Headers:    map[string]string{"Content-Type": "application/x-yaml"},
+	}, nil
 }
