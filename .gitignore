@@ -32,3 +32,18 @@ main.go
 
 __debug_bin
 *.sh
+# Ignorar tudo
+
+# Não ignorar pastas e arquivos específicos
+!/.docs/
+!/config/
+!.env.example
+!.gitignore
+!code_of_conduct.md
+!contributing.md
+!license
+!readme.md
+
+# Dentro das pastas que você não deseja ignorar, especifique para não ignorar seus conteúdos
+!/.docs/*
+!/config/*

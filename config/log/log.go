@@ -16,6 +16,8 @@
 package log
 
 import (
+	"encoding/json"
+	"github.com/caiomarcatti12/nanogo/v2/config/context_manager"
 	"os"
 
 	"github.com/caiomarcatti12/nanogo/v2/config/env"
@@ -25,14 +27,22 @@ import (
 var (
 	logger         *logrus.Entry
 	logInitialized bool
+	fcm            = context_manager.NewSafeContextManager()
 )
 
-func LoadLog(correlationID ...string) *logrus.Entry {
-	var cid string
-	if len(correlationID) > 0 {
-		cid = correlationID[0]
-	} else {
-		cid = ""
+type Fields map[string]interface{}
+
+// GetCorrelationID retrieves the correlationID from gls.
+func GetCorrelationID() string {
+	if correlationID, ok := fcm.GetValue("x-correlation-id"); ok {
+		return correlationID.(string)
+	}
+	return ""
+}
+
+func InitializeLogger() {
+	if logInitialized {
+		return
 	}
 
 	logrus.SetOutput(os.Stdout)
@@ -44,94 +54,83 @@ func LoadLog(correlationID ...string) *logrus.Entry {
 		logrus.SetFormatter(&logrus.TextFormatter{})
 	}
 
+	logInitialized = true
+
+	UpdateCorrelationID() // Call this to set the initial logger
+}
+
+func UpdateCorrelationID() {
+	if logger == nil {
+		InitializeLogger()
+	}
+
+	correlationID := GetCorrelationID()
+
 	logger = logrus.WithFields(logrus.Fields{
 		"app":              env.GetEnv("APP_NAME"),
 		"env":              env.GetEnv("ENV"),
 		"version":          env.GetEnv("VERSION"),
-		"x-correlation-id": cid,
+		"x-correlation-id": correlationID,
 	})
+}
 
-	logInitialized = true
+func extractFields(args ...interface{}) (string, logrus.Fields) {
+	if len(args) == 0 {
+		return "", nil
+	}
 
-	return logger
+	// Obtendo o primeiro nível
+	innerArgs, ok := args[0].([]interface{})
+	if !ok || len(innerArgs) == 0 {
+		return "", nil
+	}
+
+	// Extraindo a mensagem do primeiro nível
+	msg, _ := innerArgs[0].(string)
+
+	// Extraindo os campos, se existirem
+	fields := logrus.Fields{}
+	if len(innerArgs) > 1 {
+		switch v := innerArgs[1].(type) {
+		case Fields:
+			fields = logrus.Fields(v)
+		default: // Tratar como struct ou qualquer outro tipo
+			data, err := json.Marshal(v)
+			if err == nil {
+				_ = json.Unmarshal(data, &fields)
+			}
+		}
+	}
+
+	return msg, fields
 }
 
 func Fatal(args ...interface{}) {
-	if !logInitialized {
-		LoadLog()
-	}
-
-	logger.Fatal(args)
+	UpdateCorrelationID()
+	msg, fields := extractFields(args)
+	logger.WithFields(fields).Fatal(msg)
 }
 
 func Debug(args ...interface{}) {
-	if !logInitialized {
-		LoadLog()
-	}
-
-	logger.Debug(args)
+	UpdateCorrelationID()
+	msg, fields := extractFields(args)
+	logger.WithFields(fields).Debug(msg)
 }
 
 func Info(args ...interface{}) {
-	if !logInitialized {
-		LoadLog()
-	}
-
-	logger.Info(args)
+	UpdateCorrelationID()
+	msg, fields := extractFields(args)
+	logger.WithFields(fields).Info(msg)
 }
 
 func Error(args ...interface{}) {
-	if !logInitialized {
-		LoadLog()
-	}
-
-	logger.Error(args)
+	UpdateCorrelationID()
+	msg, fields := extractFields(args)
+	logger.WithFields(fields).Error(msg)
 }
 
 func Warning(args ...interface{}) {
-	if !logInitialized {
-		LoadLog()
-	}
-
-	logger.Warning(args)
-}
-
-func Debugf(format string, args ...interface{}) {
-	if !logInitialized {
-		LoadLog()
-	}
-
-	logger.Debugf(format, args)
-}
-
-func Infof(format string, args ...interface{}) {
-	if !logInitialized {
-		LoadLog()
-	}
-
-	logger.Infof(format, args)
-}
-
-func Fatalf(format string, args ...interface{}) {
-	if !logInitialized {
-		LoadLog()
-	}
-
-	logger.Fatalf(format, args)
-}
-
-func Errorf(format string, args ...interface{}) {
-	if !logInitialized {
-		LoadLog()
-	}
-
-	logger.Errorf(format, args)
-}
-
-func Warningf(format string, args ...interface{}) {
-	if !logInitialized {
-		LoadLog()
-	}
-
-	logger.Warningf(format, args)
+	UpdateCorrelationID()
+	msg, fields := extractFields(args)
+	logger.WithFields(fields).Warning(msg)
 }

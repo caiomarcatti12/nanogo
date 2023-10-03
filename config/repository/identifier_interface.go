@@ -13,18 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package log
+package repository
 
-import (
-	"context"
+import "github.com/google/uuid"
 
-	log "github.com/sirupsen/logrus"
-)
-
-func GetLoggerFromContext(ctx context.Context) *log.Entry {
-	logger := ctx.Value("logger")
-	if logger == nil {
-		InitializeLogger()
-	}
-	return logger.(*log.Entry)
+type Identifier interface {
+	GetID() uuid.UUID
+	SetID(id uuid.UUID)
 }

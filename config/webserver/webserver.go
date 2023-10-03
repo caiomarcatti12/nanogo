@@ -22,8 +22,9 @@ import (
 	"github.com/caiomarcatti12/nanogo/v2/config/env"
 	"github.com/caiomarcatti12/nanogo/v2/config/errors"
 	"github.com/caiomarcatti12/nanogo/v2/config/mapper"
+	"github.com/caiomarcatti12/nanogo/v2/config/validator"
 	"net/http"
-	"os"
+	"strconv"
 	"sync"
 
 	"github.com/caiomarcatti12/nanogo/v2/config/log"
@@ -46,7 +47,7 @@ var (
 func getWebServerInstance() *WebServer {
 	once.Do(func() {
 		router := mux.NewRouter()
-		port := getPortWebServer()
+		port := env.GetEnv("SERVER_PORT", "8080")
 		crt := env.GetEnv("SERVER_CERTIFICATE", "")
 		key := env.GetEnv("SERVER_KEY", "")
 
@@ -87,18 +88,34 @@ func AddRouter[T any](method string, path string, f func(ctx *HandlerContext[T])
 		contextPayload := r.Context().Value("payload")
 
 		// type assertion aqui
+		logInput(r.URL.RawQuery, r.Header, contextPayload)
+
 		var typedPayload T
 		if len(decoderType) > 0 && !isNil(decoderType[0]) {
 			err := mapper.Transform(contextPayload, &typedPayload)
 			if err != nil {
-				sendJSONError(w, "Invalid payload format: "+err.Error(), http.StatusBadRequest)
+				sendJSONError(w, "Invalid payload format: "+err.Error(), http.StatusBadRequest, "")
+				return
+			}
+
+			errorValidateStruct := validator.ValidateStruct(typedPayload)
+
+			if errorValidateStruct != nil {
+				sendJSONError(w, errorValidateStruct.Message, errorValidateStruct.Code, errorValidateStruct.Details)
 				return
 			}
 		} else if contextPayload != nil {
 			if tp, ok := contextPayload.(T); ok {
 				typedPayload = tp
+
+				errorValidateStruct := validator.ValidateStruct(typedPayload)
+
+				if errorValidateStruct != nil {
+					sendJSONError(w, errorValidateStruct.Message, errorValidateStruct.Code, errorValidateStruct.Details)
+					return
+				}
 			} else {
-				sendJSONError(w, "Mismatched payload type", http.StatusBadRequest)
+				sendJSONError(w, "Mismatched payload type", http.StatusBadRequest, "")
 				return
 			}
 		}
@@ -113,10 +130,10 @@ func AddRouter[T any](method string, path string, f func(ctx *HandlerContext[T])
 
 		if err != nil {
 			if customErr, ok := err.(*errors.CustomError); ok {
-				sendJSONError(w, customErr.Message, customErr.Code)
+				sendJSONError(w, customErr.Message, customErr.Code, customErr.Details)
 				return
 			} else {
-				sendJSONError(w, err.Error(), http.StatusInternalServerError)
+				sendJSONError(w, err.Error(), http.StatusInternalServerError, "")
 				return
 			}
 		}
@@ -139,7 +156,7 @@ func AddRouter[T any](method string, path string, f func(ctx *HandlerContext[T])
 				case string:
 					w.Write([]byte(v))
 				default:
-					sendJSONError(w, "Unsupported data type", http.StatusInternalServerError)
+					sendJSONError(w, "Unsupported data type", http.StatusInternalServerError, "")
 					return
 				}
 			} else if apiResponse.Data != nil {
@@ -177,26 +194,58 @@ func (ws *WebServer) Start() {
 	}
 }
 
-func getPortWebServer() string {
-	port := os.Getenv("SERVER_PORT")
-
-	if port == "" {
-		log.Fatal("A porta do servidor não foi definida no arquivo .env")
-	}
-
-	return port
-}
-
-func sendJSONError(w http.ResponseWriter, errorMessage string, statusCode int) {
+func sendJSONError(w http.ResponseWriter, errorMessage string, statusCode int, details interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 
+	if statusCode == 500 {
+		log.Error(errorMessage, log.Fields{"details": details})
+
+		if env.GetEnv("ENV", "dev") == "production" {
+			details = nil
+		}
+	}
+
 	// Encode and send the error message
-	json.NewEncoder(w).Encode(map[string]string{
-		"error": errorMessage,
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"details": details,
+		"error":   errorMessage,
 	})
 }
 
 func isNil(i interface{}) bool {
 	return i == nil
+}
+
+func logInput(url string, header http.Header, payload interface{}) {
+	if isLogEnabled("PRINT_INPUT") || isAnyInputLogEnabled() {
+		fields := make(log.Fields)
+
+		if isLogEnabled("PRINT_INPUT") || isLogEnabled("PRINT_URL_INPUT") {
+			fields["url"] = url
+		}
+
+		if isLogEnabled("PRINT_INPUT") || isLogEnabled("PRINT_HEADER_INPUT") {
+			fields["headers"] = header
+		}
+
+		if isLogEnabled("PRINT_INPUT") || isLogEnabled("PRINT_BODY_INPUT") {
+			fields["payload"] = payload
+		}
+
+		log.Debug("Logging input data for incoming request.", fields)
+	}
+}
+
+func isAnyInputLogEnabled() bool {
+	return isLogEnabled("PRINT_URL_INPUT") || isLogEnabled("PRINT_HEADER_INPUT") || isLogEnabled("PRINT_BODY_INPUT")
+}
+
+func isLogEnabled(envVarName string) bool {
+	envValue := env.GetEnv(envVarName, "false")
+	b, err := strconv.ParseBool(envValue)
+	if err != nil {
+		return false
+	}
+	return b
 }

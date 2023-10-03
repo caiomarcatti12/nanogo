@@ -19,6 +19,7 @@ import (
 	"context"
 	"errors"
 	"github.com/caiomarcatti12/nanogo/v2/config/rsql"
+	"github.com/caiomarcatti12/nanogo/v2/config/util"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"reflect"
 	"time"
@@ -30,12 +31,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type MongoRepository[T repository.Model] struct {
-	collection *mongo.Collection
+type MongoRepository[T repository.Identifier] struct {
+	collection mongo.Collection
 	model      T
 }
 
-func NewMongoRepository[T repository.Model](collectionName string, model T) MongoRepository[T] {
+func NewMongoRepository[T repository.Identifier](collectionName string, model T) MongoRepository[T] {
 	db, err := ConnectMongoDB()
 
 	if err != nil {
@@ -43,7 +44,7 @@ func NewMongoRepository[T repository.Model](collectionName string, model T) Mong
 	}
 
 	collection := db.Collection(collectionName)
-	return MongoRepository[T]{collection: collection, model: model}
+	return MongoRepository[T]{collection: *collection, model: model}
 }
 
 func (r *MongoRepository[T]) Insert(document T) (T, error) {
@@ -55,8 +56,9 @@ func (r *MongoRepository[T]) Insert(document T) (T, error) {
 		return reflect.Zero(reflect.TypeOf(document)).Interface().(T), errors.New("erro ao gerar UUID: " + err.Error())
 	}
 
-	document.SetID(&uuid)
-	_, err = r.collection.InsertOne(ctx, document)
+	document.SetID(uuid)
+	cp := document
+	_, err = r.collection.InsertOne(ctx, cp)
 	if err != nil {
 		log.Errorf("Erro ao inserir documento: %v", err)
 		return reflect.Zero(reflect.TypeOf(document)).Interface().(T), err
@@ -65,7 +67,7 @@ func (r *MongoRepository[T]) Insert(document T) (T, error) {
 	return document, nil
 }
 
-func (r *MongoRepository[T]) Update(document T) (T, error) {
+func (r *MongoRepository[T]) Update(document T) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -74,10 +76,10 @@ func (r *MongoRepository[T]) Update(document T) (T, error) {
 	_, err := r.collection.UpdateOne(ctx, filter, updateDoc)
 	if err != nil {
 		log.Errorf("Erro ao atualizar documento: %v", err)
-		return reflect.Zero(reflect.TypeOf(document)).Interface().(T), err
+		return false, err
 	}
 
-	return document, nil
+	return true, nil
 }
 
 func (r *MongoRepository[T]) Delete(document T) (bool, error) {
@@ -118,11 +120,11 @@ func (r *MongoRepository[T]) FindById(id uuid.UUID) (T, error) {
 
 	if err != nil {
 		if err.Error() == "mongo: no documents in result" {
-			return reflect.Zero(reflect.TypeOf(r.model)).Interface().(T), nil
+			return util.ZeroReflectGeneric(r.model), nil
 		}
 
 		log.Errorf("Erro ao encontrar documento pelo ID: %v", err)
-		return reflect.Zero(reflect.TypeOf(r.model)).Interface().(T), err
+		return util.ZeroReflectGeneric(r.model), err
 	}
 
 	return result, nil

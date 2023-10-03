@@ -13,11 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package repository
+package validator
 
-import "github.com/google/uuid"
+import (
+	"github.com/caiomarcatti12/nanogo/v2/config/errors"
+	"net/http"
+)
 
-type Model interface {
-	GetID() *uuid.UUID
-	SetID(id *uuid.UUID)
+func InvalidStructException(details string) *errors.CustomError {
+	return &errors.CustomError{
+		Code:    http.StatusBadRequest,
+		Message: "The data provided is invalid.",
+		Details: details,
+	}
 }
