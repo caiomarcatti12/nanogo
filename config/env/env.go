@@ -111,6 +111,16 @@ func GetEnv(variable string, default_ ...string) string {
 	return value
 }
 
+func GetEnvBool(variable string, default_ ...string) bool {
+	value := GetEnv(variable, default_...)
+
+	b, err := strconv.ParseBool(value)
+	if err != nil {
+		return false
+	}
+	return b
+}
+
 func getLoadRemoteEnvParams(params ...LoadRemoteEnvParams) LoadRemoteEnvParams {
 	var p LoadRemoteEnvParams
 	if len(params) > 0 {
