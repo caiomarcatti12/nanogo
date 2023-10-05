@@ -47,3 +47,4 @@ __debug_bin
 # Dentro das pastas que você não deseja ignorar, especifique para não ignorar seus conteúdos
 !/.docs/*
 !/config/*
+/.docs/swagger/*

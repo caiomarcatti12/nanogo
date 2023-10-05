@@ -18,17 +18,24 @@ ENV_REFRESH_TIME=5
 
 Depois de definir essas variáveis básicas no arquivo `.env` local, você pode utilizá-las para configurar os parâmetros de `LoadRemoteEnvParams` e iniciar o carregamento remoto de variáveis de ambiente:
 
+Os parâmetros para a função `LoadRemoteEnv` são opcionais. Caso você não forneça os valores durante a chamada, eles serão buscados a partir das respectivas variáveis de ambiente configuradas em seu arquivo `.env` ou no ambiente de execução atual.
+
+**Exemplo de uso:**
+
 ```go
 func main() {
-	env.LoadEnv()
-	
-	env.LoadRemoteEnv(env.LoadRemoteEnvParams{
+	params := env.LoadRemoteEnvParams{
 		Host:     env.GetEnv("CLOUD_PROPERTIES_HOST"),
 		Token:    env.GetEnv("CLOUD_PROPERTIES_TOKEN"),
 		AppName:  env.GetEnv("APP_NAME"),
 		Env:      env.GetEnv("ENV"),
 		Attempts: 1,
-	})
+	}
+	
+	env.LoadRemoteEnv(params)
+	
+	// Os parâmetros para a função `LoadRemoteEnv` são opcionais.
+	env.LoadRemoteEnv()
 }
 ```
 

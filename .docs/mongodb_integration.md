@@ -31,7 +31,7 @@ func main() {
 
 ### Definindo o Modelo
 
-Defina o modelo da sua entidade implementando a interface `repository.Model`. Aqui está um modelo simplificado baseado no exemplo fornecido:
+Defina o modelo da sua entidade implementando a interface `repository.Identifier`. Aqui está um modelo simplificado baseado no exemplo fornecido:
 
 ```go
 package model
@@ -41,18 +41,18 @@ import (
 	"github.com/google/uuid"
 )
 
-var _ repository.Model = &MyEntity{}
+var _ repository.Identifier = &MyEntity{}
 
 type MyEntity struct {
-	ID       *uuid.UUID `bson:"_id,omitempty"`
+	ID       uuid.UUID `bson:"_id,omitempty"`
 	Name     string     `bson:"name"`
 }
 
-func (e *MyEntity) GetID() *uuid.UUID {
+func (e *MyEntity) GetID() uuid.UUID {
 	return e.ID
 }
 
-func (e *MyEntity) SetID(id *uuid.UUID) {
+func (e *MyEntity) SetID(id uuid.UUID) {
 	e.ID = id
 }
 ```
@@ -70,7 +70,7 @@ import (
 )
 
 type MyEntityRepositoryInterface interface {
-	repository.Repository[model.MyEntity]
+	repository.Repository[*model.MyEntity]
 }
 ```
 
@@ -89,39 +89,53 @@ import (
 	"github.com/google/uuid"
 )
 
+var _ repository.Repository[*model.MyEntity] = &MyEntityMongoRepository{}
+
 type MyEntityMongoRepository struct {
 	collection mongodb.MongoRepository[*model.MyEntity]
 }
 
 func NewMyEntityMongoRepository() MyEntityMongoRepository {
 	return MyEntityMongoRepository{
-		collection: mongodb.NewMongoRepository("my_entities", &model.MyEntity{}),
+		collection: mongodb.NewMongoRepository("MyEntity", &model.MyEntity{}),
 	}
 }
 
+// Implementando o método Insert da interface Repository
 func (r MyEntityMongoRepository) Insert(document *model.MyEntity) (*model.MyEntity, error) {
 	return r.collection.Insert(document)
 }
 
-func (r MyEntityMongoRepository) Update(document *model.MyEntity) (*model.MyEntity, error) {
+// Implementando o método Update da interface Repository
+func (r MyEntityMongoRepository) Update(document *model.MyEntity) (bool, error) {
 	return r.collection.Update(document)
 }
 
+// Implementando o método Delete da interface Repository
 func (r MyEntityMongoRepository) Delete(document *model.MyEntity) (bool, error) {
 	return r.collection.Delete(document)
 }
 
+// Implementando o método DeleteById da interface Repository
 func (r MyEntityMongoRepository) DeleteById(id uuid.UUID) (bool, error) {
 	return r.collection.DeleteById(id)
 }
 
+// Implementando o método FindById da interface Repository
 func (r MyEntityMongoRepository) FindById(id uuid.UUID) (*model.MyEntity, error) {
 	return r.collection.FindById(id)
 }
 
+// Implementando o método FindAll da interface Repository
 func (r MyEntityMongoRepository) FindAll() ([]*model.MyEntity, error) {
 	return r.collection.FindAll()
 }
+
+// Implementando o método RawQueryParseRsql da interface Repository
+func (r MyEntityMongoRepository) RawQueryParseRsql(filter rsql.QueryFilter) ([]*model.MyEntity, int64, error) {
+	return r.collection.RawQueryParseRsql(filter)
+}
+
 ```
 
 Neste código:

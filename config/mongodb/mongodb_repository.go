@@ -60,7 +60,7 @@ func (r *MongoRepository[T]) Insert(document T) (T, error) {
 	cp := document
 	_, err = r.collection.InsertOne(ctx, cp)
 	if err != nil {
-		log.Errorf("Erro ao inserir documento: %v", err)
+		log.Error("Erro ao inserir documento", err)
 		return reflect.Zero(reflect.TypeOf(document)).Interface().(T), err
 	}
 
@@ -75,7 +75,7 @@ func (r *MongoRepository[T]) Update(document T) (bool, error) {
 	updateDoc := bson.M{"$set": document}
 	_, err := r.collection.UpdateOne(ctx, filter, updateDoc)
 	if err != nil {
-		log.Errorf("Erro ao atualizar documento: %v", err)
+		log.Error("Erro ao atualizar documento", err)
 		return false, err
 	}
 
@@ -89,7 +89,7 @@ func (r *MongoRepository[T]) Delete(document T) (bool, error) {
 	filter := bson.D{{"_id", document.GetID()}}
 	_, err := r.collection.DeleteOne(ctx, filter)
 	if err != nil {
-		log.Errorf("Erro ao deletar documento: %v", err)
+		log.Error("Erro ao deletar documento", err)
 		return false, err
 	}
 
@@ -103,7 +103,7 @@ func (r *MongoRepository[T]) DeleteById(uuid uuid.UUID) (bool, error) {
 	filter := bson.D{{"_id", uuid}}
 	result, err := r.collection.DeleteOne(ctx, filter)
 	if err != nil {
-		log.Errorf("Erro ao deletar documento: %v", err)
+		log.Error("Erro ao deletar documento", err)
 		return false, err
 	}
 
@@ -123,7 +123,7 @@ func (r *MongoRepository[T]) FindById(id uuid.UUID) (T, error) {
 			return util.ZeroReflectGeneric(r.model), nil
 		}
 
-		log.Errorf("Erro ao encontrar documento pelo ID: %v", err)
+		log.Error("Erro ao encontrar documento pelo ID", err)
 		return util.ZeroReflectGeneric(r.model), err
 	}
 
@@ -142,7 +142,7 @@ func (r *MongoRepository[T]) FindAll() ([]T, error) {
 
 	var results []T
 	if err = cursor.All(ctx, &results); err != nil {
-		log.Errorf("Erro ao buscar todos os documentos: %v", err)
+		log.Error("Erro ao buscar todos os documentos", err)
 		return nil, err
 	}
 
@@ -193,7 +193,7 @@ func (r *MongoRepository[T]) RawQuery(query bson.M, sort bson.M, limit int64, sk
 
 	count, err := r.collection.CountDocuments(ctx, query)
 	if err != nil {
-		log.Errorf("Erro ao contar os documentos: %v", err)
+		log.Error("Erro ao contar os documentos", err)
 		return nil, 0, err
 	}
 
@@ -206,7 +206,7 @@ func (r *MongoRepository[T]) RawQueryCount(query bson.M) (int64, error) {
 
 	count, err := r.collection.CountDocuments(ctx, query)
 	if err != nil {
-		log.Errorf("Erro ao contar os documentos: %v", err)
+		log.Error("Erro ao contar os documentos", err)
 		return 0, err
 	}
 

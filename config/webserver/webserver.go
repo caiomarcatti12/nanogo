@@ -24,7 +24,6 @@ import (
 	"github.com/caiomarcatti12/nanogo/v2/config/mapper"
 	"github.com/caiomarcatti12/nanogo/v2/config/validator"
 	"net/http"
-	"strconv"
 	"sync"
 
 	"github.com/caiomarcatti12/nanogo/v2/config/log"
@@ -242,10 +241,5 @@ func isAnyInputLogEnabled() bool {
 }
 
 func isLogEnabled(envVarName string) bool {
-	envValue := env.GetEnv(envVarName, "false")
-	b, err := strconv.ParseBool(envValue)
-	if err != nil {
-		return false
-	}
-	return b
+	return env.GetEnvBool(envVarName, "false")
 }
