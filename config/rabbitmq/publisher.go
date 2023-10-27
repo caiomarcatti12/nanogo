@@ -28,7 +28,7 @@ func Publish[T any](exchangeName string, routingKey string, body T) {
 	bodyBytes, err := json.Marshal(body)
 
 	if err != nil {
-		logger.Fatalf("Houve uma falha ao converter a struct para json: %s", err)
+		logger.Fatal("Houve uma falha ao converter a struct para json", err)
 	}
 
 	errPublish := connection.Channel.Publish(
@@ -43,6 +43,6 @@ func Publish[T any](exchangeName string, routingKey string, body T) {
 	)
 
 	if errPublish != nil {
-		logger.Fatalf("Failed to publish a message: %s", errPublish)
+		logger.Fatal("Failed to publish a message", errPublish)
 	}
 }
