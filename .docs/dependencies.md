@@ -1,7 +1,3 @@
-Claro! Vou adicionar a biblioteca [swag](https://github.com/swaggo/swag) à lista de dependências diretas e fornecer uma breve descrição de sua utilidade.
-
----
-
 ### **Dependências de Projetos Externos**
 
 O **Nanogo** foi construído sobre a solidez e eficiência de várias bibliotecas e ferramentas amplamente reconhecidas na comunidade Golang. Aqui está uma lista das principais dependências externas que potencializam o Nanogo:
@@ -34,4 +30,8 @@ O **Nanogo** foi construído sobre a solidez e eficiência de várias biblioteca
 
 - **[Swaggo Swag](https://github.com/swaggo/swag) (v1.16.2)**
   - Uma biblioteca para automaticamente gerar documentação de API Swagger 2.0 para Go. Ela analisa os comentários do código e gera a documentação necessária, tornando a manutenção e apresentação de documentações de API mais simples e integrada.
+
+- **[Prometheus Client Golang](https://github.com/prometheus/client_golang) (v1.11.0)**
+  - Esta biblioteca fornece funcionalidades para a exportação de métricas para o [Prometheus](https://prometheus.io/), um sistema de monitoramento e alerta de código aberto. Com este cliente, o **Nanogo** pode expor métricas de desempenho internas, tais como contadores, gauges e histograms, que podem ser coletados pelo servidor Prometheus para visualização, alerta e análise de tendências.
+
 

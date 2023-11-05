@@ -86,6 +86,9 @@ O framework **Nanogo** oferece um conjunto robusto de funcionalidades projetadas
 - **[Logger Integrado](./.docs/logger.md)**
     - Monitore e rastreie as operações e eventos de seu aplicativo com eficiência e precisão usando nosso logger integrado. Com suporte a múltiplos níveis de log e Correlation ID.
 
+- **[Metric Manager](./.docs/metric_manager.md)**
+    - Capture e monitore métricas de desempenho de aplicativos em tempo real com nosso Metric Manager. Integra-se perfeitamente com o Prometheus para visualização e alertas.
+
 Cada funcionalidade foi meticulosamente desenvolvida para fornecer a melhor experiência possível aos desenvolvedores, poupando tempo e esforço ao criar softwares incríveis com **Nanogo**.
 
 ### **Como Contribuir**

@@ -2,8 +2,6 @@
 
 O pacote `jwt` fornece uma implementação para gerenciar tokens JWT (JSON Web Tokens) em Go. Ele facilita a criação e validação de tokens JWT, encapsulando as funcionalidades necessárias em uma estrutura `JWTManager`.
 
-Claro! Aqui está a seção de configuração adaptada para o `JWTManager`:
-
 ### Configuração
 
 Para configurar o `JWTManager`, você pode optar por definir a seguinte variável de ambiente, embora seja opcional:

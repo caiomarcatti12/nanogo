@@ -2,8 +2,6 @@
 
 A classe `Logger` fornece uma maneira centralizada e estruturada de gerenciar mensagens de log em sua aplicação. Ela é integrada com configurações de ambiente e pode gerar logs em diferentes formatos com base no ambiente atual.
 
-Claro, vou ajustar a seção sobre o Correlation ID para incluir essas informações:
-
 #### Correlation ID
 
 O logger usa um Correlation ID para rastrear e correlacionar logs originados a partir de uma única operação ou requisição. Este identificador ajuda a agrupar e identificar logs associados a uma ação específica, facilitando a análise e a depuração.
@@ -11,8 +9,6 @@ O logger usa um Correlation ID para rastrear e correlacionar logs originados a p
 **Origem do Correlation ID**:
 
 O Correlation ID geralmente é obtido a partir do cabeçalho da requisição `x-correlation-id`. Se este cabeçalho não estiver presente na requisição, o sistema automaticamente gera um novo Correlation ID usando um UUID (Universally Unique Identifier).
-
-Claro, vou ajustar a seção sobre os níveis de log para indicar que o `Fields` é opcional:
 
 ---
 

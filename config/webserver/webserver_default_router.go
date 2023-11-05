@@ -17,6 +17,7 @@ package webserver
 
 import (
 	"github.com/caiomarcatti12/nanogo/v2/config/env"
+	"github.com/caiomarcatti12/nanogo/v2/config/metric_manager"
 )
 
 func WebserverDefaultRouter() {
@@ -25,5 +26,15 @@ func WebserverDefaultRouter() {
 	if env.GetEnvBool("ENABLE_SWAGGER", "false") {
 		docsRoute := env.GetEnv("SWAGGER_DOCS_ROUTE", "/swagger")
 		AddRouter("GET", docsRoute, SwaggerHandler)
+	}
+
+	if env.GetEnvBool("ENABLE_PROMETHEUS", "false") {
+		prometheusRoute := env.GetEnv("PROMETHEUS_ROUTE", "/metrics")
+
+		if env.GetEnv("PROMETHEUS_TOKEN", "") != "" {
+			AddRouter("GET", prometheusRoute, metric_manager.MetricsHandlerAuthenticated)
+		} else {
+			AddRouter("GET", prometheusRoute, metric_manager.MetricsHandler)
+		}
 	}
 }
