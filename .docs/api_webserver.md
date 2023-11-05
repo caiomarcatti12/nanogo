@@ -221,8 +221,6 @@ func DownloadHandler(ctx *webserver.HandlerContext[dto.ApplicationCreateDTO]) (i
 Neste exemplo, o `DownloadHandler` está configurado para retornar um conjunto de bytes que representam o conteúdo do arquivo. Os cabeçalhos da resposta HTTP são configurados para indicar o tipo de conteúdo como "application/octet-stream", e um cabeçalho "Content-Disposition" está sendo usado para especificar que a resposta deve ser tratada como um arquivo para download, dando-lhe um nome de arquivo específico ("meuarquivo.txt").
 
 
-Claro! Vou criar uma seção que aborda a validação de structs de entrada sem expor diretamente a biblioteca mencionada:
-
 ---
 
 ### Validação da Struct de Entrada
