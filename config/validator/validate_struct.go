@@ -63,11 +63,11 @@ func ValidateStruct(s interface{}) *errors.CustomError {
 					return InvalidStructException(fmt.Sprintf("field %s has invalid value", field))
 				}
 			}
-		} else if invalidValidationError, ok := err.(*validator.InvalidValidationError); ok {
+		} /* else if invalidValidationError, ok := err.(*validator.InvalidValidationError); ok {
 			return InvalidStructException(invalidValidationError.Error())
 		} else {
 			// Lidar com outros tipos de erros aqui
-		}
+		}*/
 
 	}
 	return nil
