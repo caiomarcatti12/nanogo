@@ -44,23 +44,31 @@ func ValidateStruct(s interface{}) *errors.CustomError {
 
 	err := instance.validator.Struct(s)
 	if err != nil {
-		for _, err := range err.(validator.ValidationErrors) {
-			field := err.Field()
-			tag := err.Tag()
+		// Verifica se o erro é do tipo ValidationErrors
+		if validationErrors, ok := err.(validator.ValidationErrors); ok {
+			for _, err := range validationErrors {
+				field := err.Field()
+				tag := err.Tag()
 
-			switch tag {
-			case "required":
-				return InvalidStructException(fmt.Sprintf("field %s is required", field))
-			case "email":
-				return InvalidStructException(fmt.Sprintf("field %s is not a valid email", field))
-			case "gte":
-				return InvalidStructException(fmt.Sprintf("field %s should be greater than or equal to %s", field, err.Param()))
-			case "lte":
-				return InvalidStructException(fmt.Sprintf("field %s should be less than or equal to %s", field, err.Param()))
-			default:
-				return InvalidStructException(fmt.Sprintf("field %s has invalid value", field))
+				switch tag {
+				case "required":
+					return InvalidStructException(fmt.Sprintf("field %s is required", field))
+				case "email":
+					return InvalidStructException(fmt.Sprintf("field %s is not a valid email", field))
+				case "gte":
+					return InvalidStructException(fmt.Sprintf("field %s should be greater than or equal to %s", field, err.Param()))
+				case "lte":
+					return InvalidStructException(fmt.Sprintf("field %s should be less than or equal to %s", field, err.Param()))
+				default:
+					return InvalidStructException(fmt.Sprintf("field %s has invalid value", field))
+				}
 			}
-		}
+		} /* else if invalidValidationError, ok := err.(*validator.InvalidValidationError); ok {
+			return InvalidStructException(invalidValidationError.Error())
+		} else {
+			// Lidar com outros tipos de erros aqui
+		}*/
+
 	}
 	return nil
 }

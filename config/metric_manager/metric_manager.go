@@ -109,7 +109,7 @@ func (m *MetricManager) ObserveSummary(name string, value float64, labelValues L
 }
 
 func (m *MetricManager) makeFullNameMetric(name string) string {
-	return env.GetEnv("PROMETHEUS_PREFIX", "") + name
+	return env.GetEnv("PROMETHEUS_PREFIX", "") + "_" + name
 }
 
 func (m *MetricManager) safeRegister(fullName string, collector prometheus.Collector) {

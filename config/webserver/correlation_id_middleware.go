@@ -27,8 +27,9 @@ func CorrelationIDMiddleware(next http.Handler) http.Handler {
 		correlationID := r.Header.Get("X-Correlation-ID")
 		if correlationID == "" {
 			correlationID = uuid.New().String()
-			r.Header.Set("X-Correlation-ID", correlationID)
 		}
+
+		w.Header().Set("X-Correlation-ID", correlationID)
 
 		fcm := context_manager.NewSafeContextManager()
 

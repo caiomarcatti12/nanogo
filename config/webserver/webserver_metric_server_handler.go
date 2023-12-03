@@ -14,32 +14,31 @@
  * limitations under the License.
  */
 
-package metric_manager
+package webserver
 
 import (
 	"github.com/caiomarcatti12/nanogo/v2/config/env"
-	"github.com/caiomarcatti12/nanogo/v2/config/webserver"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 )
 
-func MetricsHandler(ctx *webserver.HandlerContext[interface{}]) (interface{}, error) {
+func MetricsHandler(ctx *HandlerContext[interface{}]) (interface{}, error) {
 	handler := promhttp.Handler()
 	handler.ServeHTTP(ctx.Response, ctx.Request)
 
-	return &webserver.APIResponse{
+	return &APIResponse{
 		StatusCode: http.StatusOK,
 	}, nil
 }
 
-func MetricsHandlerAuthenticated(ctx *webserver.HandlerContext[interface{}]) (interface{}, error) {
+func MetricsHandlerAuthenticated(ctx *HandlerContext[interface{}]) (interface{}, error) {
 	tokenSecret := env.GetEnv("PROMETHEUS_TOKEN", "")
 
 	if tokenSecret != "" {
 		providedToken := ctx.Request.Header.Get("Authorization")
 
 		if providedToken != "Bearer "+tokenSecret {
-			return &webserver.APIResponse{
+			return &APIResponse{
 				StatusCode: http.StatusUnauthorized,
 			}, nil
 		}
@@ -48,7 +47,7 @@ func MetricsHandlerAuthenticated(ctx *webserver.HandlerContext[interface{}]) (in
 	handler := promhttp.Handler()
 	handler.ServeHTTP(ctx.Response, ctx.Request)
 
-	return &webserver.APIResponse{
+	return &APIResponse{
 		StatusCode: http.StatusOK,
 	}, nil
 }
