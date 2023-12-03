@@ -16,6 +16,7 @@
 package webserver
 
 import (
+	"github.com/caiomarcatti12/nanogo/v2/config/i18n"
 	"github.com/caiomarcatti12/nanogo/v2/config/log"
 	"net/http"
 )
@@ -24,8 +25,8 @@ func HealthcheckHandler(ctx *HandlerContext[any]) (interface{}, error) {
 	log.Debug("Healthcheck request received")
 
 	return &APIResponse{
-		Data:       "Service is up and running", // ou simplesmente nil se você não quiser enviar uma mensagem
+		Data:       i18n.Get("healthcheck"), // ou simplesmente nil se você não quiser enviar uma mensagem
 		StatusCode: http.StatusOK,
-		Headers:    map[string]string{"Content-Type": "text/plain"},
+		Headers:    map[string]string{"Content-Type": "text/plain; charset=utf-8"},
 	}, nil
 }
