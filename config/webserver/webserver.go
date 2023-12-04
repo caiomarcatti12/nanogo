@@ -25,8 +25,6 @@ import (
 	"github.com/caiomarcatti12/nanogo/v2/config/mapper"
 	"github.com/caiomarcatti12/nanogo/v2/config/validator"
 	"net/http"
-	"os"
-	"path/filepath"
 	"sync"
 
 	"github.com/caiomarcatti12/nanogo/v2/config/log"
@@ -85,14 +83,7 @@ func NewWebServer() *WebServer {
 
 	i18nInstance := i18n.GetInstance()
 	i18nInstance.SetLanguage("en-us")
-
-	cwd, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Info(filepath.Join(cwd, "config/i18n/translations"))
-	err = i18nInstance.LoadTranslations(filepath.Join(cwd, "config/i18n/translations"))
+	err := i18nInstance.LoadDefaultTranslations()
 
 	if err != nil {
 		panic(err)

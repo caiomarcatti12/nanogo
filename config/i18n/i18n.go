@@ -16,13 +16,19 @@
 package i18n
 
 import (
+	"embed"
 	"fmt"
 	"gopkg.in/yaml.v2"
+	"io/fs"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 )
+
+//go:embed translations/*
+var defaultTranslationFiles embed.FS
 
 // i18n é a estrutura para o Singleton de internacionalização.
 type i18n struct {
@@ -58,38 +64,69 @@ func (i *i18n) GetLanguage() string {
 }
 
 // LoadTranslations carrega os arquivos de tradução de um diretório.
-func (i *i18n) LoadTranslations(directory string) error {
-	files, err := ioutil.ReadDir(directory)
+func (i *i18n) LoadDefaultTranslations() error {
+	// Primeiro, carrega as traduções padrão incorporadas
+	defaultFiles, err := defaultTranslationFiles.ReadDir("translations")
 	if err != nil {
 		return err
 	}
-
-	for _, f := range files {
-		if filepath.Ext(f.Name()) == ".yaml" || filepath.Ext(f.Name()) == ".yml" {
-			content, err := ioutil.ReadFile(filepath.Join(directory, f.Name()))
-			if err != nil {
-				return err
-			}
-
-			var newTranslations map[string]string
-			err = yaml.Unmarshal(content, &newTranslations)
-			if err != nil {
-				return err
-			}
-
-			locale := strings.Split(f.Name(), ".")[0]
-
-			// Mescla as novas traduções com as existentes
-			if existingTranslations, exists := i.translations[locale]; exists {
-				for key, value := range newTranslations {
-					existingTranslations[key] = value
-				}
-			} else {
-				i.translations[locale] = newTranslations
-			}
+	for _, f := range defaultFiles {
+		if err := i.loadTranslationFile(defaultTranslationFiles, "translations/"+f.Name()); err != nil {
+			return err
 		}
 	}
 
+	return nil
+}
+
+// LoadTranslations carrega os arquivos de tradução de um diretório.
+func (i *i18n) LoadTranslations(directory string) error {
+	// Em seguida, carrega as traduções do diretório especificado, se fornecido
+	if directory != "" {
+		files, err := ioutil.ReadDir(directory)
+		if err != nil {
+			return err
+		}
+		for _, f := range files {
+			if err := i.loadTranslationFile(os.DirFS(directory), f.Name()); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// loadTranslationFile carrega um arquivo de tradução de um fs.FS (pode ser um embed.FS ou um os.DirFS)
+func (i *i18n) loadTranslationFile(fsys fs.FS, filename string) error {
+	if filepath.Ext(filename) == ".yaml" || filepath.Ext(filename) == ".yml" {
+		file, err := fsys.Open(filename)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+
+		content, err := ioutil.ReadAll(file)
+		if err != nil {
+			return err
+		}
+
+		var newTranslations map[string]string
+		err = yaml.Unmarshal(content, &newTranslations)
+		if err != nil {
+			return err
+		}
+
+		locale := strings.Split(filename, ".")[0]
+
+		// Mescla as novas traduções com as existentes
+		if existingTranslations, exists := i.translations[locale]; exists {
+			for key, value := range newTranslations {
+				existingTranslations[key] = value
+			}
+		} else {
+			i.translations[locale] = newTranslations
+		}
+	}
 	return nil
 }
 
