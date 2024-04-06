@@ -19,15 +19,16 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"os"
+	"path/filepath"
+	"sync"
+
 	"github.com/caiomarcatti12/nanogo/v2/config/env"
 	"github.com/caiomarcatti12/nanogo/v2/config/errors"
 	"github.com/caiomarcatti12/nanogo/v2/config/i18n"
 	"github.com/caiomarcatti12/nanogo/v2/config/mapper"
 	"github.com/caiomarcatti12/nanogo/v2/config/validator"
-	"net/http"
-	"os"
-	"path/filepath"
-	"sync"
 
 	"github.com/caiomarcatti12/nanogo/v2/config/log"
 	"github.com/gorilla/mux"
@@ -190,6 +191,7 @@ func AddRouter[T any](method string, path string, f func(ctx *HandlerContext[T])
 	}
 
 	getWebServerInstance().router.HandleFunc(path, handlerFunc).Methods(method)
+	getWebServerInstance().router.HandleFunc(path, handlerFunc).Methods("OPTIONS")
 }
 
 func (ws *WebServer) Start() {
