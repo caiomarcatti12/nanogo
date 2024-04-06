@@ -70,6 +70,7 @@ func getWebServerInstance() *WebServer {
 			}
 		}
 
+		ws.router.Use(CorsMiddleware)
 		ws.router.Use(CorrelationIDMiddleware)
 		ws.router.Use(LanguageMiddleware)
 		ws.router.Use(PayloadMiddleware)
