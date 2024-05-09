@@ -16,11 +16,12 @@
 package mapper
 
 import (
-	"github.com/google/uuid"
-	"github.com/mitchellh/mapstructure"
 	"reflect"
 	"strconv"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/mitchellh/mapstructure"
 )
 
 func Transform(input interface{}, output interface{}) error {
@@ -28,6 +29,13 @@ func Transform(input interface{}, output interface{}) error {
 		DecodeHook: mapstructure.ComposeDecodeHookFunc(
 			func(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
 				if f.Kind() == reflect.String && t == reflect.TypeOf(&uuid.UUID{}) {
+					uuidVal, err := uuid.Parse(data.(string))
+					if err != nil {
+						return nil, err
+					}
+					return &uuidVal, nil
+				}
+				if f.Kind() == reflect.String && t == reflect.TypeOf(uuid.UUID{}) {
 					uuidVal, err := uuid.Parse(data.(string))
 					if err != nil {
 						return nil, err

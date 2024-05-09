@@ -17,8 +17,9 @@ package mongodb
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
+	"fmt"
+	"reflect"
 	"time"
 
 	"github.com/caiomarcatti12/nanogo/v2/config/log"
@@ -68,12 +69,6 @@ func (r *MongoORM[T]) Insert(document T) (uuid.UUID, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	docMap, err := r.convertDocumentToMap(document)
-
-	if err != nil {
-		return uuid.Nil, err
-	}
-
 	_id, err := uuid.NewRandom()
 
 	if err != nil {
@@ -82,10 +77,15 @@ func (r *MongoORM[T]) Insert(document T) (uuid.UUID, error) {
 	}
 
 	// Adicionando o _id ao mapa
-	docMap["_id"] = _id
+	err = r.SetID(&document, _id)
+
+	if err != nil {
+		r.logger.Error(err.Error())
+		return _id, err
+	}
 
 	// Inserindo o documento na coleção
-	_, err = r.collection.InsertOne(ctx, docMap)
+	_, err = r.collection.InsertOne(ctx, document)
 	if err != nil {
 		r.logger.Error(err.Error())
 		return _id, err
@@ -98,50 +98,39 @@ func (r *MongoORM[T]) Update(document T) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	docMap, err := r.convertDocumentToMap(document)
+	_id, err := r.GetID(&document)
 
 	if err != nil {
+		r.logger.Error(err.Error())
 		return false, err
 	}
 
-	if stringId, ok := docMap["ID"].(string); ok {
-		delete(docMap, "ID")
+	filter := bson.D{{"_id", _id}}
+	updateDoc := bson.M{"$set": document}
 
-		_id, err := uuid.Parse(stringId)
+	_, err = r.collection.UpdateOne(ctx, filter, updateDoc)
 
-		if err != nil {
-			r.logger.Error(err.Error())
-			return false, err
-		}
-
-		filter := bson.D{{"_id", _id}}
-		updateDoc := bson.M{"$set": docMap}
-
-		_, err = r.collection.UpdateOne(ctx, filter, updateDoc)
-
-		if err != nil {
-			r.logger.Error(err.Error())
-			return false, err
-		}
-
-		return true, nil
-	} else {
-		return false, errors.New("ID not found")
+	if err != nil {
+		r.logger.Error(err.Error())
+		return false, err
 	}
+
+	return true, nil
+
 }
 
 func (r *MongoORM[T]) Delete(document T) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	// Configurando as opções de pesquisa
-	docMap, err := r.convertDocumentToMap(document)
+	_id, err := r.GetID(&document)
 
 	if err != nil {
+		r.logger.Error(err.Error())
 		return false, err
 	}
 
-	filter := bson.D{{"_id", docMap["_id"]}}
+	filter := bson.D{{"_id", _id}}
 
 	_, err = r.collection.DeleteOne(ctx, filter)
 	if err != nil {
@@ -271,18 +260,36 @@ func (r *MongoORM[T]) RawQueryCount(query bson.M) (int64, error) {
 	return count, nil
 }
 
-func (r *MongoORM[T]) convertDocumentToMap(document interface{}) (map[string]interface{}, error) {
-	var docMap map[string]interface{}
-
-	// Serializando a struct para JSON
-	docBytes, err := json.Marshal(document)
-	if err != nil {
-		return docMap, errors.New("erro ao serializar documento: " + err.Error())
+func (r *MongoORM[T]) SetID(entity interface{}, id uuid.UUID) error {
+	val := reflect.ValueOf(entity)
+	if val.Kind() == reflect.Ptr {
+		val = val.Elem() // Se for um ponteiro, obtém o valor ao qual ele aponta
 	}
 
-	if err := json.Unmarshal(docBytes, &docMap); err != nil {
-		return docMap, errors.New("erro ao desserializar para mapa: " + err.Error())
+	if val.Kind() == reflect.Struct {
+		idField := val.FieldByName("ID")
+		if idField.IsValid() && idField.Type() == reflect.TypeOf(uuid.UUID{}) {
+			idField.Set(reflect.ValueOf(id))
+			return nil
+		}
 	}
 
-	return docMap, nil
+	return fmt.Errorf("field ID not found, cannot be set, or type mismatch")
+}
+
+func (r *MongoORM[T]) GetID(entity interface{}) (uuid.UUID, error) {
+	val := reflect.ValueOf(entity)
+	if val.Kind() == reflect.Ptr {
+		val = val.Elem() // Se for um ponteiro, obtém o valor ao qual ele aponta
+	}
+
+	// Checa se o valor é uma struct e se o tipo é ModuleEntity
+	if val.Kind() == reflect.Struct {
+		idField := val.FieldByName("ID")
+		if idField.IsValid() && idField.Type() == reflect.TypeOf(uuid.UUID{}) {
+			return idField.Interface().(uuid.UUID), nil
+		}
+	}
+
+	return uuid.Nil, fmt.Errorf("field ID not found or type mismatch")
 }

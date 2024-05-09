@@ -25,6 +25,7 @@ import (
 	"github.com/caiomarcatti12/nanogo/v2/config/errors"
 	"github.com/caiomarcatti12/nanogo/v2/config/log"
 	"github.com/caiomarcatti12/nanogo/v2/config/mapper"
+	"github.com/caiomarcatti12/nanogo/v2/config/validator"
 	webserver_types "github.com/caiomarcatti12/nanogo/v2/config/webserver/types"
 )
 
@@ -105,15 +106,22 @@ func (ws *WebServer) executeHandler(route webserver_types.Route, contextPayload 
 	if numArgs > 0 {
 		for i := 0; i < numArgs; i++ {
 			paramType := methodType.In(0)
-			instanceParam := reflect.New(paramType).Interface()
 
-			err := mapper.Transform(contextPayload, instanceParam)
+			ptrToStruct := reflect.New(paramType)
+
+			err := mapper.Transform(contextPayload, ptrToStruct.Interface())
 
 			if err != nil {
-				args[i] = reflect.Zero(paramType)
-			} else {
-				args[i] = reflect.ValueOf(instanceParam).Elem()
+				return nil, fmt.Errorf("error decoding context payload into struct: %s", err)
 			}
+
+			errorValidateStruct := validator.ValidateStruct(ptrToStruct.Interface())
+
+			if errorValidateStruct != nil {
+				return nil, errorValidateStruct
+			}
+
+			args[i] = ptrToStruct.Elem()
 		}
 	}
 

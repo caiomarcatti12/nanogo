@@ -16,14 +16,14 @@
 package validator
 
 import (
-	"github.com/caiomarcatti12/nanogo/v2/config/errors"
 	"net/http"
+
+	"github.com/caiomarcatti12/nanogo/v2/config/errors"
 )
 
-func InvalidStructException(details string) *errors.CustomError {
+func InvalidStructException(message string) *errors.CustomError {
 	return &errors.CustomError{
 		Code:    http.StatusBadRequest,
-		Message: "The data provided is invalid.",
-		Details: details,
+		Message: message,
 	}
 }
