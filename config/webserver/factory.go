@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package repository
+package webserver
 
-import "github.com/google/uuid"
+import (
+	"github.com/caiomarcatti12/nanogo/v2/config/env"
+	"github.com/caiomarcatti12/nanogo/v2/config/log"
+)
 
-type Identifier interface {
-	GetID() uuid.UUID
-	SetID(id uuid.UUID)
+func FactoryWebServer(env env.IEnv, logger log.ILog) IWebServer {
+	return NewWebServer(env, logger)
 }

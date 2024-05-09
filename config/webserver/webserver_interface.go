@@ -16,27 +16,12 @@
 package webserver
 
 import (
-	"github.com/caiomarcatti12/nanogo/v2/config/context_manager"
-	"net/http"
-
-	"github.com/google/uuid"
+	webserver_middleware "github.com/caiomarcatti12/nanogo/v2/config/webserver/middleware"
+	webserver_types "github.com/caiomarcatti12/nanogo/v2/config/webserver/types"
 )
 
-func CorrelationIDMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		correlationID := r.Header.Get("X-Correlation-ID")
-		if correlationID == "" {
-			correlationID = uuid.New().String()
-		}
-
-		w.Header().Set("X-Correlation-ID", correlationID)
-
-		fcm := context_manager.NewSafeContextManager()
-
-		contextValues := fcm.CreateValue("x-correlation-id", correlationID)
-
-		fcm.SetValues(contextValues, func() {
-			next.ServeHTTP(w, r)
-		})
-	})
+type IWebServer interface {
+	AddMidleware(middleware webserver_middleware.IMiddleware)
+	AddRoute(route webserver_types.Route)
+	Start()
 }

@@ -13,35 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package rabbitmq
+package webserver_route
 
 // import (
-// 	"encoding/json"
-
-// 	"github.com/streadway/amqp"
+// 	"github.com/caiomarcatti12/nanogo/v2/config/env"
 // )
 
-// func Publish[T any](exchangeName string, routingKey string, body T) {
-// 	connection := NewInstanceRabbitmq()
+// func WebserverDefaultRouter() {
+// 	AddRouter("GET", "/healthcheck", HealthcheckHandler)
 
-// 	bodyBytes, err := json.Marshal(body)
-
-// 	if err != nil {
-// 		//logger.Fatal("Houve uma falha ao converter a struct para json", err)
+// 	if env.GetEnvBool("ENABLE_SWAGGER", "false") {
+// 		docsRoute := env.GetEnv("SWAGGER_DOCS_ROUTE", "/swagger")
+// 		AddRouter("GET", docsRoute, SwaggerHandler)
 // 	}
 
-// 	errPublish := connection.Channel.Publish(
-// 		exchangeName,
-// 		routingKey,
-// 		false,
-// 		false,
-// 		amqp.Publishing{
-// 			ContentType: "application/json",
-// 			Body:        bodyBytes,
-// 		},
-// 	)
+// 	if env.GetEnvBool("ENABLE_PROMETHEUS", "false") {
+// 		prometheusRoute := env.GetEnv("PROMETHEUS_ROUTE", "/metrics")
 
-// 	if errPublish != nil {
-// 		//logger.Fatal("Failed to publish a message", errPublish)
+// 		if env.GetEnv("PROMETHEUS_TOKEN", "") != "" {
+// 			AddRouter("GET", prometheusRoute, MetricsHandlerAuthenticated)
+// 		} else {
+// 			AddRouter("GET", prometheusRoute, MetricsHandler)
+// 		}
 // 	}
 // }

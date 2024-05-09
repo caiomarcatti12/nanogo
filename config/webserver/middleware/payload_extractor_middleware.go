@@ -13,81 +13,90 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package webserver
+package webserver_middleware
 
 import (
 	"context"
 	"encoding/json"
-	"github.com/caiomarcatti12/nanogo/v2/config/env"
-	"github.com/google/uuid"
-	"github.com/gorilla/mux"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/caiomarcatti12/nanogo/v2/config/env"
+	webserver_types "github.com/caiomarcatti12/nanogo/v2/config/webserver/types"
+	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 )
 
-func PayloadMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-		payload := make(map[string]interface{})
-
-		if r.Method == http.MethodGet {
-			parseGetPayload(r, payload)
-		}
-
-		parseRoutePayload(r, payload)
-
-		if isMultiPart(r) {
-			if err := parseMultiPartPayload(r, w, payload); err != nil {
-				return
-			}
-		} else {
-			if err := parseJSONPayload(r, w, payload); err != nil {
-				return
-			}
-		}
-
-		if len(payload) > 0 {
-			newCtx := context.WithValue(ctx, "payload", payload)
-			next.ServeHTTP(w, r.WithContext(newCtx))
-		} else {
-			next.ServeHTTP(w, r)
-		}
-	})
+type PayloadExtractorMiddleware struct {
+	maxUploadSize string
 }
 
-func parseGetPayload(r *http.Request, payload map[string]interface{}) {
+func NewPayloadExtractorMiddleware(env env.IEnv) IMiddleware {
+	return &PayloadExtractorMiddleware{
+		maxUploadSize: env.GetEnv("SERVER_MAX_UPLOAD_SIZE", "5"),
+	}
+}
+
+func (m *PayloadExtractorMiddleware) GetName() string {
+	return "PayloadExtractorMiddleware"
+}
+
+func (m *PayloadExtractorMiddleware) Process(w http.ResponseWriter, r *http.Request, next http.Handler) {
+	payload := make(map[string]interface{})
+
+	if r.Method == http.MethodGet {
+		m.parseGetPayload(r, payload)
+	}
+
+	m.parseRoutePayload(r, payload)
+
+	if m.isMultiPart(r) {
+		if err := m.parseMultiPartPayload(r, w, payload); err != nil {
+			return
+		}
+	} else {
+		if err := m.parseJSONPayload(r, w, payload); err != nil {
+			return
+		}
+	}
+
+	newCtx := context.WithValue(r.Context(), "payload", payload)
+	next.ServeHTTP(w, r.WithContext(newCtx))
+}
+
+func (m *PayloadExtractorMiddleware) parseGetPayload(r *http.Request, payload map[string]interface{}) {
 	for key, values := range r.URL.Query() {
 		if len(values) > 0 {
-			payload[key] = parseValue(values[0])
+			payload[key] = m.parseValue(values[0])
 		}
 	}
 }
 
-func parseRoutePayload(r *http.Request, payload map[string]interface{}) {
+func (m *PayloadExtractorMiddleware) parseRoutePayload(r *http.Request, payload map[string]interface{}) {
 	vars := mux.Vars(r)
 	for key, value := range vars {
-		payload[key] = parseValue(value)
+		payload[key] = m.parseValue(value)
 	}
 }
 
-func parseMultiPartPayload(r *http.Request, w http.ResponseWriter, payload map[string]interface{}) error {
-	if err := checkMaxUploadSize(r); err != nil {
+func (m *PayloadExtractorMiddleware) parseMultiPartPayload(r *http.Request, w http.ResponseWriter, payload map[string]interface{}) error {
+	if err := m.checkMaxUploadSize(r); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return err
 	}
 
 	for key, values := range r.MultipartForm.Value {
 		if len(values) > 0 {
-			payload[key] = parseValue(values[0])
+			payload[key] = m.parseValue(values[0])
 		}
 	}
 
 	for key := range r.MultipartForm.File {
-		fileUpload, err := parseUpload(r, key)
+		fileUpload, err := m.parseUpload(r, key)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return err
@@ -97,7 +106,7 @@ func parseMultiPartPayload(r *http.Request, w http.ResponseWriter, payload map[s
 	return nil
 }
 
-func parseJSONPayload(r *http.Request, w http.ResponseWriter, payload map[string]interface{}) error {
+func (m *PayloadExtractorMiddleware) parseJSONPayload(r *http.Request, w http.ResponseWriter, payload map[string]interface{}) error {
 	if r.Body != http.NoBody {
 		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil && err != io.EOF {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -107,7 +116,7 @@ func parseJSONPayload(r *http.Request, w http.ResponseWriter, payload map[string
 	return nil
 }
 
-func parseValue(value string) interface{} {
+func (m *PayloadExtractorMiddleware) parseValue(value string) interface{} {
 	if id, err := uuid.Parse(value); err == nil {
 		return id
 	} else if intValue, err := strconv.Atoi(value); err == nil {
@@ -122,13 +131,12 @@ func parseValue(value string) interface{} {
 	return value
 }
 
-func isMultiPart(r *http.Request) bool {
+func (m *PayloadExtractorMiddleware) isMultiPart(r *http.Request) bool {
 	return strings.HasPrefix(r.Header.Get("Content-Type"), "multipart/form-data")
 }
 
-func checkMaxUploadSize(r *http.Request) error {
-	maxUploadSizeStr := env.GetEnv("SERVER_MAX_UPLOAD_SIZE", "5")
-	maxUploadSize, err := strconv.ParseInt(maxUploadSizeStr, 10, 64)
+func (m *PayloadExtractorMiddleware) checkMaxUploadSize(r *http.Request) error {
+	maxUploadSize, err := strconv.ParseInt(m.maxUploadSize, 10, 64)
 	if err != nil || maxUploadSize <= 0 {
 		maxUploadSize = 5 << 20
 	}
@@ -140,7 +148,7 @@ func checkMaxUploadSize(r *http.Request) error {
 	return nil
 }
 
-func parseUpload(r *http.Request, name string) (*FileUpload, error) {
+func (m *PayloadExtractorMiddleware) parseUpload(r *http.Request, name string) (*webserver_types.FileUpload, error) {
 	file, handler, err := r.FormFile(name)
 	if err != nil {
 		return nil, err
@@ -152,7 +160,7 @@ func parseUpload(r *http.Request, name string) (*FileUpload, error) {
 		return nil, err
 	}
 
-	return &FileUpload{
+	return &webserver_types.FileUpload{
 		Filename: handler.Filename,
 		Size:     handler.Size,
 		Content:  fileBytes,

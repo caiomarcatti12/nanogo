@@ -16,8 +16,8 @@
 package rsql
 
 type QueryFilter struct {
-	Filter     *string `mapstructure:"filter"`
-	Size       *int64  `mapstructure:"size"`
-	Skip       *int64  `mapstructure:"skip"`
-	SortParams *string `mapstructure:"sortParams"`
+	Filter     string `mapstructure:"filter"`
+	Size       int64  `mapstructure:"size"`
+	Skip       int64  `mapstructure:"skip"`
+	SortParams string `mapstructure:"sortParams"`
 }

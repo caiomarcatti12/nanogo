@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package webserver
+package webserver_types
 
-type APIResponse struct {
-	Data       interface{}
-	StatusCode int
-	Headers    map[string]string
+import "net/http"
+
+type HandlerContext[T any] struct {
+	Payload  T
+	RawQuery string
+	Headers  http.Header
+	Request  *http.Request
+	Response http.ResponseWriter
 }

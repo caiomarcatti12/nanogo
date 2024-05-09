@@ -13,25 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package webserver
+package log
 
-import (
-	"github.com/caiomarcatti12/nanogo/v2/config/env"
-	"io/ioutil"
-	"net/http"
-)
-
-func SwaggerHandler(ctx *HandlerContext[any]) (interface{}, error) {
-	docsPath := env.GetEnv("SWAGGER_DOCS_PATH", ".docs/swagger/swaggeer.yaml")
-
-	content, err := ioutil.ReadFile(docsPath)
-	if err != nil {
-		return nil, err
-	}
-
-	return &APIResponse{
-		Data:       content,
-		StatusCode: http.StatusOK,
-		Headers:    map[string]string{"Content-Type": "application/x-yaml"},
-	}, nil
+type ILog interface {
+	Fatal(message string, args ...interface{})
+	Debug(message string, args ...interface{})
+	Info(message string, args ...interface{})
+	Error(message string, args ...interface{})
+	Warning(message string, args ...interface{})
 }

@@ -15,79 +15,79 @@
  */
 package rabbitmq
 
-import (
-	"encoding/json"
-	"github.com/caiomarcatti12/nanogo/v2/config/context_manager"
-	"github.com/google/uuid"
-	"log"
-	"reflect"
-)
+// import (
+// 	"encoding/json"
+// 	"reflect"
 
-type Consumer[T any] interface {
-	Consume(body T, headers map[string]interface{})
-}
+// 	"github.com/caiomarcatti12/nanogo/v2/config/context_manager"
+// 	"github.com/google/uuid"
+// )
 
-// , consumer func Consumer[T]
-func Consume[T any](exchange Exchange, queue Queue, consumer Consumer[T]) {
-	connection := NewInstanceRabbitmq()
+// type Consumer[T any] interface {
+// 	Consume(body T, headers map[string]interface{})
+// }
 
-	DeclareExchange(exchange)
-	DeclareQueue(queue)
+// // , consumer func Consumer[T]
+// func Consume[T any](exchange Exchange, queue Queue, consumer Consumer[T]) {
+// 	connection := NewInstanceRabbitmq()
 
-	BindQueue(exchange, queue)
+// 	DeclareExchange(exchange)
+// 	DeclareQueue(queue)
 
-	msgs, err := connection.Channel.Consume(
-		queue.Name, // queue
-		"",         // consumer
-		true,       // auto-ack
-		false,      // exclusive
-		false,      // no-local
-		false,      // no-wait
-		nil,        // args
-	)
-	if err != nil {
-		log.Fatalf("Failed to register a consumer: %s", err)
-	}
+// 	BindQueue(exchange, queue)
 
-	go func() {
-		for d := range msgs {
-			typ := reflect.TypeOf((*T)(nil)).Elem()
-			val := reflect.New(typ).Elem()
-			bodyMap := val.Interface().(T)
+// 	msgs, err := connection.Channel.Consume(
+// 		queue.Name, // queue
+// 		"",         // consumer
+// 		true,       // auto-ack
+// 		false,      // exclusive
+// 		false,      // no-local
+// 		false,      // no-wait
+// 		nil,        // args
+// 	)
+// 	if err != nil {
+// 		//log.Fatalf("Failed to register a consumer: %s", err)
+// 	}
 
-			err = json.Unmarshal(d.Body, &bodyMap)
-			if err != nil {
-				log.Fatalf("Error decoding body JSON: %s", err)
-				continue
-			}
+// 	go func() {
+// 		for d := range msgs {
+// 			typ := reflect.TypeOf((*T)(nil)).Elem()
+// 			val := reflect.New(typ).Elem()
+// 			bodyMap := val.Interface().(T)
 
-			headerBytes, err := json.Marshal(d.Headers)
-			if err != nil {
-				log.Fatalf("Error encoding headers to JSON: %s", err)
-				continue
-			}
+// 			err = json.Unmarshal(d.Body, &bodyMap)
+// 			if err != nil {
+// 				//log.Fatalf("Error decoding body JSON: %s", err)
+// 				continue
+// 			}
 
-			headersMap := make(map[string]interface{})
-			err = json.Unmarshal(headerBytes, &headersMap)
-			if err != nil {
-				log.Fatalf("Error decoding headers JSON: %s", err)
-				continue
-			}
+// 			headerBytes, err := json.Marshal(d.Headers)
+// 			if err != nil {
+// 				//log.Fatalf("Error encoding headers to JSON: %s", err)
+// 				continue
+// 			}
 
-			// Pegue o x-correlation-id do header
-			correlationID, exists := headersMap["x-correlation-id"]
-			if !exists {
-				correlationID = uuid.New().String()
-			}
+// 			headersMap := make(map[string]interface{})
+// 			err = json.Unmarshal(headerBytes, &headersMap)
+// 			if err != nil {
+// 				//log.Fatalf("Error decoding headers JSON: %s", err)
+// 				continue
+// 			}
 
-			// Configure o x-correlation-id no contexto
-			fcm := context_manager.NewSafeContextManager()
-			contextValues := fcm.CreateValue("x-correlation-id", correlationID)
+// 			// Pegue o x-correlation-id do header
+// 			correlationID, exists := headersMap["x-correlation-id"]
+// 			if !exists {
+// 				correlationID = uuid.New().String()
+// 			}
 
-			// Defina os valores no contexto e execute o consumer
-			fcm.SetValues(contextValues, func() {
-				consumer.Consume(bodyMap, headersMap)
-			})
-		}
-	}()
-}
+// 			// Configure o x-correlation-id no contexto
+// 			fcm := context_manager.NewSafeContextManager()
+// 			contextValues := fcm.CreateValue("x-correlation-id", correlationID)
+
+// 			// Defina os valores no contexto e execute o consumer
+// 			fcm.SetValues(contextValues, func() {
+// 				consumer.Consume(bodyMap, headersMap)
+// 			})
+// 		}
+// 	}()
+// }

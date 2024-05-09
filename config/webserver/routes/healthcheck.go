@@ -13,27 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package webserver
+package webserver_route
 
 import (
-	"github.com/caiomarcatti12/nanogo/v2/config/env"
+	"net/http"
+
+	webserver_types "github.com/caiomarcatti12/nanogo/v2/config/webserver/types"
 )
 
-func WebserverDefaultRouter() {
-	AddRouter("GET", "/healthcheck", HealthcheckHandler)
+type IHealthCheckController interface {
+	Handler() (interface{}, error)
+}
 
-	if env.GetEnvBool("ENABLE_SWAGGER", "false") {
-		docsRoute := env.GetEnv("SWAGGER_DOCS_ROUTE", "/swagger")
-		AddRouter("GET", docsRoute, SwaggerHandler)
-	}
+type HealthCheckController struct {
+}
 
-	if env.GetEnvBool("ENABLE_PROMETHEUS", "false") {
-		prometheusRoute := env.GetEnv("PROMETHEUS_ROUTE", "/metrics")
+func NewHealthCheckController() IHealthCheckController {
+	return &HealthCheckController{}
+}
 
-		if env.GetEnv("PROMETHEUS_TOKEN", "") != "" {
-			AddRouter("GET", prometheusRoute, MetricsHandlerAuthenticated)
-		} else {
-			AddRouter("GET", prometheusRoute, MetricsHandler)
-		}
-	}
+type Teste struct {
+	Teste string
+}
+
+func (hc *HealthCheckController) Handler() (interface{}, error) {
+	return webserver_types.APIResponse{
+		Data:       "OK",
+		StatusCode: http.StatusOK,
+		Headers:    map[string]string{"Content-Type": "text/plain; charset=utf-8"},
+	}, nil
 }

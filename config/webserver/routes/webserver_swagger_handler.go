@@ -13,19 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package repository
+package webserver_route
 
-import (
-	"github.com/caiomarcatti12/nanogo/v2/config/rsql"
-	"github.com/google/uuid"
-)
+// import (
+// 	"github.com/caiomarcatti12/nanogo/v2/config/env"
+// 	"io/ioutil"
+// 	"net/http"
+// )
 
-type Repository[T Identifier] interface {
-	Insert(document T) (T, error)
-	Update(document T) (bool, error)
-	Delete(document T) (bool, error)
-	FindById(id uuid.UUID) (T, error)
-	DeleteById(id uuid.UUID) (bool, error)
-	FindAll() ([]T, error)
-	RawQueryParseRsql(filter rsql.QueryFilter) ([]T, int64, error)
-}
+// func SwaggerHandler(ctx *HandlerContext[any]) (interface{}, error) {
+// 	docsPath := env.GetEnv("SWAGGER_DOCS_PATH", ".docs/swagger/swaggeer.yaml")
+
+// 	content, err := ioutil.ReadFile(docsPath)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	return &APIResponse{
+// 		Data:       content,
+// 		StatusCode: http.StatusOK,
+// 		Headers:    map[string]string{"Content-Type": "application/x-yaml"},
+// 	}, nil
+// }

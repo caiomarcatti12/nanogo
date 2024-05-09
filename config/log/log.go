@@ -17,36 +17,33 @@ package log
 
 import (
 	"encoding/json"
-	"github.com/caiomarcatti12/nanogo/v2/config/context_manager"
 	"os"
+	"strings"
+
+	"github.com/caiomarcatti12/nanogo/v2/config/context_manager"
 
 	"github.com/caiomarcatti12/nanogo/v2/config/env"
 	"github.com/sirupsen/logrus"
 )
 
-var (
-	logger         *logrus.Entry
-	logInitialized bool
-	fcm            = context_manager.NewSafeContextManager()
-)
-
 type Fields map[string]interface{}
 
-// GetCorrelationID retrieves the correlationID from gls.
-func GetCorrelationID() string {
-	if correlationID, ok := fcm.GetValue("x-correlation-id"); ok {
-		return correlationID.(string)
-	}
-	return ""
+type Logger struct {
+	logger        *logrus.Entry
+	fcm           *context_manager.SafeContextManager
+	defaultFields logrus.Fields
 }
 
-func InitializeLogger() {
-	if logInitialized {
-		return
+func FactoryLogger(env env.IEnv) ILog {
+	l := &Logger{
+		fcm: context_manager.NewSafeContextManager(),
 	}
 
 	logrus.SetOutput(os.Stdout)
-	logrus.SetLevel(logrus.TraceLevel)
+
+	// Set log level from environment variable
+	logLevel := env.GetEnv("LOG_LEVEL", "trace") // Default to "trace" if not specified
+	l.setLogLevel(logLevel)
 
 	if env.GetEnv("ENV", "dev") == "production" {
 		logrus.SetFormatter(&logrus.JSONFormatter{})
@@ -54,47 +51,90 @@ func InitializeLogger() {
 		logrus.SetFormatter(&logrus.TextFormatter{})
 	}
 
-	logInitialized = true
-
-	UpdateCorrelationID() // Call this to set the initial logger
-}
-
-func UpdateCorrelationID() {
-	if logger == nil {
-		InitializeLogger()
-	}
-
-	correlationID := GetCorrelationID()
-
-	logger = logrus.WithFields(logrus.Fields{
+	l.defaultFields = logrus.Fields{
 		"app":              env.GetEnv("APP_NAME"),
 		"env":              env.GetEnv("ENV"),
 		"version":          env.GetEnv("VERSION"),
-		"x-correlation-id": correlationID,
-	})
+		"x-correlation-id": "",
+	}
+
+	l.updateCorrelationID()
+
+	return l
 }
 
-func extractFields(args ...interface{}) (string, logrus.Fields) {
+func (l *Logger) Fatal(message string, args ...interface{}) {
+	fields := l.extractFields(args)
+	l.logger.WithFields(fields).Fatal(message)
+}
+
+func (l *Logger) Debug(message string, args ...interface{}) {
+	fields := l.extractFields(args)
+	l.logger.WithFields(fields).Debug(message)
+}
+
+func (l *Logger) Info(message string, args ...interface{}) {
+	fields := l.extractFields(args)
+	l.logger.WithFields(fields).Info(message)
+}
+
+func (l *Logger) Error(message string, args ...interface{}) {
+	fields := l.extractFields(args)
+	l.logger.WithFields(fields).Error(message)
+}
+
+func (l *Logger) Warning(message string, args ...interface{}) {
+	fields := l.extractFields(args)
+	l.logger.WithFields(fields).Warning(message)
+}
+
+func (l *Logger) setLogLevel(level string) {
+	switch strings.ToLower(level) {
+	case "panic":
+		logrus.SetLevel(logrus.PanicLevel)
+	case "fatal":
+		logrus.SetLevel(logrus.FatalLevel)
+	case "error":
+		logrus.SetLevel(logrus.ErrorLevel)
+	case "warn", "warning":
+		logrus.SetLevel(logrus.WarnLevel)
+	case "info":
+		logrus.SetLevel(logrus.InfoLevel)
+	case "debug":
+		logrus.SetLevel(logrus.DebugLevel)
+	case "trace":
+		logrus.SetLevel(logrus.TraceLevel)
+	default:
+		logrus.SetLevel(logrus.TraceLevel) // Default level if none is provided
+	}
+}
+
+func (l *Logger) updateCorrelationID() {
+	correlationID, _ := l.fcm.GetValue("x-correlation-id")
+
+	fieldsLogger := l.defaultFields
+
+	fieldsLogger["x-correlation-id"] = correlationID
+
+	l.logger = logrus.WithFields(fieldsLogger)
+}
+
+func (l *Logger) extractFields(args ...interface{}) logrus.Fields {
 	if len(args) == 0 {
-		return "", nil
+		return nil
 	}
 
-	// Obtendo o primeiro nível
 	innerArgs, ok := args[0].([]interface{})
 	if !ok || len(innerArgs) == 0 {
-		return "", nil
+		return nil
 	}
 
-	// Extraindo a mensagem do primeiro nível
-	msg, _ := innerArgs[0].(string)
-
-	// Extraindo os campos, se existirem
 	fields := logrus.Fields{}
 	if len(innerArgs) > 1 {
 		switch v := innerArgs[1].(type) {
 		case Fields:
 			fields = logrus.Fields(v)
-		default: // Tratar como struct ou qualquer outro tipo
+		default:
 			data, err := json.Marshal(v)
 			if err == nil {
 				_ = json.Unmarshal(data, &fields)
@@ -102,35 +142,5 @@ func extractFields(args ...interface{}) (string, logrus.Fields) {
 		}
 	}
 
-	return msg, fields
-}
-
-func Fatal(args ...interface{}) {
-	UpdateCorrelationID()
-	msg, fields := extractFields(args)
-	logger.WithFields(fields).Fatal(msg)
-}
-
-func Debug(args ...interface{}) {
-	UpdateCorrelationID()
-	msg, fields := extractFields(args)
-	logger.WithFields(fields).Debug(msg)
-}
-
-func Info(args ...interface{}) {
-	UpdateCorrelationID()
-	msg, fields := extractFields(args)
-	logger.WithFields(fields).Info(msg)
-}
-
-func Error(args ...interface{}) {
-	UpdateCorrelationID()
-	msg, fields := extractFields(args)
-	logger.WithFields(fields).Error(msg)
-}
-
-func Warning(args ...interface{}) {
-	UpdateCorrelationID()
-	msg, fields := extractFields(args)
-	logger.WithFields(fields).Warning(msg)
+	return fields
 }

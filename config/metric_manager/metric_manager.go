@@ -17,10 +17,10 @@ package metric_manager
 
 import (
 	"errors"
+	"sync"
+
 	"github.com/caiomarcatti12/nanogo/v2/config/env"
 	"github.com/prometheus/client_golang/prometheus"
-	"log"
-	"sync"
 )
 
 var (
@@ -116,7 +116,7 @@ func (m *MetricManager) safeRegister(fullName string, collector prometheus.Colle
 	err := prometheus.Register(collector)
 	if err != nil {
 		if _, dup := err.(prometheus.AlreadyRegisteredError); !dup {
-			log.Printf("Failed to register metric: %v", err)
+			//log.Printf("Failed to register metric: %v", err)
 		}
 	} else {
 		m.metrics[fullName] = collector
