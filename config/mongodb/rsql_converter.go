@@ -16,18 +16,19 @@
 package mongodb
 
 import (
+	"strings"
+
 	"github.com/caiomarcatti12/nanogo/v2/config/rsql"
 	"go.mongodb.org/mongo-driver/bson"
-	"strings"
 )
 
 func RsqlConvertToBson(qp rsql.QueryFilter) (bson.M, bson.M, int64, int64, error) {
 	query := bson.M{}
 
 	// Verificar se Filter foi fornecido
-	if qp.Filter != nil {
+	if qp.Filter != "" {
 		// Convertendo o filtro RSQL para bson.M
-		conditions, err := rsql.Parse(*qp.Filter)
+		conditions, err := rsql.Parse(qp.Filter)
 		if err != nil {
 			return nil, nil, 0, 0, err
 		}
@@ -56,9 +57,9 @@ func RsqlConvertToBson(qp rsql.QueryFilter) (bson.M, bson.M, int64, int64, error
 
 	sort := bson.M{}
 	// Verificar se SortParams foi fornecido
-	if qp.SortParams != nil {
+	if qp.SortParams != "" {
 		// Convertendo o parâmetro de ordenação para bson.M
-		sortFields := strings.Split(*qp.SortParams, ":")
+		sortFields := strings.Split(qp.SortParams, ":")
 		if len(sortFields) == 2 {
 			field := sortFields[0]
 			direction := 0
@@ -76,14 +77,14 @@ func RsqlConvertToBson(qp rsql.QueryFilter) (bson.M, bson.M, int64, int64, error
 
 	size := 15
 	// Verificar se Size foi fornecido
-	if qp.Size != nil {
-		size = int(*qp.Size)
+	if qp.Size != 15 {
+		size = int(qp.Size)
 	}
 
 	skip := 0
 	// Verificar se Skip foi fornecido
-	if qp.Skip != nil {
-		skip = int(*qp.Skip)
+	if qp.Skip != 0 {
+		skip = int(qp.Skip)
 	}
 
 	return query, sort, int64(size), int64(skip), nil
