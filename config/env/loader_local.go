@@ -16,38 +16,13 @@
 package env
 
 import (
-	"os"
-	"strconv"
+	"github.com/joho/godotenv"
 )
 
-type Env struct {
-}
-
-func FactoryEnv() IEnv {
-	return &Env{}
-}
-
-func (e *Env) GetEnv(variable string, default_ ...string) string {
-	value := os.Getenv(variable)
-
-	if value == "" {
-		if len(default_) > 0 {
-			return default_[0]
-		}
-		panic("A variavel de ambiente %s não foi definida. Verifique o arquivo .env" + variable)
-	}
-
-	return value
-}
-
-func (e *Env) GetEnvBool(variable string, default_ ...string) bool {
-	value := e.GetEnv(variable, default_...)
-
-	b, err := strconv.ParseBool(value)
+func LocalLoader() {
+	err := godotenv.Load()
 
 	if err != nil {
-		return false
+		panic("Erro carregando arquivo .env")
 	}
-
-	return b
 }

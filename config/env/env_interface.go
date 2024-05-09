@@ -15,39 +15,7 @@
  */
 package env
 
-import (
-	"os"
-	"strconv"
-)
-
-type Env struct {
-}
-
-func FactoryEnv() IEnv {
-	return &Env{}
-}
-
-func (e *Env) GetEnv(variable string, default_ ...string) string {
-	value := os.Getenv(variable)
-
-	if value == "" {
-		if len(default_) > 0 {
-			return default_[0]
-		}
-		panic("A variavel de ambiente %s não foi definida. Verifique o arquivo .env" + variable)
-	}
-
-	return value
-}
-
-func (e *Env) GetEnvBool(variable string, default_ ...string) bool {
-	value := e.GetEnv(variable, default_...)
-
-	b, err := strconv.ParseBool(value)
-
-	if err != nil {
-		return false
-	}
-
-	return b
+type IEnv interface {
+	GetEnv(variable string, default_ ...string) string
+	GetEnvBool(variable string, default_ ...string) bool
 }
