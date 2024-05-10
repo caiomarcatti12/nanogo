@@ -1,4 +1,4 @@
-package eda
+package event
 
 // import (
 // 	"github.com/caiomarcatti12/nanogo/v2/config/rabbitmq"

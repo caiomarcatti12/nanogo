@@ -97,6 +97,7 @@ func (ws *WebServer) AddRoute(route webserver_types.Route) {
 	}).Methods("OPTIONS")
 }
 
+
 func (ws *WebServer) Start() {
 	if ws.crt != "" && ws.key != "" {
 		ws.startWebserverHttps()

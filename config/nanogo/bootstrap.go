@@ -16,9 +16,11 @@
 package nanogo
 
 import (
+	"fmt"
+
 	"github.com/caiomarcatti12/nanogo/v2/config/di"
-	"github.com/caiomarcatti12/nanogo/v2/config/eda"
 	"github.com/caiomarcatti12/nanogo/v2/config/env"
+	"github.com/caiomarcatti12/nanogo/v2/config/event"
 	"github.com/caiomarcatti12/nanogo/v2/config/log"
 	"github.com/caiomarcatti12/nanogo/v2/config/mongodb"
 	"github.com/caiomarcatti12/nanogo/v2/config/webserver"
@@ -31,10 +33,30 @@ func Bootstrap() {
 	container := di.GetContainer()
 	container.Register(env.FactoryEnv)
 	container.Register(log.FactoryLogger)
-	container.Register(eda.FactoryEventDispatcher)
+	container.Register(event.NewInMemoryBroker)
+	container.Register(event.FactoryEventDispatcher)
 	container.Register(webserver.FactoryWebServer)
 	container.Register(mongodb.NewMongoConnector)
 	container.Register(mongodb.NewMongoORM[any])
+}
+
+func Register(factoryFunc interface{}) {
+
+	container := di.GetContainer()
+	nameFunc, err := container.GetNameReturn(factoryFunc)
+
+	if err != nil {
+		panic(err)
+	}
+
+	logger := getLogger()
+	logger.Debug(fmt.Sprintf("Registro função no DI: %s", nameFunc))
+
+	err = container.Register(factoryFunc)
+
+	if err != nil {
+		panic(err)
+	}
 }
 
 func StartMongoDB() {
@@ -57,7 +79,19 @@ func StartMongoDB() {
 	}
 }
 
-func StartWebServer(routes []webserver_types.Route) {
+func WebserverAddRoutes(routes []webserver_types.Route) {
+	ws := getWebServer()
+
+	for _, route := range routes {
+		ws.AddRoute(route)
+	}
+}
+func WebserverStart() {
+	ws := getWebServer()
+	ws.Start()
+}
+
+func getWebServer() webserver.IWebServer {
 	container := di.GetContainer()
 
 	webserverInterface, err := container.GetByFunctionConstructor(webserver.FactoryWebServer)
@@ -70,9 +104,21 @@ func StartWebServer(routes []webserver_types.Route) {
 		panic("could not assert type to IWebServer")
 	}
 
-	for _, route := range routes {
-		webserver.AddRoute(route)
+	return webserver
+}
+
+func getLogger() log.ILog {
+	container := di.GetContainer()
+
+	logInterface, err := container.GetByFunctionConstructor(log.FactoryLogger)
+	if err != nil {
+		panic(err)
 	}
 
-	webserver.Start()
+	logger, ok := logInterface.(log.ILog)
+	if !ok {
+		panic("could not assert type to ILog")
+	}
+
+	return logger
 }

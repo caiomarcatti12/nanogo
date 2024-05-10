@@ -1,4 +1,4 @@
-package eda
+package event
 
 type Event struct {
 	Channel string
