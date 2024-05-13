@@ -64,7 +64,7 @@ func (c *Container) GetNameReturn(factoryFunc interface{}) (string, error) {
 		return "", errors.New("factory function must return exactly one result")
 	}
 
-	name := factoryType.Out(0).Name()
+	name := factoryType.Out(0).PkgPath() + "/" + factoryType.Out(0).Name()
 	return name, nil
 }
 
@@ -135,7 +135,7 @@ func (c *Container) resolveParameters(fn interface{}) ([]reflect.Value, error) {
 	var in []reflect.Value
 
 	for i := 0; i < fnType.NumIn(); i++ {
-		argType := fnType.In(i).Name()
+		argType := fnType.In(i).PkgPath() + "/" + fnType.In(i).Name()
 		argInstance, err := c.GetByName(argType)
 		if err != nil {
 			return nil, err
