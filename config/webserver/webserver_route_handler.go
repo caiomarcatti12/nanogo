@@ -27,6 +27,7 @@ import (
 	"github.com/caiomarcatti12/nanogo/v2/config/mapper"
 	"github.com/caiomarcatti12/nanogo/v2/config/validator"
 	webserver_types "github.com/caiomarcatti12/nanogo/v2/config/webserver/types"
+	"github.com/mozillazg/go-httpheader"
 )
 
 func (ws *WebServer) Handler(w http.ResponseWriter, r *http.Request, route webserver_types.Route) {
@@ -44,7 +45,7 @@ func (ws *WebServer) Handler(w http.ResponseWriter, r *http.Request, route webse
 		ws.debugInput(w, r, payload)
 	}
 
-	data, err := ws.executeHandler(route, payload)
+	data, err := ws.executeHandler(route, payload, r.Header)
 
 	if err != nil {
 		if customErr, ok := err.(*errors.CustomError); ok {
@@ -83,7 +84,7 @@ func (ws *WebServer) Handler(w http.ResponseWriter, r *http.Request, route webse
 		json.NewEncoder(w).Encode(data)
 	}
 }
-func (ws *WebServer) executeHandler(route webserver_types.Route, contextPayload map[string]interface{}) (interface{}, error) {
+func (ws *WebServer) executeHandler(route webserver_types.Route, contextPayload map[string]interface{}, contextHeaders http.Header) (interface{}, error) {
 	handler, err := di.GetContainer().GetByFunctionConstructor(route.IHandler)
 
 	if err != nil {
@@ -113,6 +114,12 @@ func (ws *WebServer) executeHandler(route webserver_types.Route, contextPayload 
 
 			if err != nil {
 				return nil, fmt.Errorf("error decoding context payload into struct: %s", err)
+			}
+
+			err = httpheader.Decode(contextHeaders, ptrToStruct.Interface())
+
+			if err != nil {
+				return nil, fmt.Errorf("Error decoding headers into Payload: %s", err)
 			}
 
 			errorValidateStruct := validator.ValidateStruct(ptrToStruct.Interface())
