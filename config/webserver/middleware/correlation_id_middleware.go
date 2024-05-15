@@ -22,13 +22,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// import (
-// 	"github.com/caiomarcatti12/nanogo/v2/config/context_manager"
-// 	"net/http"
-
-// 	"github.com/google/uuid"
-// )
-
 type CorrelationIdMiddleware struct {
 }
 

@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/caiomarcatti12/nanogo/v2/config/rsql"
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -34,23 +35,24 @@ func RsqlConvertToBson(qp rsql.QueryFilter) (bson.M, bson.M, int64, int64, error
 		}
 
 		for _, condition := range conditions {
+			value := parseValue(condition.Value)
 			switch condition.Operator {
 			case "==":
-				query[condition.Field] = condition.Value
+				query[condition.Field] = value
 			case "!=":
-				query[condition.Field] = bson.M{"$ne": condition.Value}
+				query[condition.Field] = bson.M{"$ne": value}
 			case "<>":
-				query[condition.Field] = bson.M{"$ne": condition.Value}
+				query[condition.Field] = bson.M{"$ne": value}
 			case "=gt=":
-				query[condition.Field] = bson.M{"$gt": condition.Value}
+				query[condition.Field] = bson.M{"$gt": value}
 			case "=gte=":
-				query[condition.Field] = bson.M{"$gte": condition.Value}
+				query[condition.Field] = bson.M{"$gte": value}
 			case "=lt=":
-				query[condition.Field] = bson.M{"$lt": condition.Value}
+				query[condition.Field] = bson.M{"$lt": value}
 			case "=lte=":
-				query[condition.Field] = bson.M{"$lte": condition.Value}
+				query[condition.Field] = bson.M{"$lte": value}
 			case "=like=":
-				query[condition.Field] = bson.M{"$regex": condition.Value, "$options": "i"}
+				query[condition.Field] = bson.M{"$regex": value, "$options": "i"}
 			}
 		}
 	}
@@ -88,4 +90,21 @@ func RsqlConvertToBson(qp rsql.QueryFilter) (bson.M, bson.M, int64, int64, error
 	}
 
 	return query, sort, int64(size), int64(skip), nil
+}
+
+func parseValue(value string) interface{} {
+	if value == "true" {
+		return true
+	}
+	if value == "false" {
+		return false
+	}
+
+	valueUUID, err := uuid.Parse(value)
+
+	if err == nil {
+		return valueUUID
+	}
+
+	return value
 }

@@ -110,7 +110,7 @@ func (ws *WebServer) executeHandler(route webserver_types.Route, contextPayload 
 
 			ptrToStruct := reflect.New(paramType)
 
-			err := mapper.Transform(contextPayload, ptrToStruct.Interface())
+			err := mapper.InjectData(contextPayload, ptrToStruct.Interface())
 
 			if err != nil {
 				return nil, fmt.Errorf("error decoding context payload into struct: %s", err)

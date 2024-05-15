@@ -16,6 +16,8 @@
 package mapper
 
 import (
+	"encoding/json"
+	"fmt"
 	"reflect"
 	"strconv"
 	"time"
@@ -24,15 +26,12 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-func Transform(input interface{}, output interface{}) error {
+func InjectData(input interface{}, output interface{}) error {
 	decoderConfig := &mapstructure.DecoderConfig{
 		DecodeHook: mapstructure.ComposeDecodeHookFunc(
-			mapstructure.StringToTimeDurationHookFunc(),
-			mapstructure.StringToSliceHookFunc(","),
-			decodeTimeFromString,       // Adiciona o hook personalizado para uuid
-			decodeUUIDFromString,       // Adiciona o hook personalizado para uuid
-			decodeBasicTypesFromString, // Adiciona o hook personalizado para uuid
-
+			decodeTimeFromString,
+			decodeUUIDFromString,
+			decodeBasicTypesFromString,
 		),
 		Result: &output,
 	}
@@ -51,12 +50,39 @@ func Transform(input interface{}, output interface{}) error {
 
 	return nil
 }
+func Transform(input interface{}, output interface{}) error {
+	jsonBytes, err := json.Marshal(input)
+	if err != nil {
+		return err
+	}
+
+	// Usando reflexão para verificar se o input é uma slice
+	inputVal := reflect.ValueOf(input)
+	if inputVal.Kind() == reflect.Slice {
+		// Tratamento para slice
+		var sliceOfMaps []map[string]interface{}
+		err = json.Unmarshal(jsonBytes, &sliceOfMaps)
+		if err != nil {
+			return err
+		}
+		return InjectData(sliceOfMaps, output)
+	} else {
+		// Tratamento para uma única struct
+		var singleMap map[string]interface{}
+		err = json.Unmarshal(jsonBytes, &singleMap)
+		if err != nil {
+			return err
+		}
+
+		return InjectData(singleMap, output)
+	}
+}
 
 // decodeUUIDFromString decodifica UUIDs a partir de strings.
 func decodeUUIDFromString(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
 	if f.Kind() == reflect.String && (t == reflect.TypeOf(uuid.UUID{}) || t == reflect.TypeOf(&uuid.UUID{})) {
 		if data.(string) == "" {
-			return uuid.Nil, nil
+			return nil, nil
 		}
 		uuidVal, err := uuid.Parse(data.(string))
 		if err != nil {
@@ -73,11 +99,13 @@ func decodeUUIDFromString(f reflect.Type, t reflect.Type, data interface{}) (int
 // decodeTimeFromString decodifica time.Time a partir de strings.
 func decodeTimeFromString(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
 	if f.Kind() == reflect.String && t == reflect.TypeOf(time.Time{}) {
-		if data.(string) == "" {
-			return nil, nil
+		strData := data.(string)
+		if strData == "" {
+			return time.Time{}, nil // Considerando time.Time zero se a string for vazia.
 		}
-		timeVal, err := time.Parse(time.RFC3339, data.(string))
+		timeVal, err := time.Parse(time.RFC3339, strData)
 		if err != nil {
+			fmt.Printf("Erro ao decodificar data: %v, dado recebido: %s\n", err, strData)
 			return nil, err
 		}
 		return timeVal, nil
@@ -118,5 +146,6 @@ func decodeBasicTypesFromString(f reflect.Type, t reflect.Type, data interface{}
 			return boolVal, nil
 		}
 	}
+
 	return data, nil
 }
