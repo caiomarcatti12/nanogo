@@ -25,11 +25,22 @@ func Parse(rsql string) ([]Condition, error) {
 
 	// Dividir a consulta RSQL em condições usando o delimitador ';'
 	for _, part := range strings.Split(rsql, ";") {
-		tokens := strings.Split(part, "==")
-		if len(tokens) != 2 {
-			return nil, fmt.Errorf("formato RSQL inválido")
+		var tokens []string
+		if strings.Contains(part, "=like=") {
+			tokens = strings.Split(part, "=like=")
+			if len(tokens) != 2 {
+				return nil, fmt.Errorf("formato RSQL inválido para =like=")
+			}
+			conditions = append(conditions, Condition{Field: tokens[0], Operator: "=like=", Value: tokens[1]})
+		} else if strings.Contains(part, "==") {
+			tokens = strings.Split(part, "==")
+			if len(tokens) != 2 {
+				return nil, fmt.Errorf("formato RSQL inválido para ==")
+			}
+			conditions = append(conditions, Condition{Field: tokens[0], Operator: "==", Value: tokens[1]})
+		} else {
+			return nil, fmt.Errorf("operador desconhecido")
 		}
-		conditions = append(conditions, Condition{Field: tokens[0], Operator: "==", Value: tokens[1]})
 	}
 
 	return conditions, nil
