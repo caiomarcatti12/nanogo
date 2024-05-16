@@ -80,8 +80,6 @@ func Transform(input interface{}, output interface{}) error {
 
 // decodeUUIDFromString decodifica UUIDs a partir de strings.
 func decodeUUIDFromString(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
-	fmt.Println("Decoding data for types from %s to %s with value %v", f, t, data)
-
 	if f.Kind() == reflect.String && (t == reflect.TypeOf(uuid.UUID{}) || t == reflect.TypeOf(&uuid.UUID{})) {
 		if data.(string) == "" {
 			if t == reflect.TypeOf(uuid.UUID{}) {
