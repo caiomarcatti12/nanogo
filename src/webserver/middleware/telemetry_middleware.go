@@ -17,8 +17,6 @@ package webserver_middleware
 
 import (
 	"net/http"
-
-	"github.com/caiomarcatti12/nanogo/v3/src/telemetry"
 )
 
 type TelemetryMiddleware struct {
@@ -33,17 +31,17 @@ func (m *TelemetryMiddleware) GetName() string {
 }
 
 func (m *TelemetryMiddleware) Process(w http.ResponseWriter, r *http.Request, next http.Handler) {
-	telemetry := telemetry.NewOpenTelemetry()
-	// fcm := context_manager.NewSafeContextManager()
+	// telemetry := telemetry.NewOpenTelemetry()
+	// // fcm := context_manager.NewSafeContextManager()
 
-	correlationID := r.Header.Get("X-Correlation-ID")
-	span := telemetry.CreateRootSpan(r.Method+" "+r.URL.Path, map[string]interface{}{"correlationID": correlationID})
-	// contextValues := fcm.CreateValue("correlationID", correlationID)
+	// correlationID := r.Header.Get("X-Correlation-ID")
+	// span := telemetry.CreateRootSpan(r.Method+" "+r.URL.Path, map[string]interface{}{"correlationID": correlationID})
+	// // contextValues := fcm.CreateValue("correlationID", correlationID)
 
-	// fcm.SetValues(contextValues, func() {
-	next.ServeHTTP(w, r)
+	// // fcm.SetValues(contextValues, func() {
+	// next.ServeHTTP(w, r)
 
-	telemetry.EndSpan(span, nil)
-	telemetry.Shutdown()
+	// telemetry.EndSpan(span, nil)
+	// telemetry.Shutdown()
 	// })
 }
