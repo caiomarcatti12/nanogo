@@ -26,6 +26,7 @@ import (
 	"github.com/caiomarcatti12/nanogo/v3/src/metric"
 	"github.com/caiomarcatti12/nanogo/v3/src/queue"
 	"github.com/caiomarcatti12/nanogo/v3/src/telemetry"
+	"github.com/caiomarcatti12/nanogo/v3/src/webserver"
 )
 
 func Bootstrap() {
@@ -36,7 +37,7 @@ func Bootstrap() {
 	container.Register(metric.Factory)
 	container.Register(cache.Factory)
 	container.Register(event.Factory)
-	// container.Register(webserver.FactoryWebServer)
+	container.Register(webserver.FactoryWebServer)
 	container.Register(db.Factory)
 	container.Register(queue.Factory)
 	container.Register(db.NewMongoORM[any])
