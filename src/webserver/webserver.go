@@ -61,7 +61,7 @@ func NewWebServer(env env.IEnv, logger log.ILog) IWebServer {
 		instance.AddMidleware(webserver_middleware.NewCorsMiddleware(env))
 		instance.AddMidleware(webserver_middleware.NewPayloadExtractorMiddleware(env))
 		instance.AddMidleware(webserver_middleware.NewCorrelationIdMiddleware())
-		instance.AddMidleware(webserver_middleware.NewTelemetryMiddleware())
+		// instance.AddMidleware(webserver_middleware.NewTelemetryMiddleware())
 
 		instance.AddRoute(webserver_types.Route{
 			Path:        "/healthcheck",
