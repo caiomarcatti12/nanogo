@@ -16,8 +16,8 @@
 package webserver
 
 import (
-	webserver_middleware "github.com/caiomarcatti12/nanogo/v2/src/webserver/middleware"
-	webserver_types "github.com/caiomarcatti12/nanogo/v2/src/webserver/types"
+	webserver_middleware "github.com/caiomarcatti12/nanogo/v3/src/webserver/middleware"
+	webserver_types "github.com/caiomarcatti12/nanogo/v3/src/webserver/types"
 )
 
 type IWebServer interface {

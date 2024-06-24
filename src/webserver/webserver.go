@@ -20,12 +20,12 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/caiomarcatti12/nanogo/v2/src/di"
-	"github.com/caiomarcatti12/nanogo/v2/src/env"
-	"github.com/caiomarcatti12/nanogo/v2/src/log"
-	webserver_middleware "github.com/caiomarcatti12/nanogo/v2/src/webserver/middleware"
-	webserver_route "github.com/caiomarcatti12/nanogo/v2/src/webserver/routes"
-	webserver_types "github.com/caiomarcatti12/nanogo/v2/src/webserver/types"
+	"github.com/caiomarcatti12/nanogo/v3/src/di"
+	"github.com/caiomarcatti12/nanogo/v3/src/env"
+	"github.com/caiomarcatti12/nanogo/v3/src/log"
+	webserver_middleware "github.com/caiomarcatti12/nanogo/v3/src/webserver/middleware"
+	webserver_route "github.com/caiomarcatti12/nanogo/v3/src/webserver/routes"
+	webserver_types "github.com/caiomarcatti12/nanogo/v3/src/webserver/types"
 	"github.com/gorilla/mux"
 )
 

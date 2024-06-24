@@ -18,8 +18,8 @@ package metric
 import (
 	"fmt"
 
-	"github.com/caiomarcatti12/nanogo/v2/src/env"
-	"github.com/caiomarcatti12/nanogo/v2/src/log"
+	"github.com/caiomarcatti12/nanogo/v3/src/env"
+	"github.com/caiomarcatti12/nanogo/v3/src/log"
 )
 
 type MetricType string
@@ -37,10 +37,10 @@ type Labels map[string]string
 type LabelsKeys []string
 
 const (
-	Counter MetricType = "Counter"
-	Gauge MetricType = "Gauge"
+	Counter   MetricType = "Counter"
+	Gauge     MetricType = "Gauge"
 	Histogram MetricType = "Histogram"
-	Summary MetricType = "Summary"
+	Summary   MetricType = "Summary"
 )
 
 func Factory(env env.IEnv, logger log.ILog) IMetric {

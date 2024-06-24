@@ -18,7 +18,7 @@ package webserver_middleware
 import (
 	"net/http"
 
-	"github.com/caiomarcatti12/nanogo/v2/src/context_manager"
+	"github.com/caiomarcatti12/nanogo/v3/src/context_manager"
 	"github.com/google/uuid"
 )
 

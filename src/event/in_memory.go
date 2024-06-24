@@ -18,7 +18,7 @@ package event
 import (
 	"fmt"
 
-	"github.com/caiomarcatti12/nanogo/v2/src/log"
+	"github.com/caiomarcatti12/nanogo/v3/src/log"
 )
 
 type EventHandler func(Event)

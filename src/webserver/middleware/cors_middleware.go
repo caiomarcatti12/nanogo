@@ -19,7 +19,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/caiomarcatti12/nanogo/v2/src/env"
+	"github.com/caiomarcatti12/nanogo/v3/src/env"
 )
 
 type CorsMiddleware struct {

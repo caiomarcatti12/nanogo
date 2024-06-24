@@ -16,8 +16,8 @@
 package webserver_middleware
 
 // import (
-// 	"github.com/caiomarcatti12/nanogo/v2/src/context_manager"
-// 	"github.com/caiomarcatti12/nanogo/v2/src/i18n"
+// 	"github.com/caiomarcatti12/nanogo/v3/src/context_manager"
+// 	"github.com/caiomarcatti12/nanogo/v3/src/i18n"
 // 	"net/http"
 // 	"strings"
 // )

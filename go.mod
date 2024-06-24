@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-module github.com/caiomarcatti12/nanogo/v2
+module github.com/caiomarcatti12/nanogo/v3
 
 go 1.21
 

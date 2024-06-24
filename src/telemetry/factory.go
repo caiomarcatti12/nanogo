@@ -18,8 +18,8 @@ package telemetry
 import (
 	"fmt"
 
-	"github.com/caiomarcatti12/nanogo/v2/src/env"
-	"github.com/caiomarcatti12/nanogo/v2/src/log"
+	"github.com/caiomarcatti12/nanogo/v3/src/env"
+	"github.com/caiomarcatti12/nanogo/v3/src/log"
 	oteltrace "go.opentelemetry.io/otel/trace"
 )
 

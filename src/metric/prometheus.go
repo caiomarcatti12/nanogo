@@ -19,8 +19,8 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/caiomarcatti12/nanogo/v2/src/env"
-	"github.com/caiomarcatti12/nanogo/v2/src/log"
+	"github.com/caiomarcatti12/nanogo/v3/src/env"
+	"github.com/caiomarcatti12/nanogo/v3/src/log"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -90,7 +90,7 @@ func (m *Prometheus) IncrementCounter(name string, labelValues Labels) error {
 			return nil
 		}
 	}
-	
+
 	m.logger.Errorf("metric %s not found or is not a Counter", name)
 	return errors.New("metric not found or is not a Counter")
 }

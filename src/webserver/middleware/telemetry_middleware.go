@@ -18,7 +18,7 @@ package webserver_middleware
 import (
 	"net/http"
 
-	"github.com/caiomarcatti12/nanogo/v2/src/telemetry"
+	"github.com/caiomarcatti12/nanogo/v3/src/telemetry"
 )
 
 type TelemetryMiddleware struct {

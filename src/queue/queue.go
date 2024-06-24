@@ -18,10 +18,10 @@ package queue
 import (
 	"fmt"
 
-	"github.com/caiomarcatti12/nanogo/v2/src/env"
-	"github.com/caiomarcatti12/nanogo/v2/src/log"
-	"github.com/caiomarcatti12/nanogo/v2/src/metric"
-	"github.com/caiomarcatti12/nanogo/v2/src/telemetry"
+	"github.com/caiomarcatti12/nanogo/v3/src/env"
+	"github.com/caiomarcatti12/nanogo/v3/src/log"
+	"github.com/caiomarcatti12/nanogo/v3/src/metric"
+	"github.com/caiomarcatti12/nanogo/v3/src/telemetry"
 )
 
 type IConsumer[T any] interface {

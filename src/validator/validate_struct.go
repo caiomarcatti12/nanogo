@@ -17,8 +17,9 @@ package validator
 
 import (
 	"fmt"
-	"github.com/caiomarcatti12/nanogo/v2/src/errors"
 	"sync"
+
+	"github.com/caiomarcatti12/nanogo/v3/src/errors"
 
 	"github.com/go-playground/validator/v10"
 )

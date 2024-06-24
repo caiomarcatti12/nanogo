@@ -23,8 +23,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/caiomarcatti12/nanogo/v2/src/log"
-	"github.com/caiomarcatti12/nanogo/v2/src/rsql"
+	"github.com/caiomarcatti12/nanogo/v3/src/log"
+	"github.com/caiomarcatti12/nanogo/v3/src/rsql"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"

@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/caiomarcatti12/nanogo/v2/src/env"
-	"github.com/caiomarcatti12/nanogo/v2/src/log"
+	"github.com/caiomarcatti12/nanogo/v3/src/env"
+	"github.com/caiomarcatti12/nanogo/v3/src/log"
 	"github.com/gomodule/redigo/redis"
 )
 

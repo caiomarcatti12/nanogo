@@ -17,7 +17,7 @@
 package webserver_route
 
 // import (
-// 	"github.com/caiomarcatti12/nanogo/v2/src/env"
+// 	"github.com/caiomarcatti12/nanogo/v3/src/env"
 // 	"github.com/prometheus/client_golang/prometheus/promhttp"
 // 	"net/http"
 // )

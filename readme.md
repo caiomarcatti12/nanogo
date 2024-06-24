@@ -55,7 +55,7 @@ Para uma descrição detalhada de cada dependência e como elas são usadas no f
 **Adicione a Biblioteca como Dependência**: Abra o terminal no diretório do seu projeto e execute o comando a seguir para adicionar a biblioteca Nanogo como uma dependência:
 
 ```
-go get github.com/caiomarcatti12/nanogo/v2
+go get github.com/caiomarcatti12/nanogo/v3
 ```
 
 ### **Funcionalidades 🔥**
