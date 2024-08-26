@@ -1,4 +1,4 @@
-name: Auto-Approve Pull Request
+name: Auto-Merge Pull Request
 
 on:
   pull_request:
@@ -6,29 +6,27 @@ on:
 
 permissions:
   pull-requests: write
-  contents: read  # Permite ler o conteúdo do repositório
-  actions: read   # Permite ler os logs e status das ações
-  issues: write   # Permite comentar e fechar issues relacionadas a Pull Requests
+  contents: read
+  actions: read
+  issues: write
 
 jobs:
-  auto-approve:
+  auto-merge:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout no repository
+      - name: Checkout do repositório
         uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Instalar GitHub CLI
         run: sudo apt-get install -y gh
 
-      - name: Aprovar o Pull Request automaticamente
+      - name: Mesclar o Pull Request automaticamente
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PR_NUMBER=$(gh pr list --state open --json number --jq '.[0].number')
           if [ -n "$PR_NUMBER" ]; then
-            gh pr review "$PR_NUMBER" --approve
+            gh pr merge "$PR_NUMBER" --merge --admin --comment "Merge automático realizado pelo GitHub Actions"
           else
             echo "Nenhum Pull Request aberto encontrado."
           fi
