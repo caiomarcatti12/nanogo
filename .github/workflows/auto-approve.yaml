@@ -1,0 +1,20 @@
+name: Auto-Approve Pull Request
+
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  auto-approve:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Instalar GitHub CLI
+      run: sudo apt-get install -y gh
+
+    - name: Aprovar o Pull Request automaticamente
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        PR_NUMBER=$(gh pr list --state open --json number --jq '.[0].number')
+        gh pr review "$PR_NUMBER" --approve
