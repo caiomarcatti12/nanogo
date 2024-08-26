@@ -3,10 +3,13 @@ name: Release
 on:
   pull_request:
     types: [closed]  # Executa o workflow quando uma PR é fechada
+  push:
+    branches:
+      - main  # Executa o workflow quando há um push direto na branch main
 
 jobs:
   release:
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     steps:
@@ -29,13 +32,29 @@ jobs:
         git config user.name "GitHub Actions"
         git config user.email "actions@github.com"
 
+    - name: Determinar tipo de bump de versão
+      id: determine-version-bump
+      run: |
+        if [[ "${{ github.event.head_commit.message }}" == *"fix/"* ]]; then
+          echo "bump_type=patch" >> $GITHUB_ENV
+        elif [[ "${{ github.event.head_commit.message }}" == *"feat/"* ]]; then
+          echo "bump_type=minor" >> $GITHUB_ENV
+        elif [[ "${{ github.event.head_commit.message }}" == *"BREAKING CHANGE"* ]]; then
+          echo "bump_type=major" >> $GITHUB_ENV
+        else
+          echo "bump_type=patch" >> $GITHUB_ENV
+        fi
+
     - name: Versão Bump e push tag
       id: version
       uses: anothrNick/github-tag-action@v1.37.0
       with:
-        tag_prefix: "v"
-        release_branches: main
         github_token: ${{ secrets.GITHUB_TOKEN }}
+        tag_prefix: "v"
+        bump_type: ${{ env.bump_type }}
+        version_type: "semver"
+        release_branches: main
+        create_major_version_tag: true
 
     - name: Enviar o pacote para package do GitHub
       run: |
