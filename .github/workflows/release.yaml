@@ -25,7 +25,7 @@ jobs:
       run: go mod download
 
     - name: Compilar o código
-      run: go build -o nanogo ./cmd/nanogo
+      run: go build -o nanogo ./cmd/webserver
 
     - name: Configurar Git
       run: |
@@ -42,12 +42,12 @@ jobs:
         elif [[ "${{ github.event.head_commit.message }}" == *"BREAKING CHANGE"* ]]; then
           echo "bump_type=major" >> $GITHUB_ENV
         else
-          echo "bump_type=patch" >> $GITHUB_ENV
+          echo "bump_type='patch'" >> $GITHUB_ENV
         fi
 
     - name: Versão Bump e push tag
       id: version
-      uses: anothrNick/github-tag-action@1.70.0
+      uses: anothrNick/github-tag-action@v1.40.0
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         tag_prefix: "v"
@@ -56,11 +56,13 @@ jobs:
         release_branches: main
         create_major_version_tag: true
 
-    - name: Enviar o pacote para package do GitHub
-      run: |
-        go mod tidy
-        go build -o nanogo ./cmd/nanogo
-        GOPROXY=proxy.golang.org
-        go publish
+    - name: Instalar GitHub CLI
+      run: sudo apt-get install -y gh
+
+    - name: Criar release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        TAG_NAME=$(git describe --tags --abbrev=0)
+        RELEASE_NAME="Release $TAG_NAME"
+        gh release create $TAG_NAME --title "$RELEASE_NAME" --notes "Release gerada automaticamente pela GitHub Action."
