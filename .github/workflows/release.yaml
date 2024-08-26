@@ -60,6 +60,7 @@ jobs:
 
     - name: Buscar descrição do PR
       id: pr-description
+      if: github.event.pull_request
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
       run: |
