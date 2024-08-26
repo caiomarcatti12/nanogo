@@ -48,11 +48,12 @@ jobs:
 
     - name: Versão Bump e push tag
       id: version
-      uses: anothrNick/github-tag-action@v1
+      uses: anothrNick/github-tag-action@1.70.0
       env:
         DEFAULT_BUMP: ${{ env.bump_type }}
         RELEASE_BRANCHES : release.*
         WITH_V: true
+        DRY_RUN: true
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Instalar GitHub CLI
@@ -62,6 +63,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        TAG_NAME=$(git describe --tags --abbrev=0)
+        TAG_NAME="${{ steps.version.outputs.new_tag }}"
         RELEASE_NAME="Release $TAG_NAME"
         gh release create $TAG_NAME --title "$RELEASE_NAME" --notes "Release gerada automaticamente pela GitHub Action."
