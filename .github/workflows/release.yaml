@@ -56,16 +56,16 @@ jobs:
         DEFAULT_BUMP: ${{ env.bump_type }}
         RELEASE_BRANCHES : release.*
         WITH_V: true
-        # DRY_RUN: true
+        DRY_RUN: true
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    # - name: Instalar GitHub CLI
-    #   run: sudo apt-get install -y gh
+    - name: Instalar GitHub CLI
+      run: sudo apt-get install -y gh
 
-    # - name: Criar release
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #   run: |
-    #     TAG_NAME="${{ steps.version.outputs.new_tag }}"
-    #     RELEASE_NAME="Release $TAG_NAME"
-    #     gh release create $TAG_NAME --title "$RELEASE_NAME" --notes "Release gerada automaticamente pela GitHub Action."
+    - name: Criar release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        TAG_NAME="${{ steps.version.outputs.new_tag }}"
+        RELEASE_NAME="Release $TAG_NAME"
+        gh release create $TAG_NAME --title "$RELEASE_NAME" --notes "Release gerada automaticamente pela GitHub Action."
