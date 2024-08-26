@@ -25,10 +25,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/caiomarcatti12/nanogo/v3/pkg/env"
-	"github.com/caiomarcatti12/nanogo/v3/pkg/i18n"
-	"github.com/caiomarcatti12/nanogo/v3/pkg/log"
-	webserver_types "github.com/caiomarcatti12/nanogo/v3/pkg/webserver/types"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/env"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/i18n"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/log"
+	webserver_types "github.com/caiomarcatti12/nanogo/v1/pkg/webserver/types"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )

@@ -22,12 +22,12 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/caiomarcatti12/nanogo/v3/pkg/context_manager"
-	"github.com/caiomarcatti12/nanogo/v3/pkg/di"
-	"github.com/caiomarcatti12/nanogo/v3/pkg/env"
-	"github.com/caiomarcatti12/nanogo/v3/pkg/log"
-	"github.com/caiomarcatti12/nanogo/v3/pkg/metric"
-	"github.com/caiomarcatti12/nanogo/v3/pkg/telemetry"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/context_manager"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/di"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/env"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/log"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/metric"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/telemetry"
 	"github.com/google/uuid"
 	"github.com/streadway/amqp"
 )

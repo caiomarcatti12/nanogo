@@ -19,9 +19,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/caiomarcatti12/nanogo/v3/pkg/env"
-	"github.com/caiomarcatti12/nanogo/v3/pkg/i18n"
-	"github.com/caiomarcatti12/nanogo/v3/pkg/log"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/env"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/i18n"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/log"
 )
 
 type CorsMiddleware struct {

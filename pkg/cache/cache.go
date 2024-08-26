@@ -18,8 +18,8 @@ package cache
 import (
 	"fmt"
 
-	"github.com/caiomarcatti12/nanogo/v3/pkg/env"
-	"github.com/caiomarcatti12/nanogo/v3/pkg/log"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/env"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/log"
 )
 
 type ICache interface {

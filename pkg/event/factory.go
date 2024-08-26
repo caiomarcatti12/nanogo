@@ -16,9 +16,9 @@
 package event
 
 import (
-	"github.com/caiomarcatti12/nanogo/v3/pkg/env"
-	"github.com/caiomarcatti12/nanogo/v3/pkg/i18n"
-	"github.com/caiomarcatti12/nanogo/v3/pkg/log"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/env"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/i18n"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/log"
 )
 
 func Factory(env env.IEnv, log log.ILog, i18n i18n.I18N) IEventDispatcher {

@@ -19,7 +19,7 @@ import (
 	"errors"
 	"os"
 
-	"github.com/caiomarcatti12/nanogo/v3/pkg/i18n"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/i18n"
 )
 
 func Loader(i18n i18n.I18N) error {

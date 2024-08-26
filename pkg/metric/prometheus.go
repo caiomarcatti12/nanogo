@@ -19,8 +19,8 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/caiomarcatti12/nanogo/v3/pkg/env"
-	"github.com/caiomarcatti12/nanogo/v3/pkg/log"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/env"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/log"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
