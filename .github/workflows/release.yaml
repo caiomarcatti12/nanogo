@@ -9,7 +9,6 @@ permissions:
 
 jobs:
   release:
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     steps:
@@ -60,7 +59,8 @@ jobs:
 
     - name: Buscar descrição do PR
       id: pr-description
-      if: github.event.pull_request
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
       run: |
         PR_NUMBER="${{ github.event.pull_request.number }}"
         PR_BODY=$(gh pr view "$PR_NUMBER" --json body -q ".body")
