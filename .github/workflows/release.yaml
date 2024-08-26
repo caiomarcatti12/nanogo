@@ -54,7 +54,7 @@ jobs:
         RELEASE_BRANCHES : release.*
         WITH_V: true
         DRY_RUN: true
-        INITIAL_VERSION: 0.0.1
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Instalar GitHub CLI
       run: sudo apt-get install -y gh
