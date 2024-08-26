@@ -13,6 +13,8 @@ jobs:
     steps:
     - name: Checkout no repository
       uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Instalar GitHub CLI
       run: sudo apt-get install -y gh
