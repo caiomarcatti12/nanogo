@@ -20,11 +20,11 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/caiomarcatti12/nanogo/v3/pkg/errors"
-	"github.com/caiomarcatti12/nanogo/v3/pkg/mapper"
-	"github.com/caiomarcatti12/nanogo/v3/pkg/types"
-	"github.com/caiomarcatti12/nanogo/v3/pkg/validator"
-	webserver_types "github.com/caiomarcatti12/nanogo/v3/pkg/webserver/types"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/errors"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/mapper"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/types"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/validator"
+	webserver_types "github.com/caiomarcatti12/nanogo/v1/pkg/webserver/types"
 	"github.com/gorilla/websocket"
 	"github.com/mozillazg/go-httpheader"
 )

@@ -18,7 +18,7 @@ package validator
 import (
 	"net/http"
 
-	"github.com/caiomarcatti12/nanogo/v3/pkg/errors"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/errors"
 )
 
 func InvalidStructException(message string) *errors.CustomError {

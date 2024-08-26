@@ -16,7 +16,7 @@
 package env
 
 import (
-	"github.com/caiomarcatti12/nanogo/v3/pkg/i18n"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/i18n"
 )
 
 func Factory(i18n i18n.I18N) IEnv {

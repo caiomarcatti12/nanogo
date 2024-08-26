@@ -21,10 +21,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/caiomarcatti12/nanogo/v3/pkg/context_manager"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/context_manager"
 	"github.com/google/uuid"
 
-	"github.com/caiomarcatti12/nanogo/v3/pkg/env"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/env"
 	"github.com/sirupsen/logrus"
 )
 
