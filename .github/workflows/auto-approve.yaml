@@ -22,7 +22,7 @@ jobs:
 
       - name: Mesclar o Pull Request automaticamente
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN  }}
         run: |
           PR_NUMBER=$(gh pr list --state open --json number --jq '.[0].number')
           if [ -n "$PR_NUMBER" ]; then
