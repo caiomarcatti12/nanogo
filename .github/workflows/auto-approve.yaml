@@ -27,4 +27,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PR_NUMBER=$(gh pr list --state open --json number --jq '.[0].number')
-          gh pr review "$PR_NUMBER" --approve
+          if [ -n "$PR_NUMBER" ]; then
+            gh pr review "$PR_NUMBER" --approve
+          else
+            echo "Nenhum Pull Request aberto encontrado."
+          fi
