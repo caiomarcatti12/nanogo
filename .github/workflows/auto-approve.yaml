@@ -6,6 +6,9 @@ on:
 
 permissions:
   pull-requests: write
+  contents: read  # Permite ler o conteúdo do repositório
+  actions: read   # Permite ler os logs e status das ações
+  issues: write   # Permite comentar e fechar issues relacionadas a Pull Requests
 
 jobs:
   auto-approve:
