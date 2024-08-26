@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: write  # Permissões para ler e escrever em conteúdos, incluindo tags e releases
+  pull-requests: read
 
 jobs:
   release:
