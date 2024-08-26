@@ -16,7 +16,7 @@
 package webserver
 
 // import (
-// 	"github.com/caiomarcatti12/nanogo/v1/pkg/errors"
+// 	"github.com/caiomarcatti12/nanogo/pkg/errors"
 // 	"net/http"
 // 	"strconv"
 // )

@@ -18,11 +18,11 @@ package webserver_middleware
 import (
 	"net/http"
 
-	"github.com/caiomarcatti12/nanogo/v1/pkg/context_manager"
-	"github.com/caiomarcatti12/nanogo/v1/pkg/env"
-	"github.com/caiomarcatti12/nanogo/v1/pkg/i18n"
-	"github.com/caiomarcatti12/nanogo/v1/pkg/log"
-	"github.com/caiomarcatti12/nanogo/v1/pkg/telemetry"
+	"github.com/caiomarcatti12/nanogo/pkg/context_manager"
+	"github.com/caiomarcatti12/nanogo/pkg/env"
+	"github.com/caiomarcatti12/nanogo/pkg/i18n"
+	"github.com/caiomarcatti12/nanogo/pkg/log"
+	"github.com/caiomarcatti12/nanogo/pkg/telemetry"
 	"github.com/gorilla/mux"
 )
 

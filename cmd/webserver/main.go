@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/caiomarcatti12/nanogo/v1/pkg/di"
-	"github.com/caiomarcatti12/nanogo/v1/pkg/nanogo"
-	"github.com/caiomarcatti12/nanogo/v1/pkg/webserver"
+	"github.com/caiomarcatti12/nanogo/pkg/di"
+	"github.com/caiomarcatti12/nanogo/pkg/nanogo"
+	"github.com/caiomarcatti12/nanogo/pkg/webserver"
 )
 
 func main() {

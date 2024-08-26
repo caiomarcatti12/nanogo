@@ -24,8 +24,8 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/caiomarcatti12/nanogo/v1/pkg/log"
-	"github.com/caiomarcatti12/nanogo/v1/pkg/rsql"
+	"github.com/caiomarcatti12/nanogo/pkg/log"
+	"github.com/caiomarcatti12/nanogo/pkg/rsql"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"

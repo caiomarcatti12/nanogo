@@ -19,12 +19,12 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/caiomarcatti12/nanogo/v1/pkg/di"
-	"github.com/caiomarcatti12/nanogo/v1/pkg/env"
-	"github.com/caiomarcatti12/nanogo/v1/pkg/i18n"
-	"github.com/caiomarcatti12/nanogo/v1/pkg/log"
-	"github.com/caiomarcatti12/nanogo/v1/pkg/webserver"
-	webserver_types "github.com/caiomarcatti12/nanogo/v1/pkg/webserver/types"
+	"github.com/caiomarcatti12/nanogo/pkg/di"
+	"github.com/caiomarcatti12/nanogo/pkg/env"
+	"github.com/caiomarcatti12/nanogo/pkg/i18n"
+	"github.com/caiomarcatti12/nanogo/pkg/log"
+	"github.com/caiomarcatti12/nanogo/pkg/webserver"
+	webserver_types "github.com/caiomarcatti12/nanogo/pkg/webserver/types"
 	"github.com/gorilla/websocket"
 )
 

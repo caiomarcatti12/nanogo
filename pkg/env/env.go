@@ -19,7 +19,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/caiomarcatti12/nanogo/v1/pkg/i18n"
+	"github.com/caiomarcatti12/nanogo/pkg/i18n"
 )
 
 type Env struct {

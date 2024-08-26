@@ -16,7 +16,7 @@
 package webserver_route
 
 // import (
-// 	"github.com/caiomarcatti12/nanogo/v1/pkg/env"
+// 	"github.com/caiomarcatti12/nanogo/pkg/env"
 // 	"io/ioutil"
 // 	"net/http"
 // )

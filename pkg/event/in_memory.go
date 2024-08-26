@@ -18,11 +18,11 @@ package event
 import (
 	"reflect"
 
-	"github.com/caiomarcatti12/nanogo/v1/pkg/di"
-	"github.com/caiomarcatti12/nanogo/v1/pkg/i18n"
-	"github.com/caiomarcatti12/nanogo/v1/pkg/log"
-	"github.com/caiomarcatti12/nanogo/v1/pkg/mapper"
-	"github.com/caiomarcatti12/nanogo/v1/pkg/validator"
+	"github.com/caiomarcatti12/nanogo/pkg/di"
+	"github.com/caiomarcatti12/nanogo/pkg/i18n"
+	"github.com/caiomarcatti12/nanogo/pkg/log"
+	"github.com/caiomarcatti12/nanogo/pkg/mapper"
+	"github.com/caiomarcatti12/nanogo/pkg/validator"
 )
 
 type InMemoryBroker struct {

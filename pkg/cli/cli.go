@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/caiomarcatti12/nanogo/v1/pkg/log"
+	"github.com/caiomarcatti12/nanogo/pkg/log"
 )
 
 // Flag define a estrutura para uma flag

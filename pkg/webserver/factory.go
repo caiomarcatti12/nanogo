@@ -16,12 +16,12 @@
 package webserver
 
 import (
-	"github.com/caiomarcatti12/nanogo/v1/pkg/context_manager"
-	"github.com/caiomarcatti12/nanogo/v1/pkg/di"
-	"github.com/caiomarcatti12/nanogo/v1/pkg/env"
-	"github.com/caiomarcatti12/nanogo/v1/pkg/i18n"
-	"github.com/caiomarcatti12/nanogo/v1/pkg/log"
-	"github.com/caiomarcatti12/nanogo/v1/pkg/telemetry"
+	"github.com/caiomarcatti12/nanogo/pkg/context_manager"
+	"github.com/caiomarcatti12/nanogo/pkg/di"
+	"github.com/caiomarcatti12/nanogo/pkg/env"
+	"github.com/caiomarcatti12/nanogo/pkg/i18n"
+	"github.com/caiomarcatti12/nanogo/pkg/log"
+	"github.com/caiomarcatti12/nanogo/pkg/telemetry"
 )
 
 func Factory(env env.IEnv,

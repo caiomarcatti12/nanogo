@@ -16,8 +16,8 @@
 package queue
 
 //  import (
-// 	 "github.com/caiomarcatti12/nanogo/v1/pkg/env"
-// 	 logger "github.com/caiomarcatti12/nanogo/v1/pkg/log"
+// 	 "github.com/caiomarcatti12/nanogo/pkg/env"
+// 	 logger "github.com/caiomarcatti12/nanogo/pkg/log"
 
 // 	 "sync"
 

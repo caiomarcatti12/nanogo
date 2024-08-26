@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	rsql "github.com/caiomarcatti12/nanogo/v1/pkg/rsql"
+	rsql "github.com/caiomarcatti12/nanogo/pkg/rsql"
 	mock "github.com/stretchr/testify/mock"
 
 	uuid "github.com/google/uuid"

@@ -21,8 +21,8 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/caiomarcatti12/nanogo/v1/pkg/mapper"
-	"github.com/caiomarcatti12/nanogo/v1/pkg/validator"
+	"github.com/caiomarcatti12/nanogo/pkg/mapper"
+	"github.com/caiomarcatti12/nanogo/pkg/validator"
 	"github.com/gorilla/websocket"
 )
 
