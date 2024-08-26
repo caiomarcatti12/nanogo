@@ -26,7 +26,7 @@ jobs:
         run: |
           PR_NUMBER=$(gh pr list --state open --json number --jq '.[0].number')
           if [ -n "$PR_NUMBER" ]; then
-            gh pr merge "$PR_NUMBER" --merge --admin --comment "Merge automático realizado pelo GitHub Actions"
+            gh pr merge "$PR_NUMBER" --merge --admin --delete-branch
           else
             echo "Nenhum Pull Request aberto encontrado."
           fi
