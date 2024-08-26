@@ -11,17 +11,17 @@ jobs:
   auto-approve:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout no repository
-      uses: actions/checkout@v3
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout no repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Instalar GitHub CLI
-      run: sudo apt-get install -y gh
+      - name: Instalar GitHub CLI
+        run: sudo apt-get install -y gh
 
-    - name: Aprovar o Pull Request automaticamente
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        PR_NUMBER=$(gh pr list --state open --json number --jq '.[0].number')
-        gh pr review "$PR_NUMBER" --approve
+      - name: Aprovar o Pull Request automaticamente
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(gh pr list --state open --json number --jq '.[0].number')
+          gh pr review "$PR_NUMBER" --approve
