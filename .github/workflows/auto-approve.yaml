@@ -3,12 +3,15 @@ name: Auto-Approve Pull Request
 
 on:
   pull_request:
-    types: [opened]
+    types: [opened, synchronize]
 
 jobs:
   auto-approve:
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout no repository
+      uses: actions/checkout@v3
+
     - name: Instalar GitHub CLI
       run: sudo apt-get install -y gh
 
