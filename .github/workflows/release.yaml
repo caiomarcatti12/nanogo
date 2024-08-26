@@ -48,12 +48,11 @@ jobs:
 
     - name: Versão Bump e push tag
       id: version
-      uses: anothrNick/github-tag-action@1.70.0
+      uses: anothrNick/github-tag-action@v1
       env:
         DEFAULT_BUMP: ${{ env.bump_type }}
         RELEASE_BRANCHES : release.*
         WITH_V: true
-        DRY_RUN: true
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Instalar GitHub CLI
