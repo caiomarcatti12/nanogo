@@ -49,12 +49,10 @@ jobs:
       id: version
       uses: anothrNick/github-tag-action@1.70.0
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        tag_prefix: "v"
-        bump_type: ${{ env.bump_type }}
-        version_type: "semver"
-        release_branches: main
-        create_major_version_tag: true
+        DEFAULT_BUMP: ${{ env.bump_type }}
+        RELEASE_BRANCHES: release.*
+        WITH_V : true
+
 
     - name: Instalar GitHub CLI
       run: sudo apt-get install -y gh
