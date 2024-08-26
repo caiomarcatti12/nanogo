@@ -3,6 +3,9 @@ name: Release
 on:
   pull_request:
     types: [closed]  # Executa o workflow quando uma PR é fechada
+  push:
+    branches:
+      - main  # Executa o workflow quando há um push direto na branch main
 
 permissions:
   contents: write  # Permissões para ler e escrever em conteúdos, incluindo tags e releases
