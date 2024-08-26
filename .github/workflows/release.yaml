@@ -52,7 +52,9 @@ jobs:
       env:
         DEFAULT_BUMP: ${{ env.bump_type }}
         RELEASE_BRANCHES : release.*
-        WITH_V : true
+        WITH_V: true
+        DRY_RUN: true
+        INITIAL_VERSION: 0.0.1
 
     - name: Instalar GitHub CLI
       run: sudo apt-get install -y gh
