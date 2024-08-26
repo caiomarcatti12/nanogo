@@ -18,7 +18,7 @@ package webserver_route
 import (
 	"net/http"
 
-	"github.com/caiomarcatti12/nanogo/v3/pkg/types"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/types"
 )
 
 type IHealthCheckController interface {

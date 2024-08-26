@@ -16,11 +16,11 @@
 package websocketserver
 
 import (
-	"github.com/caiomarcatti12/nanogo/v3/pkg/di"
-	"github.com/caiomarcatti12/nanogo/v3/pkg/env"
-	"github.com/caiomarcatti12/nanogo/v3/pkg/i18n"
-	"github.com/caiomarcatti12/nanogo/v3/pkg/log"
-	"github.com/caiomarcatti12/nanogo/v3/pkg/webserver"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/di"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/env"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/i18n"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/log"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/webserver"
 )
 
 func Factory(env env.IEnv, logger log.ILog, i18n i18n.I18N, ws webserver.IWebServer, di di.IContainer) IWebSocketServer {

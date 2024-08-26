@@ -16,7 +16,7 @@
 package event
 
 // import (
-// 	"github.com/caiomarcatti12/nanogo/v3/pkg/rabbitmq"
+// 	"github.com/caiomarcatti12/nanogo/v1/pkg/rabbitmq"
 // )
 
 // type RabbitMQBroker struct {

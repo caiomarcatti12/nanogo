@@ -20,8 +20,8 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/caiomarcatti12/nanogo/v3/pkg/i18n"
-	"github.com/caiomarcatti12/nanogo/v3/pkg/log"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/i18n"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/log"
 )
 
 type IContainer interface {

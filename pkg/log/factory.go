@@ -16,8 +16,8 @@
 package log
 
 import (
-	"github.com/caiomarcatti12/nanogo/v3/pkg/context_manager"
-	"github.com/caiomarcatti12/nanogo/v3/pkg/env"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/context_manager"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/env"
 )
 
 func Factory(env env.IEnv, contextManager context_manager.ISafeContextManager) ILog {

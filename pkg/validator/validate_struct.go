@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/caiomarcatti12/nanogo/v3/pkg/errors"
+	"github.com/caiomarcatti12/nanogo/v1/pkg/errors"
 
 	"github.com/go-playground/validator/v10"
 )
