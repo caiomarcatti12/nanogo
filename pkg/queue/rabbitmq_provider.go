@@ -303,9 +303,9 @@ func (r *Rabbitmq) Consume(queue Queue, consumerHandler interface{}) error {
 }
 
 func (r *Rabbitmq) createConsumerInstance(consumerHandler interface{}) (interface{}, error) {
-	di.GetContainer().Register(consumerHandler)
+	di.GetInstance().Register(consumerHandler)
 
-	consumer, err := di.GetContainer().GetByFunctionConstructor(consumerHandler)
+	consumer, err := di.GetInstance().GetByFactory(consumerHandler)
 	if err != nil {
 		return nil, err
 	}
