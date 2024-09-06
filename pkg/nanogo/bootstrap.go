@@ -23,6 +23,8 @@ import (
 	"github.com/caiomarcatti12/nanogo/pkg/event"
 	"github.com/caiomarcatti12/nanogo/pkg/i18n"
 	"github.com/caiomarcatti12/nanogo/pkg/log"
+	"github.com/caiomarcatti12/nanogo/pkg/metric"
+	"github.com/caiomarcatti12/nanogo/pkg/queue"
 	"github.com/caiomarcatti12/nanogo/pkg/telemetry"
 	"github.com/caiomarcatti12/nanogo/pkg/webserver"
 	"github.com/caiomarcatti12/nanogo/pkg/websocketserver"
@@ -88,9 +90,17 @@ func Bootstrap() {
 		panic(err)
 	}
 
+	if err := container.Register(metric.Factory); err != nil {
+		panic(err)
+	}
+
+	if err := container.Register(queue.Factory); err != nil {
+		panic(err)
+	}
+
+	// container.Register(queue.Factory)
 	// container.Register(metric.Factory)
 	// container.Register(cache.Factory)
-	// container.Register(queue.Factory)
 	// container.Register(cli.Factory)
 
 }
