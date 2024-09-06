@@ -26,6 +26,7 @@ import (
 	"github.com/caiomarcatti12/nanogo/pkg/di"
 	"github.com/caiomarcatti12/nanogo/pkg/env"
 	"github.com/caiomarcatti12/nanogo/pkg/log"
+	"github.com/caiomarcatti12/nanogo/pkg/mapper"
 	"github.com/caiomarcatti12/nanogo/pkg/metric"
 	"github.com/caiomarcatti12/nanogo/pkg/telemetry"
 	"github.com/google/uuid"
@@ -421,7 +422,7 @@ func (r *Rabbitmq) bindQueue(exchange RabbitmqExchange, queue RabbitmqQueue) err
 }
 
 // Função para verificar se consumerHandler implementa IConsumer ignorando o tipo
-func (r *Rabbitmq) callConsumerHandler(consumer interface{}, msg []byte, headers map[string]interface{}) (err error) {
+func (r *Rabbitmq) callConsumerHandler(consumer interface{}, body []byte, headers map[string]interface{}) (err error) {
 	span := r.telemetry.StartChildSpan("consumerHandler")
 	defer r.telemetry.EndSpan(span, err)
 
@@ -446,8 +447,18 @@ func (r *Rabbitmq) callConsumerHandler(consumer interface{}, msg []byte, headers
 	// Criar uma nova instância do tipo do primeiro parâmetro
 	bodyValue := reflect.New(bodyType).Interface()
 
+	// Declarar uma variável do tipo []map[string]interface{}
+	var result map[string]interface{}
+
+	// Fazer o parse do JSON
+	err = json.Unmarshal(body, &result)
+	if err != nil {
+		fmt.Println("Erro ao fazer unmarshal:", err)
+		return
+	}
+
 	// Desserializar msg para a instância criada
-	if err = json.Unmarshal(msg, &bodyValue); err != nil {
+	if err = mapper.Transform(result, &bodyValue); err != nil {
 		err = fmt.Errorf("failed to unmarshal message: %v", err)
 		return
 	}
