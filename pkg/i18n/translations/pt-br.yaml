@@ -1,0 +1,65 @@
+# Copyright 2023 Caio Matheus Marcatti Calimério
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+healthcheck: O serviço está instalado e funcionando
+di:
+  factory_func_is_nil: Para registrar uma função no DI, ela não pode ser nula
+  factory_func_is_not_func: Para registrar uma função no DI, ela precisa ser uma função
+  factory_func_has_no_one_result: Para registrar uma função no DI, a função de fábrica deve retornar exatamente um resultado que é do tipo interface
+  register_new_factory: Registrando uma nova fábrica de DI {{factory}}
+  get_by_factory: Obtendo nova instancia no DI de {{factory}}
+  factory_new_instance: Fabrincando nova instancia no DI de {{factory}}
+  get_by_factory_cached: Instancia {{factory}} encontrada em cache
+  no_service_registered_for_type: A fabrica de {{factory}} não existe no DI
+  factory_function_returned_no_results: A fabrica de {{factory}} retornou um resultado vazio
+  factory_function_returned_nil: A fabrica de {{factory}} retornou um resultado nulo
+  resolve_parameters: Resolvendo os parâmetros de {{factory}}
+  factory_call: Instanciando a fabrica de {{factory}}
+  factory_error: Houve um erro ao instanciar a fabrica de {{factory}} {{error}}
+  set_factory_in_cache: Armazenando a fabrica de {{factory}} em cache
+
+env:
+  provider_not_found: O provedor de configurações {{provider}} não foi encontrado
+  provider_not_valid_function: O provedor de configurações {{provider}} não é uma função
+  not_found: A variável de ambiente {{variable}} não foi definida.
+
+event:
+  provider_not_found: O provedor de eventos {{provider}} não foi encontrado
+  handler_not_found: Nenhum manipulador encontrado para o evento {{event}}
+
+webserver:
+  add_middleware: Adicionando middlware {{middleware}} ao webserver
+  add_route: Adicionando rota {{method}} {{path}} ao webserver
+  server_https_started: Servidor (HTTPS) iniciado em {{host}}:{{port}}
+  server_http_started: Servidor (HTTP) iniciado em {{host}}:{{port}}
+  error_injecting_data: Houve um erro ao montar os dados da requisição
+  error_decoding_headers: Houve um erro ao decodificar os cabeçalhos {{error}}
+  method_not_found: Não foi possivel encontrar o método {{method}} na requisição {{path}}
+  execute_handler: Processando handler da requisição {{method}} {{path}}
+  middleware: 
+    extracting_payload: Extraindo payload da requisição
+    resolving_correlation_id: Resolvendo ID de correlação de logs
+    select_language: Selecionando idioma
+    resolving_cors: Resolvendo CORS
+
+websocketserver:
+  add_route: Adicionando rota {{path}} ao websocketserver
+  execute_handler: Processando handler da requisição {{path}}
+  read_message_error: Houve uma erro ao ler a mensagem da requisição {{error}}
+  parse_message_error: Houve uma erro ao parsar a mensagem da requisição {{error}}
+  write_message_error: Houve uma erro ao responder a mensagem para o cliente {{error}}
+  marshal_error: Houve uma erro ao serializar os dados da requisição {{error}}
+  route_not_found: A rota {{path}} não foi encontrada
+  error_injecting_data: Houve um erro ao montar os dados da requisição
+  method_not_found: Não foi possivel encontrar o método {{method}} na requisição {{path}}
+ 
