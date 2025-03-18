@@ -13,28 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package env
 
 import (
-	"fmt"
+	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/joho/godotenv"
 )
 
-// fileLoader verifica se o arquivo .env existe e carrega suas variáveis
+// fileLoader checks if the .env file exists in the expected location and loads its variables
 func fileLoader() error {
-	const envFilePath = "../../configs/.env"
+	// Get the directory where the binary is located
+	executable, err := os.Executable()
+	if err != nil {
+		log.Fatal("Error obtaining the binary path:", err)
+	}
+	execDir := filepath.Dir(executable)
 
-	// Verifica se o arquivo .env existe
-	if _, err := os.Stat(envFilePath); os.IsNotExist(err) {
-		return fmt.Errorf("Arquivo %s não encontrado", envFilePath)
+	// List of possible locations where the .env file might be
+	possiblePaths := []string{
+		filepath.Join(execDir, ".env"), // Same directory as the binary
+		"../../configs/.env",           // Expected path for development
+		".env",                         // Project root directory
 	}
 
-	// Carrega o arquivo .env
-	if err := godotenv.Load(envFilePath); err != nil {
-		return fmt.Errorf("Erro ao carregar o arquivo %s: %v", envFilePath, err)
+	// Check and load the first available .env file
+	for _, path := range possiblePaths {
+		if _, err := os.Stat(path); err == nil {
+			// Load the .env file
+			if err := godotenv.Load(path); err != nil {
+				log.Fatalf("Error loading .env file at path: %s, error: %v", path, err)
+			}
+			log.Println("Successfully loaded .env file:", path)
+			return nil
+		}
 	}
 
+	// If no .env file is found, print an error and exit
+	log.Fatal("No .env file found in the expected locations")
 	return nil
 }
