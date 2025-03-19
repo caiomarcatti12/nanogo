@@ -37,6 +37,8 @@ func fileLoader() error {
 	possiblePaths := []string{
 		filepath.Join(execDir, ".env"), // Same directory as the binary
 		"../../configs/.env",           // Expected path for development
+		"../configs/.env",              // Expected path for development
+		"./configs/.env",               // Expected path for development
 		".env",                         // Project root directory
 	}
 
