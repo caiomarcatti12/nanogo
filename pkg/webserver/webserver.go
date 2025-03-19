@@ -63,7 +63,7 @@ func newWebServer(
 ) IWebServer {
 	once.Do(func() {
 		instance = &WebServer{
-			host:           env.GetEnv("WEB_SERVER_HOST", "localhost"),
+			host:           env.GetEnv("WEB_SERVER_HOST", ""),
 			port:           env.GetEnv("WEB_SERVER_PORT", "8080"),
 			crt:            env.GetEnv("WEB_SERVER_CERTIFICATE", ""),
 			key:            env.GetEnv("WEB_SERVER_KEY", ""),
@@ -85,7 +85,19 @@ func newWebServer(
 		instance.AddMidleware(webserver_middleware.NewTelemetryMiddleware(env, logger, i18n, telemetry, contextManager))
 
 		instance.AddRoute(webserver_types.Route{
-			Path:        "/healthcheck",
+			Path:        "/healthz/livez",
+			Method:      http.MethodGet,
+			IHandler:    webserver_route.NewHealthCheckController,
+			HandlerFunc: "Handler",
+		})
+		instance.AddRoute(webserver_types.Route{
+			Path:        "/healthz/readyz",
+			Method:      http.MethodGet,
+			IHandler:    webserver_route.NewHealthCheckController,
+			HandlerFunc: "Handler",
+		})
+		instance.AddRoute(webserver_types.Route{
+			Path:        "/healthz/startupz",
 			Method:      http.MethodGet,
 			IHandler:    webserver_route.NewHealthCheckController,
 			HandlerFunc: "Handler",
