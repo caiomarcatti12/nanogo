@@ -35,7 +35,17 @@ func Factory(env env.IEnv, logger log.ILog) IDatabase {
 
 	switch provider {
 	case "MONGODB":
-		instance := NewInstaceMongoDB(env, logger)
+		credential := MongoCredential{
+			protocol:   env.GetEnv("MONGO_PROTOCOL", "mongodb"),
+			dbAuthName: env.GetEnv("MONGO_AUTH_DBNAME", "admin"),
+			username:   env.GetEnv("MONGO_USERNAME", ""),
+			password:   env.GetEnv("MONGO_PASSWORD", ""),
+			host:       env.GetEnv("MONGO_HOST", ""),
+			port:       env.GetEnv("MONGO_PORT", "27017"),
+			database:   env.GetEnv("MONGO_DATABASE", ""),
+			uri:        env.GetEnv("MONGO_URI", ""),
+		}
+		instance := NewInstaceMongoDB(credential, logger)
 
 		err := instance.Connect()
 

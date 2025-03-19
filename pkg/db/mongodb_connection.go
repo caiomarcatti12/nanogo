@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/caiomarcatti12/nanogo/pkg/env"
 	"github.com/caiomarcatti12/nanogo/pkg/log"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -47,19 +46,10 @@ type MongoCredential struct {
 	uri        string
 }
 
-func NewInstaceMongoDB(env env.IEnv, logger log.ILog) IDatabase {
+func NewInstaceMongoDB(credential MongoCredential, logger log.ILog) IDatabase {
 	return &MongoClient{
-		logger: logger,
-		credential: MongoCredential{
-			protocol:   env.GetEnv("MONGO_PROTOCOL", "mongodb"),
-			dbAuthName: env.GetEnv("MONGO_AUTH_DBNAME", "admin"),
-			username:   env.GetEnv("MONGO_USERNAME", ""),
-			password:   env.GetEnv("MONGO_PASSWORD", ""),
-			host:       env.GetEnv("MONGO_HOST", ""),
-			port:       env.GetEnv("MONGO_PORT", "27017"),
-			database:   env.GetEnv("MONGO_DATABASE", ""),
-			uri:        env.GetEnv("MONGO_URI", ""),
-		},
+		logger:     logger,
+		credential: credential,
 	}
 }
 
