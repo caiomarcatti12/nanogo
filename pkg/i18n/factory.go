@@ -15,9 +15,14 @@
  */
 package i18n
 
-import "github.com/caiomarcatti12/nanogo/pkg/yaml"
+import (
+	"github.com/caiomarcatti12/nanogo/pkg/util"
+	"github.com/caiomarcatti12/nanogo/pkg/yaml"
+)
 
-func Factory(translationsPath string) (I18N, error) {
+func Factory() (I18N, error) {
+	translationsPath := util.GetAbsolutePath("pkg/i18n/translations")
+
 	yamlLoader := yaml.NewYAMLLoader()
 	translations, err := yamlLoader.Load(translationsPath)
 	if err != nil {
