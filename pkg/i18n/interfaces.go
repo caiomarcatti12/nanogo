@@ -19,6 +19,18 @@ type I18N interface {
 	SetLanguage(lang string)
 	GetLanguage() string
 	GetDefaultLanguage() string
-	LoadTranslations(directory string) error
+	LoadTranslations(path string) error
 	Get(key string, vars ...map[string]interface{}) string
+}
+
+type TranslationLoader interface {
+	Load(path string) (map[string]map[string]string, error)
+}
+
+type TranslationResolver interface {
+	Resolve(locale, key string) (string, bool)
+}
+
+type VariableReplacer interface {
+	Replace(text string, vars map[string]interface{}) string
 }

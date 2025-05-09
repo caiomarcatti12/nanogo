@@ -15,6 +15,18 @@
  */
 package i18n
 
-func Factory() I18N {
-	return newI18n()
+import "github.com/caiomarcatti12/nanogo/pkg/yaml"
+
+func Factory(translationsPath string) (I18N, error) {
+	yamlLoader := yaml.NewYAMLLoader()
+	translations, err := yamlLoader.Load(translationsPath)
+	if err != nil {
+		return nil, err
+	}
+
+	resolver := NewResolver(translations)
+	replacer := NewReplacer()
+	service := NewService(yamlLoader, resolver, replacer)
+
+	return service, nil
 }
