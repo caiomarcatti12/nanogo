@@ -48,16 +48,19 @@ func GetExecutableDir() string {
 		panic("não foi possível obter o caminho do executável: " + err.Error())
 	}
 
-	// Se for um diretório temporário, retorna o diretório atual.
-	if filepath.HasPrefix(exePath, os.TempDir()) {
-		dir, err := os.Getwd()
+	dir := filepath.Dir(exePath)
+
+	// Se executando em diretório temporário (modo debug GoLand)
+	if filepath.HasPrefix(dir, os.TempDir()) {
+		// Tente pegar Working Directory definido pelo GoLand
+		wd, err := os.Getwd()
 		if err != nil {
 			panic("não foi possível obter o diretório atual: " + err.Error())
 		}
-		return dir
+		return wd
 	}
 
-	return filepath.Dir(exePath)
+	return dir
 }
 
 func GetExecutableAbsolutePath(path string) string {
