@@ -1,18 +1,3 @@
-/*
- * Copyright 2023 Caio Matheus Marcatti Calimério
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package env
 
 import (
@@ -22,6 +7,8 @@ import (
 	"github.com/caiomarcatti12/nanogo/pkg/i18n"
 )
 
+// Loader carrega as variáveis de ambiente usando o provedor especificado em ENV_PROVIDER.
+// Caso nenhum provedor seja especificado, o padrão é o arquivo .env (FileEnvLoader).
 func Loader(i18n i18n.I18N) error {
 	provider := os.Getenv("ENV_PROVIDER")
 
@@ -29,17 +16,24 @@ func Loader(i18n i18n.I18N) error {
 		provider = "ENV_FILE"
 	}
 
-	// Retrieve the provider function from the map
-	providerFunc, exists := providers[provider]
-	if !exists {
+	switch provider {
+	case "AWS":
+		return loadAWSSecrets(i18n)
+	case "ENV_FILE":
+		return loadFileEnv(i18n)
+	default:
 		return errors.New(i18n.Get("env.provider_not_found", map[string]interface{}{"provider": provider}))
 	}
+}
 
-	// Assert that the provider is a function
-	providerFuncTyped, ok := providerFunc.(func() error)
-	if !ok {
-		return errors.New(i18n.Get("env.provider_not_valid_function", map[string]interface{}{"provider": provider}))
-	}
+// loadAWSSecrets inicializa e executa o loader para AWS Secrets Manager
+func loadAWSSecrets(i18n i18n.I18N) error {
+	awsLoader := NewAWSLoader(i18n)
+	return awsLoader.LoadSecrets("", "", "", "", "", "")
+}
 
-	return providerFuncTyped()
+// loadFileEnv inicializa e executa o loader para arquivos .env
+func loadFileEnv(i18n i18n.I18N) error {
+	fileEnvLoader := NewFileEnvLoader(i18n)
+	return fileEnvLoader.Load()
 }

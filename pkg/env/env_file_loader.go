@@ -13,48 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package env
 
 import (
 	"log"
 	"os"
-	"path/filepath"
 
+	"github.com/caiomarcatti12/nanogo/pkg/i18n"
+	"github.com/caiomarcatti12/nanogo/pkg/util"
 	"github.com/joho/godotenv"
 )
 
-// fileLoader checks if the .env file exists in the expected location and loads its variables
-func fileLoader() error {
-	// Get the directory where the binary is located
-	executable, err := os.Executable()
-	if err != nil {
-		log.Fatal("Error obtaining the binary path:", err)
-	}
-	execDir := filepath.Dir(executable)
+type FileEnvLoader struct {
+	i18n i18n.I18N
+}
 
-	// List of possible locations where the .env file might be
+func NewFileEnvLoader(i18n i18n.I18N) *FileEnvLoader {
+	return &FileEnvLoader{i18n: i18n}
+}
+
+// Load carrega variáveis de ambiente a partir de um arquivo .env
+// Verifica múltiplos locais possíveis até encontrar o arquivo.
+func (f *FileEnvLoader) Load() error {
 	possiblePaths := []string{
-		filepath.Join(execDir, ".env"), // Same directory as the binary
-		"../../configs/.env",           // Expected path for development
-		"../configs/.env",              // Expected path for development
-		"./configs/.env",               // Expected path for development
-		".env",                         // Project root directory
+		util.GetAbsolutePath(".env"),
+		util.GetAbsolutePath("configs/.env"),
+		util.GetAbsolutePath(os.Getenv("ENV_FILE_PATH")),
 	}
 
-	// Check and load the first available .env file
 	for _, path := range possiblePaths {
 		if _, err := os.Stat(path); err == nil {
-			// Load the .env file
 			if err := godotenv.Load(path); err != nil {
-				log.Fatalf("Error loading .env file at path: %s, error: %v", path, err)
+				log.Fatalf(f.i18n.Get("env.load_error", map[string]interface{}{"path": path, "error": err}))
 			}
-			log.Println("Successfully loaded .env file:", path)
+			log.Printf(f.i18n.Get("env.load_success", map[string]interface{}{"path": path}))
 			return nil
 		}
 	}
 
-	// If no .env file is found, print an error and exit
-	log.Fatal("No .env file found in the expected locations")
+	log.Fatal(f.i18n.Get("env.not_found", nil))
 	return nil
 }

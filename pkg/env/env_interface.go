@@ -16,6 +16,6 @@
 package env
 
 type IEnv interface {
-	GetEnv(variable string, default_ ...string) string
-	GetEnvBool(variable string, default_ ...string) bool
+	GetEnv(variable string, defaultValue ...string) string
+	GetEnvBool(variable string, defaultValue ...string) bool
 }

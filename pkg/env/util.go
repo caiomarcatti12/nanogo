@@ -15,6 +15,14 @@
  */
 package env
 
-func osLoader() error {
-	return nil
+import (
+	"os"
+	"strings"
+)
+
+func getOrDefault(value, envKey string) string {
+	if strings.TrimSpace(value) == "" {
+		return os.Getenv(envKey)
+	}
+	return value
 }

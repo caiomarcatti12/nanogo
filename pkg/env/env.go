@@ -18,6 +18,7 @@ package env
 import (
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/caiomarcatti12/nanogo/pkg/i18n"
 )
@@ -32,12 +33,18 @@ func NewEnv(i18n i18n.I18N) IEnv {
 	}
 }
 
-func (e *Env) GetEnv(variable string, default_ ...string) string {
-	value := os.Getenv(variable)
+// GetEnv obtém uma variável de ambiente do sistema.
+// Valida explicitamente se o nome da variável é válido (não vazio ou espaço em branco).
+// Caso não encontrada e sem valor padrão fornecido, dispara panic.
+func (e *Env) GetEnv(variable string, defaultValue ...string) string {
+	if len(strings.TrimSpace(variable)) == 0 {
+		panic(e.i18n.Get("env.invalid_variable_name", map[string]interface{}{"variable": variable}))
+	}
 
+	value := os.Getenv(variable)
 	if value == "" {
-		if len(default_) > 0 {
-			return default_[0]
+		if len(defaultValue) > 0 {
+			return defaultValue[0]
 		}
 		panic(e.i18n.Get("env.not_found", map[string]interface{}{"variable": variable}))
 	}
@@ -45,8 +52,11 @@ func (e *Env) GetEnv(variable string, default_ ...string) string {
 	return value
 }
 
-func (e *Env) GetEnvBool(variable string, default_ ...string) bool {
-	value := e.GetEnv(variable, default_...)
+// GetEnvBool obtém uma variável booleana do ambiente do sistema.
+// Valida explicitamente o nome da variável e realiza conversão segura para bool.
+// Caso ocorra erro na conversão e nenhum valor padrão é fornecido, dispara panic.
+func (e *Env) GetEnvBool(variable string, defaultValue ...string) bool {
+	value := e.GetEnv(variable, defaultValue...)
 
 	b, err := strconv.ParseBool(value)
 
