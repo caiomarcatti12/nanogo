@@ -30,7 +30,6 @@ go.work
 .idea
 
 __debug_bin
-*.sh
 # Ignorar tudo
 
 # Não ignorar pastas e arquivos específicos
@@ -50,4 +49,3 @@ __debug_bin
 /.docs/swagger/*
 coverage.*
 
-!test.sh
