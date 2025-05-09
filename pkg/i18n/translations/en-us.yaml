@@ -11,5 +11,54 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-healthcheck: Service is up and running
-factory_func_is_nil: To register a function in DI, it cannot be null
+healthcheck: Service is installed and running
+di:
+  factory_func_is_nil: To register a function in DI, it cannot be null
+  factory_func_is_not_func: To register a function in DI, it must be a function
+  factory_func_has_no_one_result: To register a function in DI, the factory function must return exactly one result of the interface type
+  register_new_factory: Registering a new DI factory {{factory}}
+  get_by_factory: Getting new DI instance from {{factory}}
+  factory_new_instance: Creating new DI instance from {{factory}}
+  get_by_factory_cached: Instance {{factory}} found in cache
+  no_service_registered_for_type: The factory for {{factory}} does not exist in DI
+  factory_function_returned_no_results: The factory for {{factory}} returned an empty result
+  factory_function_returned_nil: The factory for {{factory}} returned a null result
+  resolve_parameters: Resolving parameters for {{factory}}
+  factory_call: Instantiating the factory for {{factory}}
+  factory_error: An error occurred while instantiating the factory for {{factory}} {{error}}
+  set_factory_in_cache: Storing the factory for {{factory}} in cache
+
+env:
+  provider_not_found: Configuration provider {{provider}} not found
+  provider_not_valid_function: Configuration provider {{provider}} is not a function
+  not_found: The environment variable {{variable}} is not defined
+
+event:
+  provider_not_found: Event provider {{provider}} not found
+  handler_not_found: No handler found for event {{event}}
+
+webserver:
+  add_middleware: Adding middleware {{middleware}} to webserver
+  add_route: Adding route {{method}} {{path}} to webserver
+  server_https_started: Server (HTTPS) started on {{host}}:{{port}}
+  server_http_started: Server (HTTP) started on {{host}}:{{port}}
+  error_injecting_data: An error occurred while injecting request data
+  error_decoding_headers: An error occurred while decoding headers {{error}}
+  method_not_found: Could not find method {{method}} in request {{path}}
+  execute_handler: Processing request handler {{method}} {{path}}
+  middleware:
+    extracting_payload: Extracting request payload
+    resolving_correlation_id: Resolving log correlation ID
+    select_language: Selecting language
+    resolving_cors: Resolving CORS
+
+websocketserver:
+  add_route: Adding route {{path}} to websocket server
+  execute_handler: Processing request handler {{path}}
+  read_message_error: An error occurred while reading the request message {{error}}
+  parse_message_error: An error occurred while parsing the request message {{error}}
+  write_message_error: An error occurred while sending the message to the client {{error}}
+  marshal_error: An error occurred while serializing the request data {{error}}
+  route_not_found: Route {{path}} was not found
+  error_injecting_data: An error occurred while injecting request data
+  method_not_found: Could not find method {{method}} in request {{path}}
