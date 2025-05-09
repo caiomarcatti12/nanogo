@@ -18,8 +18,13 @@ func Factory(logger log.ILog, env env.IEnv) IGrpcServer {
 	host := env.GetEnv("GRPC_HOST", "0.0.0.0")
 	port := env.GetEnv("GRPC_PORT", "50051")
 
+	interceptors := grpc.ChainUnaryInterceptor(
+		correlationIdInterceptor(),
+	)
+
 	return &Server{
-		grpc:     grpc.NewServer(),
+		grpc: grpc.NewServer(interceptors),
+
 		handlers: []GRPCHandler{},
 		di:       di.GetInstance(),
 		logger:   logger.(log.ILog),

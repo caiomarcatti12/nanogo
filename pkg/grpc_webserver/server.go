@@ -60,7 +60,7 @@ func (s *Server) Start() error {
 
 		method := reflect.ValueOf(instance).MethodByName(handler.ServiceFunc)
 		if !method.IsValid() {
-			return fmt.Errorf("Método de registro de serviço não encontrado: %s", handler.ServiceFunc)
+			return fmt.Errorf("método de registro de serviço não encontrado: %s", handler.ServiceFunc)
 		}
 
 		method.Call([]reflect.Value{reflect.ValueOf(s.grpc)})
