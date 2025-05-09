@@ -1,25 +1,26 @@
 # gRPC Web Server
 
-Este pacote oferece uma estrutura simples e modular para a criação e gerenciamento de servidores gRPC em aplicações Go. Permite o registro dinâmico e modular de serviços, facilitando a expansão e manutenção.
+Este pacote oferece uma estrutura simples e modular para a criação e gerenciamento de servidores gRPC em aplicações Go com suporte integrado a Dependency Injection (DI) e logs automáticos. Permite o registro dinâmico e modular de serviços, facilitando a expansão, manutenção e testabilidade.
 
 ## Estrutura
 
-O pacote `grpc-webserver` inclui:
+O pacote `grpc_webserver` inclui:
 
-* **Server:** Classe principal responsável pela inicialização e gestão do servidor gRPC.
-* **GRPCService:** Interface que deve ser implementada por todos os serviços gRPC a serem registrados.
+- **IGrpcServer:** Interface que representa o servidor gRPC.
+- **Server:** Implementação da interface `IGrpcServer`, responsável pela inicialização e gestão do servidor.
+- **Factory:** Função que cria instâncias do servidor gRPC com DI e logger injetados automaticamente.
 
 ## Funcionalidades
 
-* Inicialização simples do servidor gRPC.
-* Registro modular de serviços através da interface `GRPCService`.
-* Tratamento automático de conexões TCP.
+- Inicialização simplificada do servidor gRPC usando variáveis de ambiente.
+- Registro modular de serviços através de handlers que utilizam automaticamente o sistema de DI.
+- Logs informativos detalhados sobre o ciclo de vida do servidor e serviços.
 
 ## Uso Básico
 
 ### 1. Criando um Serviço
 
-Cada serviço deve implementar a interface `GRPCService`:
+Cada serviço deve implementar uma interface compatível com a injeção de dependências:
 
 ```go
 package example
@@ -34,6 +35,10 @@ type ExampleService struct {
 	pb.UnimplementedExampleServer
 }
 
+func NewExampleService() *ExampleService {
+	return &ExampleService{}
+}
+
 func (s *ExampleService) Register(server *grpc.Server) {
 	pb.RegisterExampleServer(server, s)
 }
@@ -44,26 +49,34 @@ func (s *ExampleService) SayHello(ctx context.Context, req *pb.HelloRequest) (*p
 }
 ```
 
-### 2. Inicializando o Servidor
+### 2. Inicializando o Servidor usando Factory
 
 ```go
 package main
 
 import (
-	"log"
+	"github.com/caiomarcatti12/nanogo/pkg/di"
+	"github.com/caiomarcatti12/nanogo/pkg/env"
+	"github.com/caiomarcatti12/nanogo/pkg/log"
 	"your_package/grpc_webserver"
 	"your_package/example"
 )
 
 func main() {
-	server := grpc_webserver.New()
+	container := di.GetInstance()
+	environment := env.Factory(nil)
+	grpcServer := grpc_webserver.Factory(container, environment)
 
-	// Adicione seu serviço
-	server.Add(&example.ExampleService{})
+	// Adicione seu serviço usando a estrutura GRPCHandler
+	grpcServer.Add(grpc_webserver.GRPCHandler{
+		IHandler:    example.NewExampleService,
+		ServiceFunc: "Register",
+	})
 
 	// Inicie o servidor
-	if err := server.Start(":50051"); err != nil {
-		log.Fatalf("failed to start server: %v", err)
+	if err := grpcServer.Start(); err != nil {
+		logger, _ := container.GetByFactory(log.Factory)
+		logger.(log.ILog).Fatalf("Erro ao iniciar servidor gRPC: %v", err)
 	}
 }
 ```
@@ -103,19 +116,22 @@ func main() {
 }
 ```
 
+## Variáveis de Ambiente
+
+| Variável   | Descrição              | Default    |
+|------------|------------------------|------------|
+| GRPC_HOST  | Endereço do servidor   | `0.0.0.0`  |
+| GRPC_PORT  | Porta do servidor gRPC | `50051`    |
+
 ## Métodos Principais
 
-* `New(opts ...grpc.ServerOption) *Server`: Cria e inicializa uma nova instância do servidor.
-* `Add(service GRPCService)`: Adiciona um serviço ao servidor.
-* `Start(address string) error`: Inicia o servidor na porta TCP especificada.
-
-## Tratamento de Erros
-
-O servidor retorna erros diretamente ao iniciar, permitindo que o chamador gerencie falhas na criação do listener ou ao iniciar o servidor gRPC.
+- `Factory(container di.IContainer, env env.IEnv) IGrpcServer`: Cria e configura uma nova instância do servidor.
+- `Add(handler GRPCHandler)`: Registra um serviço no servidor.
+- `Start() error`: Inicia o servidor no endereço configurado pelas variáveis de ambiente.
 
 ## Testes Automatizados
 
-Para garantir a estabilidade e robustez do pacote, testes são executados usando:
+Execute testes automatizados com:
 
 ```shell
 go test ./...
@@ -123,6 +139,6 @@ go test ./...
 
 ## Boas Práticas
 
-* Sempre valide parâmetros antes de adicionar serviços ao servidor.
-* Utilize portas claramente definidas e documentadas para evitar conflitos.
-* Registre todos os serviços antes de iniciar o servidor para garantir que estejam disponíveis imediatamente após o início do servidor.
+- Sempre utilize o Factory para criar servidores gRPC.
+- Configure os serviços utilizando DI para facilitar testes e manutenção.
+- Utilize variáveis de ambiente claramente definidas para flexibilidade e escalabilidade.

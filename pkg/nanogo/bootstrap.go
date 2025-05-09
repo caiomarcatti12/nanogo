@@ -21,6 +21,7 @@ import (
 	"github.com/caiomarcatti12/nanogo/pkg/di"
 	"github.com/caiomarcatti12/nanogo/pkg/env"
 	"github.com/caiomarcatti12/nanogo/pkg/event"
+	"github.com/caiomarcatti12/nanogo/pkg/grpc_webserver"
 	"github.com/caiomarcatti12/nanogo/pkg/i18n"
 	"github.com/caiomarcatti12/nanogo/pkg/log"
 	"github.com/caiomarcatti12/nanogo/pkg/metric"
@@ -101,6 +102,10 @@ func Bootstrap() {
 	}
 
 	if err := container.Register(queue.Factory); err != nil {
+		panic(err)
+	}
+
+	if err := container.Register(grpc_webserver.Factory); err != nil {
 		panic(err)
 	}
 
