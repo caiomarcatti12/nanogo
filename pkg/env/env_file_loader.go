@@ -37,9 +37,9 @@ func NewFileEnvLoader(i18n i18n.I18N) *FileEnvLoader {
 // Verifica múltiplos locais possíveis até encontrar o arquivo.
 func (f *FileEnvLoader) Load() error {
 	possiblePaths := []string{
-		util.GetAbsolutePath(".env"),
-		util.GetAbsolutePath("configs/.env"),
-		util.GetAbsolutePath(os.Getenv("ENV_FILE_PATH")),
+		util.GetExecutableAbsolutePath(".env"),
+		util.GetExecutableAbsolutePath("configs/.env"),
+		os.Getenv("ENV_FILE_PATH"),
 	}
 
 	for _, path := range possiblePaths {

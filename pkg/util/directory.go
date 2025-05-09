@@ -16,6 +16,7 @@
 package util
 
 import (
+	"os"
 	"path/filepath"
 	"runtime"
 )
@@ -37,4 +38,28 @@ func GetAbsolutePath(path string) string {
 		panic(err)
 	}
 	return filepath.Join(absRootDir, path)
+}
+
+// GetExecutableDir tenta usar o diretório do executável e, caso seja um diretório temporário,
+// usa o diretório atual.
+func GetExecutableDir() string {
+	exePath, err := os.Executable()
+	if err != nil {
+		panic("não foi possível obter o caminho do executável: " + err.Error())
+	}
+
+	// Se for um diretório temporário, retorna o diretório atual.
+	if filepath.HasPrefix(exePath, os.TempDir()) {
+		dir, err := os.Getwd()
+		if err != nil {
+			panic("não foi possível obter o diretório atual: " + err.Error())
+		}
+		return dir
+	}
+
+	return filepath.Dir(exePath)
+}
+
+func GetExecutableAbsolutePath(path string) string {
+	return filepath.Join(GetExecutableDir(), path)
 }
