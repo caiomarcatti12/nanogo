@@ -26,13 +26,19 @@ import (
 	"github.com/caiomarcatti12/nanogo/pkg/metric"
 	"github.com/caiomarcatti12/nanogo/pkg/queue"
 	"github.com/caiomarcatti12/nanogo/pkg/telemetry"
+	"github.com/caiomarcatti12/nanogo/pkg/util"
 	"github.com/caiomarcatti12/nanogo/pkg/webserver"
 	"github.com/caiomarcatti12/nanogo/pkg/websocketserver"
 )
 
 func Bootstrap() {
-	i18nAdapter := i18n.Factory()
-	err := env.Loader(i18nAdapter)
+	i18nAdapter, err := i18n.Factory(util.GetAbsolutePath("pkg/i18n/translations"))
+
+	if err != nil {
+		panic(err)
+	}
+
+	err = env.Loader(i18nAdapter)
 
 	if err != nil {
 		panic(err)
