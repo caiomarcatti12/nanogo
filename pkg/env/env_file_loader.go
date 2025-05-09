@@ -16,7 +16,6 @@
 package env
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -45,7 +44,7 @@ func (f *FileEnvLoader) Load() error {
 	}
 
 	for _, path := range possiblePaths {
-		log.Println(fmt.Sprintf("Loading env file: %s", path))
+		//log.Println(fmt.Sprintf("Loading env file: %s", path))
 		if _, err := os.Stat(path); err == nil {
 			if err := godotenv.Load(path); err != nil {
 				log.Fatalf(f.i18n.Get("env.load_error", map[string]interface{}{"path": path, "error": err}))
