@@ -39,6 +39,8 @@ func (f *FileEnvLoader) Load() error {
 	possiblePaths := []string{
 		util.GetExecutableAbsolutePath(".env"),
 		util.GetExecutableAbsolutePath("configs/.env"),
+		util.GetExecutableAbsolutePath("../../configs/.env"),
+		util.GetExecutableAbsolutePath("../configs/.env"),
 		os.Getenv("ENV_FILE_PATH"),
 	}
 
