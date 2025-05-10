@@ -15,8 +15,6 @@
  */
 package i18n
 
-import "strings"
-
 type DefaultResolver struct {
 	translations map[string]map[string]string
 }
@@ -26,16 +24,13 @@ func NewResolver(translations map[string]map[string]string) *DefaultResolver {
 }
 
 func (r *DefaultResolver) Resolve(locale, key string) (string, bool) {
-	keys := strings.Split(key, ".")
-	current := r.translations[locale]
-
-	for i, k := range keys {
-		if i == len(keys)-1 {
-			val, exists := current[k]
-			return val, exists
-		}
-		// Para simplificar, assumindo apenas uma profundidade
-		return "", false
+	// Obtenha o mapa de traduções para o locale
+	current, exists := r.translations[locale]
+	if !exists {
+		return "", false // Retorna falso se o locale não existir
 	}
-	return "", false
+
+	// Verifica se a chave 'key' existe no mapa 'current'
+	val, exists := current[key]
+	return val, exists
 }
