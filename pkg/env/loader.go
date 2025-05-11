@@ -21,6 +21,8 @@ func Loader(i18n i18n.I18N) error {
 		return loadAWSSecrets(i18n)
 	case "ENV_FILE":
 		return loadFileEnv(i18n)
+	case "VAULT_HASHICORP":
+		return loadVaultHashcorp(i18n)
 	default:
 		return errors.New(i18n.Get("env.provider_not_found", map[string]interface{}{"provider": provider}))
 	}

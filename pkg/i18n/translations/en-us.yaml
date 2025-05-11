@@ -33,6 +33,17 @@ env:
   provider_not_valid_function: Configuration provider {{provider}} is not a function
   not_found: The environment variable {{variable}} is not defined
 
+vault:
+  addr_not_defined: The environment variable VAULT_HASHICORP_HOST was not defined.
+  token_not_defined: The environment variable VAULT_HASHICORP_TOKEN was not defined.
+  secret_path_not_defined: The environment variable VAULT_HASHICORP_SECRET_PATH was not defined.
+  client_creation_error: "An error occurred while creating the Vault client: {{error}}"
+  secret_read_error: "An error occurred while reading the Vault secret: {{error}}"
+  secret_not_found: "No secret found at the specified path: {{path}}"
+  secret_value_not_string: The secret value for key {{key}} is not a string.
+  env_set_error: "An error occurred while setting environment variable {{key}}: {{error}}"
+  load_success: "Environment variables successfully loaded from Vault: {{path}}"
+
 event:
   provider_not_found: Event provider {{provider}} not found
   handler_not_found: No handler found for event {{event}}
