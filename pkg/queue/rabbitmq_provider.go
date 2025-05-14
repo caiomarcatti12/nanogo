@@ -89,6 +89,16 @@ type RabbitmqQueue struct {
 	Parameters  amqp.Table
 }
 
+// BindingConfig descreve *qualquer* tipo de bind:
+// Exchange -> Exchange, ou Exchange -> Queue, etc.
+type BindingConfig struct {
+	Source      string // nome do exchange de origem
+	Destination string // nome do exchange ou queue de destino
+	RoutingKey  string
+	NoWait      bool
+	Args        map[string]interface{}
+}
+
 func (r *RabbitmqQueue) GetName() string {
 	return r.Name
 }
@@ -167,39 +177,63 @@ func (r *Rabbitmq) SetPrefetch(prefetchCount int) error {
 }
 
 func (r *Rabbitmq) Configure(args ...interface{}) error {
-	r.logger.Info("Declaring exchanges and queues...")
-
-	countExchange := 0
-	exchange := RabbitmqExchange{}
+	r.logger.Info("Declaring exchanges, queues, and bindings...")
 
 	for _, arg := range args {
 		switch v := arg.(type) {
 		case RabbitmqExchange:
-			countExchange++
-			exchange = v
 			if err := r.declareExchange(v); err != nil {
 				return err
 			}
+			r.exchanges[v.Name] = v
 
-			r.exchanges[exchange.Name] = v
-		}
-	}
-
-	// define queues
-	for _, arg := range args {
-		switch v := arg.(type) {
 		case RabbitmqQueue:
 			if err := r.declareQueue(v); err != nil {
 				return err
 			}
+			r.queues[v.Name] = v
 
-			if countExchange == 1 {
-				if err := r.bindQueue(exchange, v); err != nil {
-					return err
-				}
+		case BindingConfig:
+			exchangeSourceConfig, ok := r.exchanges[v.Source]
+			if !ok {
+				err := fmt.Errorf("Source exchange '%s' not found in configuration", v.Source)
+				r.logger.Error(err.Error())
+				return err
 			}
 
-			r.queues[v.Name] = v
+			if queueConfig, ok := r.queues[v.Destination]; ok {
+				r.logger.Infof("Binding queue '%s' to exchange '%s' with routing key '%s'", queueConfig.Name, exchangeSourceConfig.Name, v.RoutingKey)
+				if err := r.Channel.QueueBind(
+					queueConfig.Name,
+					v.RoutingKey,
+					exchangeSourceConfig.Name,
+					v.NoWait,
+					amqp.Table(v.Args),
+				); err != nil {
+					r.logger.Errorf("Failed to bind queue '%s' to exchange '%s': %v", queueConfig.Name, exchangeSourceConfig.Name, err)
+					return err
+				}
+				r.metricMonitor.SetGauge(QueueBindExchange.String(), 1, map[string]string{"exchange": exchangeSourceConfig.Name, "queue": queueConfig.Name})
+				r.logger.Infof("Successfully bound queue '%s' to exchange '%s'", queueConfig.Name, exchangeSourceConfig.Name)
+			} else if exchangeDestConfig, ok := r.exchanges[v.Destination]; ok {
+				r.logger.Infof("Binding exchange '%s' to exchange '%s' with routing key '%s'", exchangeDestConfig.Name, exchangeSourceConfig.Name, v.RoutingKey)
+				if err := r.Channel.ExchangeBind(
+					exchangeDestConfig.Name,
+					v.RoutingKey,
+					exchangeSourceConfig.Name,
+					v.NoWait,
+					amqp.Table(v.Args),
+				); err != nil {
+					r.logger.Errorf("Failed to bind exchange '%s' to exchange '%s': %v", exchangeDestConfig.Name, exchangeSourceConfig.Name, err)
+					return err
+				}
+				r.metricMonitor.SetGauge(QueueBindExchange.String(), 1, map[string]string{"exchange": exchangeSourceConfig.Name, "queue": exchangeDestConfig.Name})
+				r.logger.Infof("Successfully bound exchange '%s' to exchange '%s'", exchangeDestConfig.Name, exchangeSourceConfig.Name)
+			} else {
+				err := fmt.Errorf("Destination '%s' not found in queue or exchange configuration", v.Destination)
+				r.logger.Error(err.Error())
+				return err
+			}
 		}
 	}
 
@@ -371,7 +405,7 @@ func (r *Rabbitmq) declareExchange(exchange RabbitmqExchange) error {
 
 	r.exchanges[exchange.Name] = exchange
 
-	r.metricMonitor.SetGauge(QueueExchangeCreated.String(), 1, map[string]string{"source": exchange.Name})
+	r.metricMonitor.SetGauge(QueueExchangeCreated.String(), 1, map[string]string{"exchange": exchange.Name})
 
 	return nil
 }
@@ -395,7 +429,7 @@ func (r *Rabbitmq) declareQueue(queue RabbitmqQueue) error {
 
 	r.queues[queue.Name] = queue
 
-	r.metricMonitor.SetGauge(QueueCreated.String(), 1, map[string]string{"dest": queue.Name})
+	r.metricMonitor.SetGauge(QueueCreated.String(), 1, map[string]string{"queue": queue.Name})
 
 	return nil
 }
@@ -417,7 +451,7 @@ func (r *Rabbitmq) bindExchange(exchangeSource RabbitmqExchange, exchangeDest Ra
 		return err
 	}
 
-	r.metricMonitor.SetGauge(QueueBindExchange.String(), 1, map[string]string{"source": exchangeSource.Name, "dest": exchangeSource.Name})
+	r.metricMonitor.SetGauge(QueueBindExchange.String(), 1, map[string]string{"exchange": exchangeSource.Name, "queue": exchangeSource.Name})
 
 	r.logger.Infof("Successfully bound exchange %s to exchange %s", exchangeSource.Name, exchangeSource.Name)
 
@@ -440,7 +474,7 @@ func (r *Rabbitmq) bindQueue(exchange RabbitmqExchange, queue RabbitmqQueue) err
 		return err
 	}
 
-	r.metricMonitor.SetGauge(QueueBindExchange.String(), 1, map[string]string{"source": exchange.Name, "dest": queue.Name})
+	r.metricMonitor.SetGauge(QueueBindExchange.String(), 1, map[string]string{"exchange": exchange.Name, "queue": queue.Name})
 
 	return nil
 }
