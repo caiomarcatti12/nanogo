@@ -84,6 +84,8 @@ require (
 	github.com/prometheus/procfs v0.13.0 // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
+	github.com/viant/xreflect v0.0.0-20230303201326-f50afb0feb0d // indirect
+	github.com/viant/xunsafe v0.10.3 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
