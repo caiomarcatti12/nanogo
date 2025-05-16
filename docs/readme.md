@@ -35,18 +35,18 @@ O Nanogo é potencializado por várias bibliotecas e ferramentas robustas da com
 
 Para uma descrição detalhada de cada dependência e como elas são usadas no framework Nanogo, consulte o nosso guia detalhado de dependências:
 
-📄 [Consulte o Guia de Dependências](./.docs/dependencies.md)
+📄 [Consulte o Guia de Dependências](./docs/dependencies.md)
 
 ### **Arquitetura 🔥**
 
-- **[Arquitetura Limpa (Clean Architecture)](./.docs/clean_architecture.md)**
+- **[Arquitetura Limpa (Clean Architecture)](./docs/clean_architecture.md)**
     - Mantenha seu código organizado e fácil de manter aderindo aos princípios da Arquitetura Limpa.
 
-- **[Arquitetura Hexagonal](./.docs/hexagonal_architecture.md)**
+- **[Arquitetura Hexagonal](./docs/hexagonal_architecture.md)**
     - Facilite a manutenção e o teste de seus aplicativos através da implementação da Arquitetura Hexagonal.
       Claro, podemos adicionar um novo tópico à sua documentação README.md principal que destaca a "Arquitetura de Repository". Aqui está uma sugestão:
 
-- **[Arquitetura de Repository](./.docs/repository_architecture.md)**
+- **[Arquitetura de Repository](./docs/repository_architecture.md)**
     - Descubra como a estrutura de repository no nanogo facilita a abstração do acesso ao banco de dados, promovendo um código mais limpo, flexível e testável. Explore como o princípio SOLID de inversão de dependência é central para esta arquitetura, permitindo um design de software robusto e de fácil manutenção.
 
 
@@ -62,31 +62,31 @@ go get github.com/caiomarcatti12/nanogo
 
 O framework **Nanogo** oferece um conjunto robusto de funcionalidades projetadas para facilitar e acelerar o desenvolvimento de software. Abaixo, você encontrará uma lista de funcionalidades-chave juntamente com links para suas respectivas documentações:
 
-- **[API Webserver](./.docs/api_webserver.md)**
+- **[API Webserver](./docs/api_webserver.md)**
    - Construa APIs poderosas e escaláveis com nossa funcionalidade de servidor web integrado.
 
-- **[Conexão com Redis](./.docs/redis_cache.md)**
+- **[Conexão com Redis](./docs/redis_cache.md)**
    - Facilite a integração e a manipulação de bancos de dados Redis em seus projetos.
 
-- **[Integração com MongoDB](./.docs/mongodb_integration.md)**
+- **[Integração com MongoDB](./docs/mongodb_integration.md)**
    - Implemente soluções de banco de dados NoSQL rapidamente com nossa integração nativa com MongoDB.
 
-- **[Suporte para RabbitMQ](./.docs/rabbitmq_support.md)**
+- **[Suporte para RabbitMQ](./docs/rabbitmq_support.md)**
    - Orquestre microserviços eficientemente com nosso suporte integrado para RabbitMQ.
 
-- **[Carregamento de Arquivos .env](./.docs/local_env_loading.md)**
+- **[Carregamento de Arquivos .env](./docs/local_env_loading.md)**
    - Gerencie configurações de aplicativos com facilidade através do suporte para carregamento de arquivos .env.
 
-- **[Carregamento dinamico de Arquivos .env](./.docs/remote_env_loading.md)**
+- **[Carregamento dinamico de Arquivos .env](./docs/remote_env_loading.md)**
     - Gerencie configurações de aplicativos dinamicamente através do suporte para carregamento por api
 
-- **[JWT Manager](./.docs/jwt.md)**
+- **[JWT Manager](./docs/jwt.md)**
     - Crie e valide tokens JWT de maneira fácil e segura com o nosso JWT Manager.
 
-- **[Logger Integrado](./.docs/logger.md)**
+- **[Logger Integrado](./docs/logger.md)**
     - Monitore e rastreie as operações e eventos de seu aplicativo com eficiência e precisão usando nosso logger integrado. Com suporte a múltiplos níveis de log e Correlation ID.
 
-- **[Metric Manager](./.docs/metric_manager.md)**
+- **[Metric Manager](./docs/metric_manager.md)**
     - Capture e monitore métricas de desempenho de aplicativos em tempo real com nosso Metric Manager. Integra-se perfeitamente com o Prometheus para visualização e alertas.
 
 Cada funcionalidade foi meticulosamente desenvolvida para fornecer a melhor experiência possível aos desenvolvedores, poupando tempo e esforço ao criar softwares incríveis com **Nanogo**.
@@ -99,7 +99,7 @@ Acesse nosso [Guia de Contribuição](contributing.md) para entender melhor como
 
 ### **Código de Conduta**
 
-Estamos profundamente comprometidos em construir e manter uma comunidade inclusiva e acolhedora. Para isso, esperamos que todos os colaboradores sigam nosso [Código de Conduta](./.docs/code_of_conduct.md), que estabelece diretrizes claras para garantir um ambiente respeitoso e produtivo para todos.
+Estamos profundamente comprometidos em construir e manter uma comunidade inclusiva e acolhedora. Para isso, esperamos que todos os colaboradores sigam nosso [Código de Conduta](./docs/code_of_conduct.md), que estabelece diretrizes claras para garantir um ambiente respeitoso e produtivo para todos.
 
 Faça um favor a si e à comunidade: dedique um momento para ler e internalizar o código de conduta.
 
