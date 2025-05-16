@@ -37,6 +37,11 @@ Para uma descrição detalhada de cada dependência e como elas são usadas no f
 
 📄 [Consulte o Guia de Dependências](./.docs/dependencies.md)
 
+### **Documentacao de Features**
+
+Consulte a [lista completa de funcionalidades](features/README.md) para detalhes de cada pacote.
+
+
 ### **Arquitetura 🔥**
 
 - **[Arquitetura Limpa (Clean Architecture)](./.docs/clean_architecture.md)**

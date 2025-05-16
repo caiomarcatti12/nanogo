@@ -1,0 +1,30 @@
+# Documentação de Features
+
+Este diretório contém descrições detalhadas de cada funcionalidade disponibilizada pelo pacote **Nanogo**. Abaixo você encontra a lista de módulos e seus respectivos guias de uso.
+
+- [Cache](cache.md)
+- [CLI](cli.md)
+- [Context Manager](context_manager.md)
+- [Banco de Dados](db.md)
+- [Injeção de Dependências](di.md)
+- [Variáveis de Ambiente](env.md)
+- [Tratamento de Erros](errors.md)
+- [Event Dispatcher](event.md)
+- [gRPC Web Server](grpc.md)
+- [Internacionalização](i18n.md)
+- [JWT Manager](jwt.md)
+- [Logger](log.md)
+- [Mapper](mapper.md)
+- [Métricas](metric.md)
+- [Mocks](mocks.md)
+- [Bootstrap Nanogo](nanogo.md)
+- [Filas](queue.md)
+- [RSQL Parser](rsql.md)
+- [Telemetria](telemetry.md)
+- [Tipos Utilitários](types.md)
+- [Utilitários Diversos](util.md)
+- [Validador](validator.md)
+- [Web Server](webserver.md)
+- [WebSocket Server](websocketserver.md)
+- [YAML Config](yaml.md)
+
