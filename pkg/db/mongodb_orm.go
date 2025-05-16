@@ -19,6 +19,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/caiomarcatti12/nanogo/pkg/mapper"
 	"reflect"
 	"strings"
 	"time"
@@ -404,4 +405,42 @@ func parseValue(value string) interface{} {
 	}
 
 	return value
+}
+func (r *MongoORM[T]) getIdValue(document interface{}) (uuid.UUID, error) {
+	val := reflect.ValueOf(document)
+	if val.Kind() == reflect.Ptr {
+		val = val.Elem()
+	}
+	xField := mapper.GetXField(val.Type(), "id")
+	if xField == nil {
+		xField := mapper.GetXField(val.Type(), "ID")
+		if xField == nil {
+			return uuid.Nil, fmt.Errorf("campo 'ID' não encontrado")
+		}
+	}
+
+	id := xField.Value(unsafe.Pointer(val.UnsafeAddr()))
+	if uid, ok := id.(uuid.UUID); ok {
+		return uid, nil
+	}
+	return uuid.Nil, fmt.Errorf("campo 'ID' não é uuid.UUID")
+}
+
+func (r *MongoORM[T]) setIdValue(document interface{}, id uuid.UUID) error {
+	val := reflect.ValueOf(document)
+	if val.Kind() == reflect.Ptr {
+		val = val.Elem()
+	}
+	xField := mapper.GetXField(val.Type(), "id")
+	if xField == nil {
+		xField := mapper.GetXField(val.Type(), "ID")
+		if xField == nil {
+			return fmt.Errorf("campo 'ID' não encontrado")
+		}
+	}
+	if xField.Type != reflect.TypeOf(uuid.UUID{}) {
+		return fmt.Errorf("campo 'ID' não é uuid.UUID")
+	}
+	xField.SetValue(unsafe.Pointer(val.UnsafeAddr()), id)
+	return nil
 }

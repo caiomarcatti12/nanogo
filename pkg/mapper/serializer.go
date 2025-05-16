@@ -110,24 +110,76 @@ func serializeStruct(val reflect.Value) map[string]interface{} {
 }
 
 // Deserialize preenche uma struct a partir de um map[string]interface{} usando xunsafe
-func Deserialize(input map[string]interface{}, target interface{}) {
+func Deserialize(input interface{}, target interface{}) error {
 	val := reflect.ValueOf(target).Elem()
 	typeOfVal := val.Type()
 	structPtr := unsafe.Pointer(val.UnsafeAddr())
 
-	for key, v := range input {
-		if field, ok := typeOfVal.FieldByName(key); ok {
-			xField := getXField(typeOfVal, key)
+	switch data := input.(type) {
+	case map[string]interface{}:
+		// Tratamento para map (structs)
+		for key, v := range data {
+			if field, ok := typeOfVal.FieldByName(key); ok {
+				xField := getXField(typeOfVal, key)
 
-			if field.Type.Kind() == reflect.Struct {
-				if subMap, ok := v.(map[string]interface{}); ok {
-					subStruct := reflect.New(field.Type).Elem()
-					Deserialize(subMap, subStruct.Addr().Interface())
-					xField.SetValue(structPtr, subStruct.Interface())
+				// Interpreta o valor recursivamente
+				fieldValue := reflect.New(field.Type).Elem()
+				err := Deserialize(v, fieldValue.Addr().Interface())
+
+				if err != nil {
+					return err
 				}
-			} else {
-				xField.SetValue(structPtr, v)
+				xField.SetValue(structPtr, fieldValue.Interface())
 			}
 		}
+
+	case []interface{}:
+		// Tratamento para slice
+		if val.Kind() == reflect.Slice {
+			slice := reflect.MakeSlice(val.Type(), len(data), len(data))
+			for i, item := range data {
+				itemVal := reflect.New(val.Type().Elem()).Elem()
+				err := Deserialize(item, itemVal.Addr().Interface())
+
+				if err != nil {
+					return err
+				}
+				slice.Index(i).Set(itemVal)
+			}
+			val.Set(slice)
+		}
+
+	default:
+		// Tratamento para valores primitivos ou outros tipos
+		if reflect.TypeOf(data).AssignableTo(val.Type()) {
+			val.Set(reflect.ValueOf(data))
+		} else if reflect.TypeOf(data).ConvertibleTo(val.Type()) {
+			val.Set(reflect.ValueOf(data).Convert(val.Type()))
+		}
 	}
+
+	return nil
+}
+
+func GetXField(structType reflect.Type, fieldName string) *xunsafe.Field {
+	key := structType.PkgPath() + "." + structType.Name() + "." + fieldName
+
+	fieldMux.RLock()
+	xf, ok := fieldCache[key]
+	fieldMux.RUnlock()
+	if ok {
+		return xf
+	}
+
+	field, found := structType.FieldByName(fieldName)
+	if !found {
+		return nil
+	}
+	xf = xunsafe.NewField(field)
+
+	fieldMux.Lock()
+	fieldCache[key] = xf
+	fieldMux.Unlock()
+
+	return xf
 }

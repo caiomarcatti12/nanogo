@@ -138,7 +138,7 @@ func (wss *WebSocketServer) callHandler(clientConnection *websocket.Conn, route 
 			args[i] = reflect.ValueOf(clientConnection)
 		} else {
 			ptrToStruct := reflect.New(paramType)
-			err := mapper.InjectData(msg.payload, ptrToStruct.Interface())
+			err := mapper.Deserialize(msg.payload, ptrToStruct.Interface())
 
 			if err != nil {
 				return nil, errors.New(wss.i18n.Get("websocketserver.error_injecting_data", map[string]interface{}{"error": err}))

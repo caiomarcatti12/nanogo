@@ -67,7 +67,7 @@ func (m *MongoClient) Connect() error {
 			connectionURI := fmt.Sprintf("%s://%s:%s@%s:%d", m.credential.protocol, m.credential.username, m.credential.password, m.credential.host, m.credential.port)
 
 			if connectionURI == "://:@:" {
-				connErr = errors.New("Connection URI cannot be empty.")
+				connErr = errors.New("connection URI cannot be empty")
 				return
 			}
 			clientOptions = options.Client().ApplyURI(connectionURI).SetAuth(options.Credential{AuthSource: m.credential.dbAuthName})
@@ -96,5 +96,8 @@ func (m *MongoClient) GetClient() interface{} {
 
 func (m *MongoClient) Disconnect() {
 	m.logger.Info("Disconnecting from MongoDB...")
-	m.client.Disconnect(context.Background())
+	err := m.client.Disconnect(context.Background())
+	if err != nil {
+		return
+	}
 }

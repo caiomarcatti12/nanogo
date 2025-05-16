@@ -87,7 +87,7 @@ func (i *InMemoryBroker) Dispatch(event Event) {
 				paramType := methodType.In(i)
 
 				ptrToStruct := reflect.New(paramType)
-				err := mapper.InjectData(event.Data, ptrToStruct.Interface())
+				err := mapper.Deserialize(event.Data, ptrToStruct.Interface())
 
 				if err != nil {
 					// return nil, errors.InternalServerError(ws.i18n.Get("webserver.error_injecting_data", map[string]interface{}{"error": err}))

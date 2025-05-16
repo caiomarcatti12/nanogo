@@ -126,7 +126,7 @@ func (ws *WebServer) callHandler(w http.ResponseWriter, r *http.Request, route w
 			args[i] = reflect.ValueOf(r)
 		} else {
 			ptrToStruct := reflect.New(paramType)
-			err := mapper.InjectData(contextPayload, ptrToStruct.Interface())
+			err := mapper.Deserialize(contextPayload, ptrToStruct.Interface())
 
 			if err != nil {
 				return nil, errors.InternalServerError(ws.i18n.Get("webserver.error_injecting_data", map[string]interface{}{"error": err}))
