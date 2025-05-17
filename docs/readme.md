@@ -99,7 +99,7 @@ Acesse nosso [Guia de Contribuição](contributing.md) para entender melhor como
 
 ### **Código de Conduta**
 
-Estamos profundamente comprometidos em construir e manter uma comunidade inclusiva e acolhedora. Para isso, esperamos que todos os colaboradores sigam nosso [Código de Conduta](./docs/code_of_conduct.md), que estabelece diretrizes claras para garantir um ambiente respeitoso e produtivo para todos.
+Estamos profundamente comprometidos em construir e manter uma comunidade inclusiva e acolhedora. Para isso, esperamos que todos os colaboradores sigam nosso [Código de Conduta](./code_of_conduct.md), que estabelece diretrizes claras para garantir um ambiente respeitoso e produtivo para todos.
 
 Faça um favor a si e à comunidade: dedique um momento para ler e internalizar o código de conduta.
 
