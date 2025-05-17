@@ -413,7 +413,7 @@ func (r *MongoORM[T]) getIdValue(document interface{}) (uuid.UUID, error) {
 	}
 	xField := mapper.GetXField(val.Type(), "id")
 	if xField == nil {
-		xField := mapper.GetXField(val.Type(), "ID")
+		xField = mapper.GetXField(val.Type(), "ID")
 		if xField == nil {
 			return uuid.Nil, fmt.Errorf("campo 'ID' não encontrado")
 		}
@@ -433,7 +433,7 @@ func (r *MongoORM[T]) setIdValue(document interface{}, id uuid.UUID) error {
 	}
 	xField := mapper.GetXField(val.Type(), "id")
 	if xField == nil {
-		xField := mapper.GetXField(val.Type(), "ID")
+		xField = mapper.GetXField(val.Type(), "ID")
 		if xField == nil {
 			return fmt.Errorf("campo 'ID' não encontrado")
 		}
