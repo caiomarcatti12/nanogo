@@ -120,7 +120,7 @@ func (m *Prometheus) ObserveHistogram(name string, value float64, labelValues La
 }
 
 func (m *Prometheus) ObserveSummary(name string, value float64, labelValues Labels) error {
-	if metric, ok := m.metrics[name]; ok {
+	if metric, ok := m.metrics[m.makeFullNameMetric(name)]; ok {
 		if summaryVec, ok := metric.(*prometheus.SummaryVec); ok {
 			summaryVec.With(prometheus.Labels(labelValues)).Observe(value)
 			return nil
