@@ -126,10 +126,13 @@ func (c *Container) GetByName(interfaceName string) (interface{}, error) {
 	return newInstance, nil
 }
 
-// Get retrieves an instance of the requested type.// GetNameReturn retorna o nome completo do tipo retornado pela função de fábrica.
+// getNameInterface returns the fully-qualified type name from the provided factory
+// function and validates its signature.
+// getNameInterface retorna o nome completo do tipo obtido a partir da função de
+// fábrica fornecida e valida sua assinatura.
 // Validações realizadas:
 // - Verifica se factoryFunc é uma função
-// - Verifica se a função de fábrica retorna exatamente um resultado
+// - Verifica se a função de fábrica retorna um ou dois resultados
 func (c *Container) getNameInterface(factoryFunc interface{}) (string, error) {
 	if factoryFunc == nil {
 		return "", errors.New(c.i18n.Get("di.factory_func_is_nil"))
