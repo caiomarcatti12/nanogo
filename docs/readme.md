@@ -74,20 +74,29 @@ O framework **Nanogo** oferece um conjunto robusto de funcionalidades projetadas
 - **[Suporte para RabbitMQ](./docs/rabbitmq_support.md)**
    - Orquestre microserviços eficientemente com nosso suporte integrado para RabbitMQ.
 
-- **[Carregamento de Arquivos .env](./docs/local_env_loading.md)**
+- **[Carregamento de Arquivos .env](./features/load_env_loading.md)**
    - Gerencie configurações de aplicativos com facilidade através do suporte para carregamento de arquivos .env.
 
-- **[Carregamento dinamico de Arquivos .env](./docs/remote_env_loading.md)**
-    - Gerencie configurações de aplicativos dinamicamente através do suporte para carregamento por api
+- **[Carregamento dinâmico de Arquivos .env](./docs/remote_env_loading.md)**
+    - Gerencie configurações de aplicativos dinamicamente através do suporte para carregamento por API.
 
-- **[JWT Manager](./docs/jwt.md)**
-    - Crie e valide tokens JWT de maneira fácil e segura com o nosso JWT Manager.
+- **[Suporte a gRPC](./features/grpc.md)**
+    - Implemente comunicação eficiente entre serviços usando gRPC, facilitando integrações de alto desempenho.
 
-- **[Logger Integrado](./docs/logger.md)**
-    - Monitore e rastreie as operações e eventos de seu aplicativo com eficiência e precisão usando nosso logger integrado. Com suporte a múltiplos níveis de log e Correlation ID.
+- **[Internacionalização (i18n)](./features/i18n.md)**
+    - Adicione suporte a múltiplos idiomas e traduções em seu aplicativo de forma simples e flexível.
 
-- **[Metric Manager](./docs/metric_manager.md)**
-    - Capture e monitore métricas de desempenho de aplicativos em tempo real com nosso Metric Manager. Integra-se perfeitamente com o Prometheus para visualização e alertas.
+- **[Uso de consumidores de fila](./features/queue_consumer_usage.md)**
+    - Aprenda a consumir mensagens de filas de forma eficiente, integrando com sistemas de mensageria.
+
+- **[Remoção de variáveis de ambiente](./features/remove_env_usage.md)**
+    - Gerencie e remova variáveis de ambiente de maneira segura e controlada.
+
+- **[Uso de serviços](./features/service_usage.md)**
+    - Estruture e utilize serviços no framework para promover organização e reutilização de código.
+
+- **[Suporte a arquivos YAML](./features/yaml.md)**
+    - Carregue e manipule configurações em arquivos YAML para maior flexibilidade na configuração do seu projeto.
 
 Cada funcionalidade foi meticulosamente desenvolvida para fornecer a melhor experiência possível aos desenvolvedores, poupando tempo e esforço ao criar softwares incríveis com **Nanogo**.
 
