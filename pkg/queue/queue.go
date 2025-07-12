@@ -85,6 +85,14 @@ func Factory(env env.IEnv, logger log.ILog, metricMonitor metric.IMetric, teleme
 		}
 
 		return instance
+	case "NATS":
+		instance, err := NewInstanceNats(env, logger, metricMonitor, telemetry)
+
+		if err != nil {
+			panic(err)
+		}
+
+		return instance
 	default:
 		panic(fmt.Errorf("queue provider %s not found", provider))
 	}
