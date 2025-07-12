@@ -537,7 +537,7 @@ func (r *Rabbitmq) callConsumerHandler(consumer interface{}, body []byte, header
 	}
 
 	// Desserializar msg para a instância criada
-	if err = mapper.Deserialize(result, &bodyValue); err != nil {
+	if err = mapper.Deserialize(result, bodyValue); err != nil {
 		err = fmt.Errorf("failed to unmarshal message: %v", err)
 		return
 	}

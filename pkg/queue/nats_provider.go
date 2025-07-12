@@ -67,8 +67,8 @@ func (n *Nats) Connect() error {
 func (n *Nats) Configure(args ...interface{}) error {
 	for _, arg := range args {
 		switch v := arg.(type) {
-		case NatsQueue:
-			n.queues[v.Name] = v
+		case *NatsQueue:
+			n.queues[v.Name] = *v
 			n.metricMonitor.SetGauge(QueueCreated.String(), 1, map[string]string{"queue": v.Name})
 		}
 	}
@@ -214,7 +214,7 @@ func (n *Nats) callConsumerHandler(consumer interface{}, body []byte, headers ma
 	if err := json.Unmarshal(body, &jsonMap); err != nil {
 		return fmt.Errorf("failed to unmarshal message: %v", err)
 	}
-	if err := mapper.Deserialize(jsonMap, &bodyValue); err != nil {
+	if err := mapper.Deserialize(jsonMap, bodyValue); err != nil {
 		return fmt.Errorf("failed to deserialize message: %v", err)
 	}
 

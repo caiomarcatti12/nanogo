@@ -74,16 +74,12 @@ func main() {
     if err != nil {
         panic(err)
     }
-
-    // Configuração da fila
-    queueCfg := queue.NatsQueue{
-        Name:       "demo.subject",
-        QueueGroup: "demo-group",
-    }
-
     // Tudo em uma única chamada!
     consumer := queue.QueueConsumer{
-        Queue:   &queueCfg,
+        Queue:    queue.NatsQueue{
+            Name:       "demo.subject",
+            QueueGroup: "demo-group",
+        },
         Handler: NewDemoConsumer,
     }
 
