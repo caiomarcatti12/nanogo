@@ -12,11 +12,15 @@ type DemoMessage struct {
 	Text string `json:"text"`
 }
 
+type IDemoConsumer interface {
+	Handler(msg DemoMessage, headers map[string]interface{}) error
+}
+
 type DemoConsumer struct {
 	logger log.ILog
 }
 
-func NewDemoConsumer(logger log.ILog) *DemoConsumer {
+func NewDemoConsumer(logger log.ILog) IDemoConsumer {
 	return &DemoConsumer{logger: logger}
 }
 
@@ -27,6 +31,10 @@ func (c *DemoConsumer) Handler(msg DemoMessage, headers map[string]interface{}) 
 
 func main() {
 	nanogo.Bootstrap()
+
+	if err := di.GetInstance().Register(NewDemoConsumer); err != nil {
+		panic(err)
+	}
 
 	queueManager, err := di.Get[queue.IQueue]()
 	if err != nil {

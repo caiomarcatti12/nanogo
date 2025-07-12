@@ -386,6 +386,27 @@ func (r *Rabbitmq) Disconnect() error {
 	return r.Connection.Close()
 }
 
+// AddConsumer configures a queue and sets up a consumer in a single call
+func (r *Rabbitmq) AddConsumer(consumer QueueConsumer) error {
+	// Configure the queue
+	if err := r.Configure(consumer.Queue); err != nil {
+		return fmt.Errorf("failed to configure queue: %v", err)
+	}
+
+	// Register the handler in the DI container
+	if err := di.GetInstance().Register(consumer.Handler); err != nil {
+		r.logger.Warning("Handler already registered in DI container")
+	}
+
+	// Start consuming
+	if err := r.Consume(consumer.Queue, consumer.Handler); err != nil {
+		return fmt.Errorf("failed to start consuming: %v", err)
+	}
+
+	r.logger.Info("Consumer added successfully", "queue", consumer.Queue.GetName())
+	return nil
+}
+
 func (r *Rabbitmq) declareExchange(exchange RabbitmqExchange) error {
 	r.logger.Infof("Declaring exchange %s on RabbitMQ...", exchange.Name)
 	err := r.Channel.ExchangeDeclare(

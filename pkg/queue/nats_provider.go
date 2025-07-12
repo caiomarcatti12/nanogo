@@ -143,6 +143,27 @@ func (n *Nats) Disconnect() error {
 	return nil
 }
 
+// AddConsumer configures a queue and sets up a consumer in a single call
+func (n *Nats) AddConsumer(consumer QueueConsumer) error {
+	// Configure the queue
+	if err := n.Configure(consumer.Queue); err != nil {
+		return fmt.Errorf("failed to configure queue: %v", err)
+	}
+
+	// Register the handler in the DI container
+	if err := di.GetInstance().Register(consumer.Handler); err != nil {
+		n.logger.Warning("Handler already registered in DI container")
+	}
+
+	// Start consuming
+	if err := n.Consume(consumer.Queue, consumer.Handler); err != nil {
+		return fmt.Errorf("failed to start consuming: %v", err)
+	}
+
+	n.logger.Info("Consumer added successfully", "queue", consumer.Queue.GetName())
+	return nil
+}
+
 func (n *Nats) createConsumerInstance(consumerHandler interface{}) (interface{}, error) {
 	di.GetInstance().Register(consumerHandler)
 	return di.GetInstance().GetByFactory(consumerHandler)

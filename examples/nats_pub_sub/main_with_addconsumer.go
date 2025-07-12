@@ -12,11 +12,15 @@ type DemoMessage struct {
 	Text string `json:"text"`
 }
 
+type IDemoConsumer interface {
+	Handler(msg DemoMessage, headers map[string]interface{}) error
+}
+
 type DemoConsumer struct {
 	logger log.ILog
 }
 
-func NewDemoConsumer(logger log.ILog) *DemoConsumer {
+func NewDemoConsumer(logger log.ILog) IDemoConsumer {
 	return &DemoConsumer{logger: logger}
 }
 
@@ -35,22 +39,25 @@ func main() {
 
 	logger, _ := di.Get[log.ILog]()
 
+	// Configuração da fila
 	queueCfg := queue.NatsQueue{
 		Name:       "demo.subject",
 		QueueGroup: "demo-group",
 	}
 
-	_ = queueManager.Configure(queueCfg)
+	// Novo método AddConsumer - simplifica todo o processo!
+	consumer := queue.QueueConsumer{
+		Queue:   &queueCfg,
+		Handler: NewDemoConsumer,
+	}
 
-	consumer := NewDemoConsumer(logger)
+	// Registra o consumer, configura a fila e inicia o consumo em uma única chamada
+	if err := queueManager.AddConsumer(consumer); err != nil {
+		panic(err)
+	}
 
-	go func() {
-		if err := queueManager.Consume(&queueCfg, consumer); err != nil {
-			logger.Error("error consuming", "err", err)
-		}
-	}()
-
-	msg := DemoMessage{ID: "1", Text: "hello from nanogo"}
+	// Publica uma mensagem de teste
+	msg := DemoMessage{ID: "1", Text: "hello from nanogo with new AddConsumer!"}
 	if err := queueManager.Publish(queueCfg.Name, "", msg); err != nil {
 		logger.Error("publish failed", "err", err)
 	}
