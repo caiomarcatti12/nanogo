@@ -106,7 +106,14 @@ func (t *Telemetry) StartChildSpan(name string, optionalAttrs ...interface{}) ot
 	defer t.mu.Unlock()
 
 	attributes := t.extractAttributes(optionalAttrs...)
-	parentCtx := t.contextStack[len(t.contextStack)-1]
+	var parentCtx context.Context
+	if len(t.contextStack) == 0 {
+		// Se não houver contexto, use context.Background() e logue um aviso
+		t.logger.Warningf("StartChildSpan chamado sem root span/contexto. Criando span como root.")
+		parentCtx = context.Background()
+	} else {
+		parentCtx = t.contextStack[len(t.contextStack)-1]
+	}
 	newCtx, span := t.tracer.Start(parentCtx, name, oteltrace.WithAttributes(attributes...))
 	t.contextStack = append(t.contextStack, newCtx)
 
