@@ -30,9 +30,10 @@ require (
 	github.com/jtolds/gls v4.20.0+incompatible
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mozillazg/go-httpheader v0.4.0
-	github.com/prometheus/client_golang v1.19.0
-	github.com/sirupsen/logrus v1.9.3
-	github.com/stretchr/testify v1.10.0
+       github.com/prometheus/client_golang v1.19.0
+       github.com/sirupsen/logrus v1.9.3
+       github.com/ClickHouse/clickhouse-go/v2 v2.7.0
+       github.com/stretchr/testify v1.10.0
 	go.mongodb.org/mongo-driver v1.14.0
 	go.opentelemetry.io/otel v1.34.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.27.0
