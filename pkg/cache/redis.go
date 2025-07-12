@@ -16,10 +16,11 @@
 package cache
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"sync"
+
+	"github.com/bytedance/sonic"
 
 	"github.com/caiomarcatti12/nanogo/pkg/env"
 	"github.com/caiomarcatti12/nanogo/pkg/log"
@@ -93,7 +94,7 @@ func (r *RedisCache) GetDecoded(key string, dest interface{}) error {
 		return err
 	}
 
-	err = json.Unmarshal([]byte(value), &dest)
+	err = sonic.Unmarshal([]byte(value), &dest)
 
 	if err != nil {
 		return fmt.Errorf("error while trying to decode value: %w", err)
@@ -144,7 +145,7 @@ func (r *RedisCache) Disconnect() {
 }
 
 func (r *RedisCache) stringifyValue(value interface{}) (string, error) {
-	bytes, err := json.Marshal(value)
+	bytes, err := sonic.Marshal(value)
 	if err != nil {
 		return "", errors.New("failed to stringify value: " + err.Error())
 	}

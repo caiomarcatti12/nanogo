@@ -17,13 +17,14 @@ package webserver_middleware
 
 import (
 	"context"
-	"encoding/json"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/bytedance/sonic"
 
 	"github.com/caiomarcatti12/nanogo/pkg/env"
 	"github.com/caiomarcatti12/nanogo/pkg/i18n"
@@ -116,9 +117,16 @@ func (m *PayloadExtractorMiddleware) parseMultiPartPayload(r *http.Request, w ht
 
 func (m *PayloadExtractorMiddleware) parseJSONPayload(r *http.Request, w http.ResponseWriter, payload map[string]interface{}) error {
 	if r.Body != http.NoBody {
-		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil && err != io.EOF {
+		data, err := io.ReadAll(r.Body)
+		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return err
+		}
+		if len(data) > 0 {
+			if err := sonic.Unmarshal(data, &payload); err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return err
+			}
 		}
 	}
 	return nil

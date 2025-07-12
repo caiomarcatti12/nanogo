@@ -16,10 +16,11 @@
 package websocketserver
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 	"reflect"
+
+	"github.com/bytedance/sonic"
 
 	"github.com/caiomarcatti12/nanogo/pkg/mapper"
 	"github.com/caiomarcatti12/nanogo/pkg/validator"
@@ -97,7 +98,7 @@ func (wss *WebSocketServer) HandleConnections(w http.ResponseWriter, r *http.Req
 func (wss *WebSocketServer) parseMessage(msg []byte) (Message, error) {
 	var payload Message
 
-	err := json.Unmarshal(msg, &payload)
+	err := sonic.Unmarshal(msg, &payload)
 	if err != nil {
 		return Message{}, err
 	}
@@ -183,7 +184,7 @@ func (wss *WebSocketServer) sendJSONError(clientConnection *websocket.Conn, err 
 }
 
 func (wss *WebSocketServer) sendJSONResponse(clientConnection *websocket.Conn, response interface{}) error {
-	responseBytes, err := json.Marshal(response)
+	responseBytes, err := sonic.Marshal(response)
 
 	if err != nil {
 		return err
@@ -208,7 +209,7 @@ func (wss *WebSocketServer) debugInput(payload Message) {
 	logData["path"] = payload.Path
 	logData["payload"] = payload.payload
 
-	json, _ := json.MarshalIndent(logData, "", "  ")
+	b, _ := sonic.MarshalIndent(logData, "", "  ")
 
-	wss.logger.Trace(string(json))
+	wss.logger.Trace(string(b))
 }
