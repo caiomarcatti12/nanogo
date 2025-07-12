@@ -16,10 +16,11 @@
 package log
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/bytedance/sonic"
 
 	"github.com/caiomarcatti12/nanogo/pkg/context_manager"
 	"github.com/google/uuid"
@@ -150,9 +151,9 @@ func (l *Logger) extractFields(args ...interface{}) logrus.Fields {
 		case Fields:
 			fields = logrus.Fields(v)
 		default:
-			data, err := json.Marshal(v)
+			data, err := sonic.Marshal(v)
 			if err == nil {
-				_ = json.Unmarshal(data, &fields)
+				_ = sonic.Unmarshal(data, &fields)
 			}
 		}
 	}

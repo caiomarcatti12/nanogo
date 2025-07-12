@@ -16,10 +16,11 @@
 package env
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/bytedance/sonic"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -142,7 +143,7 @@ func (a *AWSLoader) retrieveAndInjectSecrets(creds *credentials.Credentials, reg
 
 func (a *AWSLoader) injectEnvVariables(jsonData string) error {
 	var data map[string]string
-	if err := json.Unmarshal([]byte(jsonData), &data); err != nil {
+	if err := sonic.Unmarshal([]byte(jsonData), &data); err != nil {
 		return fmt.Errorf(a.i18n.Get("aws.json_parse_error", map[string]interface{}{"error": err}))
 	}
 

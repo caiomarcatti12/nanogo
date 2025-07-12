@@ -16,9 +16,10 @@
 package webserver
 
 import (
-	"encoding/json"
 	"net/http"
 	"reflect"
+
+	"github.com/bytedance/sonic"
 
 	"github.com/caiomarcatti12/nanogo/pkg/errors"
 	"github.com/caiomarcatti12/nanogo/pkg/mapper"
@@ -76,14 +77,24 @@ func (ws *WebServer) Handler(w http.ResponseWriter, r *http.Request, route webse
 				return
 			}
 		} else if apiResponse.Data != nil {
-			json.NewEncoder(w).Encode(apiResponse.Data)
+			bytes, err := sonic.Marshal(apiResponse.Data)
+			if err != nil {
+				ws.sendJSONError(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			w.Write(bytes)
 		}
 	} else if !ws.isWebSocket(r) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 
 		if data != nil {
-			json.NewEncoder(w).Encode(data)
+			bytes, err := sonic.Marshal(data)
+			if err != nil {
+				ws.sendJSONError(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			w.Write(bytes)
 		}
 	}
 }
@@ -202,9 +213,12 @@ func (ws *WebServer) sendJSONError(w http.ResponseWriter, errorMessage string, s
 	}
 
 	// Encode and send the error message
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"error": errorMessage,
-	})
+	bytes, err := sonic.Marshal(map[string]interface{}{"error": errorMessage})
+	if err != nil {
+		ws.logger.Error(err.Error())
+		return
+	}
+	w.Write(bytes)
 }
 
 func (ws *WebServer) debugInput(w http.ResponseWriter, r *http.Request, payload map[string]interface{}) {
@@ -215,9 +229,9 @@ func (ws *WebServer) debugInput(w http.ResponseWriter, r *http.Request, payload 
 	logData["headers"] = r.Header
 	logData["payload"] = payload
 
-	json, _ := json.MarshalIndent(logData, "", "  ")
+	b, _ := sonic.MarshalIndent(logData, "", "  ")
 
-	ws.logger.Trace(string(json))
+	ws.logger.Trace(string(b))
 }
 
 func (ws *WebServer) isWebSocket(r *http.Request) bool {

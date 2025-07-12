@@ -24,9 +24,10 @@ require (
 	github.com/go-playground/validator/v10 v10.20.0
 	github.com/gomodule/redigo v1.9.2
 	github.com/google/uuid v1.6.0
-	github.com/gorilla/mux v1.8.1
-	github.com/gorilla/websocket v1.5.3
-	github.com/joho/godotenv v1.5.1
+        github.com/gorilla/mux v1.8.1
+        github.com/gorilla/websocket v1.5.3
+        github.com/bytedance/sonic v1.10.0
+        github.com/joho/godotenv v1.5.1
 	github.com/jtolds/gls v4.20.0+incompatible
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mozillazg/go-httpheader v0.4.0

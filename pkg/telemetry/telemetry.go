@@ -17,9 +17,10 @@ package telemetry
 
 import (
 	"context"
-	"encoding/json"
 	"sync"
 	"time"
+
+	"github.com/bytedance/sonic"
 
 	"github.com/caiomarcatti12/nanogo/pkg/context_manager"
 	"github.com/caiomarcatti12/nanogo/pkg/env"
@@ -187,14 +188,14 @@ func (t *Telemetry) extractAttributesRecursively(attrs map[string]interface{}, p
 			attributes = append(attributes, attribute.String(fullKey, v.(uuid.UUID).String()))
 		default:
 			// Convert to JSON
-			jsonData, err := json.Marshal(v)
+			jsonData, err := sonic.Marshal(v)
 			if err != nil {
 				// Handle error if needed
 				continue
 			}
 			// Convert JSON back to map[string]interface{}
 			var jsonMap map[string]interface{}
-			err = json.Unmarshal(jsonData, &jsonMap)
+			err = sonic.Unmarshal(jsonData, &jsonMap)
 			if err != nil {
 				// Handle error if needed
 				continue

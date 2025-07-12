@@ -1,8 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
+
+	"github.com/bytedance/sonic"
 	"github.com/caiomarcatti12/nanogo/pkg/log"
 )
 
@@ -21,8 +22,8 @@ func (c *EventConsumer) Handler(event Event, headers map[string]interface{}) err
 		return fmt.Errorf("evento com ID vazio não pode ser processado")
 	}
 
-	// Realiza o marshal do evento usando json.Marshal
-	jsonData, err := json.Marshal(event)
+	// Realiza o marshal do evento usando sonic.Marshal
+	jsonData, err := sonic.Marshal(event)
 	if err != nil {
 		// Log de erro caso o marshal falhe
 		c.logger.Error("Erro ao marshallizar o evento", "error", err)

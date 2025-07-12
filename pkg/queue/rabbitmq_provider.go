@@ -16,11 +16,12 @@
 package queue
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"reflect"
 	"sync"
+
+	"github.com/bytedance/sonic"
 
 	"github.com/caiomarcatti12/nanogo/pkg/context_manager"
 	"github.com/caiomarcatti12/nanogo/pkg/di"
@@ -248,7 +249,7 @@ func (r *Rabbitmq) Publish(exchange string, routingKey string, body interface{})
 
 	r.metricMonitor.IncrementCounter(QueueMessagePublish.String(), map[string]string{"queue": exchange, "routing_key": routingKey})
 
-	bodyBytes, err := json.Marshal(body)
+	bodyBytes, err := sonic.Marshal(body)
 	if err != nil {
 		r.logger.Error(err.Error())
 		return
@@ -509,7 +510,7 @@ func (r *Rabbitmq) callConsumerHandler(consumer interface{}, body []byte, header
 	var result map[string]interface{}
 
 	// Fazer o parse do JSON
-	err = json.Unmarshal(body, &result)
+	err = sonic.Unmarshal(body, &result)
 	if err != nil {
 		fmt.Println("Erro ao fazer unmarshal:", err)
 		return
