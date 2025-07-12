@@ -8,15 +8,19 @@ import (
 )
 
 type DemoMessage struct {
-	ID   string `mapstructure:"id"`
-	Text string `mapstructure:"text"`
+	ID   string `json:"id"`
+	Text string `json:"text"`
+}
+
+type IDemoConsumer interface {
+	Handler(msg DemoMessage, headers map[string]interface{}) error
 }
 
 type DemoConsumer struct {
 	logger log.ILog
 }
 
-func NewDemoConsumer(logger log.ILog) *DemoConsumer {
+func NewDemoConsumer(logger log.ILog) IDemoConsumer {
 	return &DemoConsumer{logger: logger}
 }
 

@@ -28,6 +28,15 @@ type IConsumer[T any] interface {
 	Handler(body T, headers map[string]interface{}) error
 }
 
+type IConsumerHandler interface {
+	Handler(body interface{}, headers map[string]interface{}) error
+}
+
+type QueueConsumer struct {
+	Queue   Queue
+	Handler interface{}
+}
+
 type IConfig interface {
 	Get() interface{}
 }
@@ -41,6 +50,7 @@ type IQueue interface {
 	Configure(args ...interface{}) error
 	Consume(queue Queue, consumerHandler interface{}) error
 	Publish(exchange string, routingKey string, body interface{}) error
+	AddConsumer(consumer QueueConsumer) error
 	Disconnect() error
 }
 
@@ -79,6 +89,14 @@ func Factory(env env.IEnv, logger log.ILog, metricMonitor metric.IMetric, teleme
 	switch provider {
 	case "RABBITMQ":
 		instance, err := NewInstanceRabbitmq(env, logger, metricMonitor, telemetry)
+
+		if err != nil {
+			panic(err)
+		}
+
+		return instance
+	case "NATS":
+		instance, err := NewInstanceNats(env, logger, metricMonitor, telemetry)
 
 		if err != nil {
 			panic(err)
