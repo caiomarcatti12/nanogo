@@ -54,6 +54,20 @@ func Factory(env env.IEnv, logger log.ILog) IDatabase {
 		}
 
 		return instance
+	case "CLICKHOUSE":
+		credential := ClickhouseCredential{
+			Addr:     env.GetEnv("CLICKHOUSE_ADDR", "localhost:9000"),
+			Username: env.GetEnv("CLICKHOUSE_USERNAME", "default"),
+			Password: env.GetEnv("CLICKHOUSE_PASSWORD", ""),
+			Database: env.GetEnv("CLICKHOUSE_DATABASE", "default"),
+		}
+		instance := NewInstanceClickhouse(credential, logger)
+
+		if err := instance.Connect(); err != nil {
+			panic(err)
+		}
+
+		return instance
 	default:
 		panic(fmt.Sprintf("invalid database provider: %s", provider))
 	}

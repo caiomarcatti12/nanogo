@@ -9,6 +9,7 @@ Bem-vindo ao universo do **Nanogo**, o framework Golang concebido para simplific
 1. **Integração Simplificada com Sistemas Essenciais**
     - **Redis**: Conexão facilitada com sistemas Redis, favorecendo um armazenamento de dados ágil e eficiente.
     - **Mongo**: Implemente bancos de dados MongoDB com facilidade, tirando proveito de uma das soluções de banco de dados NoSQL mais populares e eficazes disponíveis atualmente.
+    - **ClickHouse**: Utilize o banco de dados analítico ClickHouse através da integração nativa do Nanogo.
     - **RabbitMQ**: Integre-se com RabbitMQ para facilitar a comunicação entre diferentes serviços ou componentes do seu aplicativo.
     - **NATS**: Utilize o NATS para mensageria leve e de baixa latência.
 
@@ -71,6 +72,8 @@ O framework **Nanogo** oferece um conjunto robusto de funcionalidades projetadas
 
 - **[Integração com MongoDB](./docs/mongodb_integration.md)**
    - Implemente soluções de banco de dados NoSQL rapidamente com nossa integração nativa com MongoDB.
+- **[Integração com ClickHouse](./docs/clickhouse_integration.md)**
+   - Armazene dados analíticos de forma eficiente utilizando o ClickHouse integrado ao Nanogo.
 
 - **[Suporte para RabbitMQ](./docs/rabbitmq_support.md)**
    - Orquestre microserviços eficientemente com nosso suporte integrado para RabbitMQ.
